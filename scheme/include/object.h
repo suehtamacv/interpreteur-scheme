@@ -14,6 +14,7 @@
 extern "C" {
 #endif
 
+#include "boolean.h"
 #include "number.h"
 
 typedef struct object_t {
@@ -21,6 +22,7 @@ typedef struct object_t {
     uint type;
     union {
         num              number;
+        Bool             boolean;
         char             character;
         string           string;
         string           symbol;

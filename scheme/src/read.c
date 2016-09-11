@@ -9,13 +9,9 @@
 
 #include <stdio.h>
 #include <ctype.h>
-
 #include <readline/readline.h>
 #include <readline/history.h>
-
 #include "read.h"
-
-
 
 void flip( uint *i ) {
 
@@ -73,7 +69,7 @@ char* first_usefull_char(char* line) {
  *
  * Si le compte devient zéro et que
  *        - la ligne est fini, la fonction retourne S_OK
- * 				- la ligne n'est pas fini la fonction retourne S_KO
+ * 		  - la ligne n'est pas fini la fonction retourne S_KO
  *
  * S'il y a plus de parentheses fermantes qu'ouvrantes,
  * la fonction retourne S_KO.
@@ -308,14 +304,42 @@ object sfs_read( char *input, uint *here ) {
     }
 }
 
-object sfs_read_atom( char *input, uint *here ) {
-
+object sfs_read_atom(char *input, uint *here) {
     object atom = NULL;
+
+    if (input[*here] == '#') {
+        (*here)++;
+        if (input[*here] == '\\') { //C'est un char
+            atom = make_object(SFS_CHARACTER);
+
+            atom->val.character = input[(*here)++];
+            (*here)++;
+        } else { //C'est un boolean
+            atom = make_object(SFS_BOOLEAN);
+
+            switch (input[*here]) {
+            case 'f':
+                atom->val.boolean = False;
+                break;
+
+            case 't':
+                atom->val.boolean = True;
+                break;
+
+            default:
+                WARNING_MSG("#%c is not a correct boolean value. Defaulting to false", input[*here]);
+                atom->val.boolean = False;
+                break;
+            }
+
+            (*here)++;
+        }
+    }
 
     return atom;
 }
 
-object sfs_read_pair( char *stream, uint *i ) {
+object sfs_read_pair( char *stream, uint *here ) {
 
     object pair = NULL;
 

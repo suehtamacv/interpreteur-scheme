@@ -112,14 +112,6 @@ int main (int argc, char *argv[]) {
             continue;
         }
 
-        /* Pour le step 0 on se contente d'afficher */
-        /* la S-Expression lue */
-        /* puis d'en lire une autre */
-        /* METTRE EN COMMENTAIRE LES DEUX LIGNES SUIVANTES */
-        /* POUR PASSER A L'INCREMENT 1 */
-        printf("%s\n", input );
-        continue;
-
         here  = 0;
         sexpr = sfs_read( input, &here );
         if ( NULL == sexpr ) {

@@ -1,4 +1,3 @@
-
 /**
  * @file number.h
  * @author François Cayre <cayre@yiking.(null)>

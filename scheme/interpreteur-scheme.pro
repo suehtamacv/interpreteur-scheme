@@ -10,7 +10,8 @@ HEADERS += include/basic.h \
            include/number.h \
            include/object.h \
            include/print.h \
-           include/read.h
+           include/read.h \
+           include/boolean.h
 
 SOURCES += src/eval.c \
            src/mem.c \
