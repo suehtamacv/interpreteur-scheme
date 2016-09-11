@@ -312,22 +312,23 @@ object sfs_read_atom(char *input, uint *here) {
         if (input[*here] == '\\') { //C'est un char
             atom = make_object(SFS_CHARACTER);
 
-            atom->val.character = input[(*here)++];
+            atom->val.character = input[++(*here)];
             (*here)++;
         } else { //C'est un boolean
             atom = make_object(SFS_BOOLEAN);
 
-            switch (input[*here]) {
-            case 'f':
-                atom->val.boolean = False;
-                break;
-
+            switch (input[*here]) { //Les booleens valides sont seulement #t et #f
             case 't':
                 atom->val.boolean = True;
                 break;
 
+            case 'f':
+                atom->val.boolean = False;
+                break;
+
             default:
-                WARNING_MSG("#%c is not a correct boolean value. Defaulting to false", input[*here]);
+                WARNING_MSG("#%c is not a correct boolean value. Defaulting to FALSE",
+                            input[*here]);
                 atom->val.boolean = False;
                 break;
             }
@@ -339,7 +340,7 @@ object sfs_read_atom(char *input, uint *here) {
     return atom;
 }
 
-object sfs_read_pair( char *stream, uint *here ) {
+object sfs_read_pair(char *input, uint *here) {
 
     object pair = NULL;
 

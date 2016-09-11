@@ -13,6 +13,20 @@
 #include <stdio.h>
 
 void sfs_print_atom(object o) {
+    switch (o->type) {
+    case SFS_CHARACTER:
+        printf("#\\%c ", o->val.character);
+        break;
+
+    case SFS_BOOLEAN:
+        if (o->val.boolean == True) {
+            printf("#t ");
+        } else {
+            printf("#f ");
+        }
+        break;
+    }
+
     return;
 }
 
