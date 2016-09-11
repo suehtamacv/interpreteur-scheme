@@ -1,7 +1,7 @@
 --lineend=linux
 --mode=c
 
---style=vtk
+--style=google
 
 --add-brackets
 

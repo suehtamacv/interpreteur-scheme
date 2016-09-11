@@ -1,4 +1,3 @@
-
 /**
  * @file repl.c
  * @author François Cayre <cayre@yiking.(null)>
@@ -21,31 +20,30 @@
 #include "print.h"
 
 /* mode d'interaction avec l'interpreteur (exemple)*/
-typedef enum {INTERACTIF,SCRIPT} inter_mode;
+typedef enum {INTERACTIF, SCRIPT} inter_mode;
 
 
 void usage_error( char *command ) {
-
-    fprintf( stderr, "Usage: %s [file.scm]\n   If no file is given, executes in Shell mode.\n", command );
+    fprintf(stderr,
+            "Usage: %s [file.scm]\n   If no file is given, executes in Shell mode.\n",
+            command);
 }
 
 
 object nil;
 
-void init_interpreter ( void ) {
-
-    nil      = make_nil();
-
+void init_interpreter (void) {
+    nil = make_nil();
 }
 
-int main ( int argc, char *argv[] ) {
-
-    char     input[BIGSTRING];
-    uint     here = 0;
-    object   output = NULL;
-    object   sexpr = NULL;
+int main (int argc, char *argv[]) {
+    char       input[BIGSTRING];
+    uint       here = 0;
+    object     output = NULL;
+    object     sexpr = NULL;
     inter_mode mode;
-    FILE *   fp = NULL; /* le flux dans lequel les commande seront lues : stdin (mode shell) ou un fichier */
+    FILE *     fp =
+        NULL; /* le flux dans lequel les commande seront lues : stdin (mode shell) ou un fichier */
 
     /* exemples d'utilisation des macros du fichier notify.h */
     /* WARNING_MSG : sera toujours affiche */
@@ -61,13 +59,13 @@ int main ( int argc, char *argv[] ) {
        puis la sortie du programme avec un code erreur non nul (EXIT_FAILURE) */
     /* ERROR_MSG("Erreur. Arret du programme"); */
 
-    if ( argc > 2 ) {
-        usage_error( argv[0] );
-        exit( EXIT_FAILURE );
+    if (argc > 2) {
+        usage_error(argv[0]);
+        exit(EXIT_FAILURE);
     }
-    if(argc == 2 && strcmp(argv[1], "-h") == 0) {
-        usage_error( argv[0] );
-        exit( EXIT_SUCCESS );
+    if (argc == 2 && strcmp(argv[1], "-h") == 0) {
+        usage_error(argv[0]);
+        exit(EXIT_SUCCESS);
     }
 
     init_interpreter();
@@ -86,8 +84,8 @@ int main ( int argc, char *argv[] ) {
     }
 
 
-    while ( 1 ) {
-        input[0]='\0';
+    while (1) {
+        input[0] = '\0';
         here = 0;
         output = NULL;
         sexpr = NULL;
@@ -99,7 +97,7 @@ int main ( int argc, char *argv[] ) {
             /* si fichier alors on sort*/
             if (mode == SCRIPT) {
                 fclose( fp );
-                if (Sexpr_err==S_END) {
+                if (Sexpr_err == S_END) {
                     /* Cas fin de fichier script */
                     exit(EXIT_SUCCESS);
                 }

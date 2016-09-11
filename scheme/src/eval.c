@@ -1,4 +1,3 @@
-
 /**
  * @file eval.c
  * @author François Cayre <cayre@yiking.(null)>
@@ -10,7 +9,6 @@
 
 #include "eval.h"
 
-object sfs_eval( object input ) {
-
+object sfs_eval(object input) {
     return input;
 }

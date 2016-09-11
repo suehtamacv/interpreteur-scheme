@@ -12,23 +12,19 @@
 
 #include <stdio.h>
 
-void sfs_print_atom( object o ) {
-
+void sfs_print_atom(object o) {
     return;
 }
 
-void sfs_print_pair( object o ) {
-
+void sfs_print_pair(object o) {
     return;
 }
 
-void sfs_print( object o ) {
+void sfs_print(object o) {
 
-    if ( SFS_PAIR == o->type ) {
-        sfs_print_pair( o );
+    if (o->type == SFS_PAIR) {
+        sfs_print_pair(o);
+    } else {
+        sfs_print_atom(o);
     }
-    else {
-        sfs_print_atom( o );
-    }
-
 }

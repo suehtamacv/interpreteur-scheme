@@ -21,11 +21,11 @@ extern "C" {
 
 enum {S_OK, S_KO, S_END};
 
-uint   sfs_get_sexpr( string input, FILE *fp );
+uint sfs_get_sexpr(string input, FILE *fp);
 
-object sfs_read( char *input, uint *here );
-object sfs_read_atom( char *input, uint *here );
-object sfs_read_pair( char *stream, uint *i );
+object sfs_read(char *input, uint *here);
+object sfs_read_atom(char *input, uint *here);
+object sfs_read_pair(char *stream, uint *i);
 
 
 #ifdef __cplusplus

@@ -1,4 +1,3 @@
-
 /**
  * @file eval.h
  * @author François Cayre <cayre@yiking.(null)>
@@ -15,10 +14,9 @@
 extern "C" {
 #endif
 
-
 #include "object.h"
 
-object sfs_eval( object );
+object sfs_eval(object);
 
 #ifdef __cplusplus
 }

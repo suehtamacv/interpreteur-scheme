@@ -17,7 +17,6 @@ extern "C" {
 
 #include "basic.h"
 
-
 #define NUM_REAL     0x00
 #define NUM_INTEGER  0x01
 #define NUM_UINTEGER 0x02
@@ -29,12 +28,10 @@ extern "C" {
 typedef struct num_t {
 
     uint numtype;
-
     union {
-
         double       real;
         int       integer;
-    } this;
+    } val;
 
 } num;
 

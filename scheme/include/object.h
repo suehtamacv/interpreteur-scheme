@@ -1,4 +1,3 @@
-
 /**
  * @file object.h
  * @author François Cayre <cayre@yiking.(null)>
@@ -17,13 +16,10 @@ extern "C" {
 
 #include "number.h"
 
-
 typedef struct object_t {
 
     uint type;
-
     union {
-
         num              number;
         char             character;
         string           string;
@@ -32,17 +28,14 @@ typedef struct object_t {
         struct pair_t {
             struct object_t *car;
             struct object_t *cdr;
-        }                pair;
+        } pair;
 
         struct object_t *special;
-
-    } this;
-
+    } val;
 } *object;
 
-
-object make_object( uint type );
-object make_nil( void );
+object make_object(uint type);
+object make_nil(void);
 
 #define SFS_NUMBER       0x00
 #define SFS_CHARACTER    0x01

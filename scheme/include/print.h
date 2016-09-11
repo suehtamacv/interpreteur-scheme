@@ -18,10 +18,10 @@ extern "C" {
 #include "object.h"
 
 
-void sfs_print( object );
+void sfs_print(object);
 
-void sfs_print_atom( object );
-void sfs_print_pair( object );
+void sfs_print_atom(object);
+void sfs_print_pair(object);
 
 #ifdef __cplusplus
 }

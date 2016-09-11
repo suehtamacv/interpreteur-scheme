@@ -1,4 +1,3 @@
-
 /**
  * @file read.c
  * @author François Cayre <cayre@yiking.(null)>
@@ -20,10 +19,9 @@
 
 void flip( uint *i ) {
 
-    if ( *i == FALSE ) {
+    if (*i == FALSE) {
         *i = TRUE;
-    }
-    else {
+    } else {
         *i = FALSE;
     }
 }
@@ -36,7 +34,7 @@ void flip( uint *i ) {
  */
 char* first_usefull_char(char* line) {
 
-    int i=0;
+    int i = 0;
     if (line == NULL) {
         return NULL;
     }
@@ -73,7 +71,7 @@ char* first_usefull_char(char* line) {
  * Les parentheses dans des chaines et les caracteres Scheme #\( et #\)
  * ne sont pas comptes.
  *
- * Si le compte devient zéro et que 
+ * Si le compte devient zéro et que
  *        - la ligne est fini, la fonction retourne S_OK
  * 				- la ligne n'est pas fini la fonction retourne S_KO
  *
@@ -124,7 +122,7 @@ uint  sfs_get_sexpr( char *input, FILE *fp ) {
 
         /* si en mode interactif*/
         if ( stdin == fp ) {
-            uint nspaces = 2*parlevel;
+            uint nspaces = 2 * parlevel;
 
             init_string( sfs_prompt );
 
@@ -133,13 +131,13 @@ uint  sfs_get_sexpr( char *input, FILE *fp ) {
                de ce niveau (un peu à la python)*/
             sprintf( sfs_prompt, "SFS:%u > ", parlevel );
 
-            for ( i= 0; i< nspaces; i++ ) {
+            for ( i = 0; i < nspaces; i++ ) {
                 sfs_prompt[strlen(sfs_prompt)] = ' ';
             }
 
             /* si sur plusieurs lignes, le \n équivaut à un espace*/
-            if (nspaces>0) {
-                input[strlen(input)+1] = '\0';
+            if (nspaces > 0) {
+                input[strlen(input) + 1] = '\0';
                 input[strlen(input)] = ' ';
             }
 
@@ -148,7 +146,7 @@ uint  sfs_get_sexpr( char *input, FILE *fp ) {
         }
         /*si en mode fichier*/
         else {
-            chunk=k;
+            chunk = k;
             memset( chunk, '\0', BIGSTRING );
             ret = fgets( chunk, BIGSTRING, fp );
 
@@ -161,15 +159,15 @@ uint  sfs_get_sexpr( char *input, FILE *fp ) {
                 return S_END;
             }
 
-            if (strlen(chunk) == BIGSTRING-1
-                    && chunk[BIGSTRING-1] != '\n'
+            if (strlen(chunk) == BIGSTRING - 1
+                    && chunk[BIGSTRING - 1] != '\n'
                     && !feof(fp)) {
                 WARNING_MSG( "Too long line for this interpreter!" );
                 return S_KO;
             }
         }
 
-        /* si la ligne est inutile 
+        /* si la ligne est inutile
         	=> on va directement à la prochaine iteration */
         if (first_usefull_char(chunk) == NULL) {
             continue;
@@ -179,16 +177,16 @@ uint  sfs_get_sexpr( char *input, FILE *fp ) {
         s = strlen( chunk );
 
         if ( s > 0 ) {
-            if (strlen(input) + s > BIGSTRING-1 ) {
+            if (strlen(input) + s > BIGSTRING - 1 ) {
                 WARNING_MSG( "Too long a S-expression for this interpreter!" );
                 return S_KO;
             }
 
-            for ( i = 0; i< strlen(chunk); i++ ) {
+            for ( i = 0; i < strlen(chunk); i++ ) {
                 /* si la fin de la ligne chunk est inutile,
                    on ajoute un espace dans input et on sort de la boucle*/
                 if ( in_string == FALSE && first_usefull_char(chunk + i) == NULL ) {
-                    chunk[i]='\0';
+                    chunk[i] = '\0';
                     input[strlen(input)] = ' ';
                     break;
                 }
@@ -197,14 +195,14 @@ uint  sfs_get_sexpr( char *input, FILE *fp ) {
                 switch(chunk[i]) {
                 case '(':
                     if (in_string == FALSE
-                            && ! ( i>1 && chunk[i-1] == '\\' && chunk[i-2] == '#' ) ) {
+                            && ! ( i > 1 && chunk[i - 1] == '\\' && chunk[i - 2] == '#' ) ) {
                         parlevel++;
                         typeOfExpressionFound = S_EXPR_PARENTHESIS;
                     }
                     break;
                 case ')':
                     if ( in_string == FALSE
-                            && ! ( i>1 && chunk[i-1] == '\\' && chunk[i-2] == '#' ) ) {
+                            && ! ( i > 1 && chunk[i - 1] == '\\' && chunk[i - 2] == '#' ) ) {
                         parlevel--;
                         if (parlevel == 0 ) {
                             typeOfExpressionFound = FINISHED;
@@ -216,18 +214,17 @@ uint  sfs_get_sexpr( char *input, FILE *fp ) {
                     }
                     break;
                 case '"':
-                    if ( i<2 || chunk[i-1] != '\\' ) {
+                    if ( i < 2 || chunk[i - 1] != '\\' ) {
                         if ( in_string == FALSE ) {
                             if(typeOfExpressionFound == BASIC_ATOME) {
-                                WARNING_MSG("Parse error: invalid string after atom : '%s'", chunk+i);
+                                WARNING_MSG("Parse error: invalid string after atom : '%s'", chunk + i);
                                 return S_KO;
                             }
                             in_string = TRUE;
                             if(typeOfExpressionFound != S_EXPR_PARENTHESIS) {
                                 typeOfExpressionFound = STRING_ATOME;
                             }
-                        }
-                        else {
+                        } else {
                             in_string = FALSE;
                             if(typeOfExpressionFound == STRING_ATOME) {
                                 typeOfExpressionFound = FINISHED;
@@ -254,9 +251,9 @@ uint  sfs_get_sexpr( char *input, FILE *fp ) {
                     if( first_useful != NULL) {
                         if(*first_useful == ')' ) {
                             WARNING_MSG( "Parse error: too many closing parenthesis')'" );
-                        }
-                        else {
-                            WARNING_MSG("Parse error: invalid trailing chars after S-Expr : '%s'", chunk+i);
+                        } else {
+                            WARNING_MSG("Parse error: invalid trailing chars after S-Expr : '%s'",
+                                        chunk + i);
                         }
                         return S_KO;
                     }
@@ -278,12 +275,16 @@ uint  sfs_get_sexpr( char *input, FILE *fp ) {
                 return S_KO;
             }
 
-            if (input[strlen(input)-1] == '\n') input[strlen(input)-1] = ' ';
+            if (input[strlen(input) - 1] == '\n') {
+                input[strlen(input) - 1] = ' ';
+            }
         }
     } while ( parlevel > 0 );
 
     /* Suppression des espaces restant a la fin de l'expression, notamment le dernier '\n' */
-    while (isspace(input[strlen(input)-1])) input[strlen(input)-1] = '\0';
+    while (isspace(input[strlen(input) - 1])) {
+        input[strlen(input) - 1] = '\0';
+    }
 
     if(stdin == fp) {
         add_history( input );
@@ -295,16 +296,14 @@ uint  sfs_get_sexpr( char *input, FILE *fp ) {
 object sfs_read( char *input, uint *here ) {
 
     if ( input[*here] == '(' ) {
-        if ( input[(*here)+1] == ')' ) {
+        if ( input[(*here) + 1] == ')' ) {
             *here += 2;
             return nil;
-        }
-        else {
+        } else {
             (*here)++;
             return sfs_read_pair( input, here );
         }
-    }
-    else {
+    } else {
         return sfs_read_atom( input, here );
     }
 }
@@ -322,4 +321,3 @@ object sfs_read_pair( char *stream, uint *i ) {
 
     return pair;
 }
-
