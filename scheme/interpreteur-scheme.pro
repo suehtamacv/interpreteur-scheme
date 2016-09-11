@@ -19,6 +19,8 @@ SOURCES += src/eval.c \
            src/read.c \
            src/repl.c
 
+OTHER_FILES += .astylerc
+
 INCLUDEPATH += include
 
 LIBS += -lreadline
