@@ -310,31 +310,12 @@ object sfs_read_atom(char *input, uint *here) {
     if (input[*here] == '#') {
         (*here)++;
         if (input[*here] == '\\') { //C'est un char
-            atom = make_object(SFS_CHARACTER);
-
-            atom->val.character = input[++(*here)];
-            (*here)++;
+            atom = sfs_read_char(input, here);
         } else { //C'est un boolean
-            atom = make_object(SFS_BOOLEAN);
-
-            switch (input[*here]) { //Les booleens valides sont seulement #t et #f
-            case 't':
-                atom->val.boolean = True;
-                break;
-
-            case 'f':
-                atom->val.boolean = False;
-                break;
-
-            default:
-                WARNING_MSG("#%c is not a correct boolean value. Defaulting to FALSE",
-                            input[*here]);
-                atom->val.boolean = False;
-                break;
-            }
-
-            (*here)++;
+            atom = sfs_read_bool(input, here);
         }
+    } else if (input[*here] == '"') { //C'est une chaine de caracteres
+
     }
 
     return atom;
@@ -345,4 +326,39 @@ object sfs_read_pair(char *input, uint *here) {
     object pair = NULL;
 
     return pair;
+}
+
+object sfs_read_bool(char *input, uint *here) {
+    object atom = make_object(SFS_BOOLEAN);
+
+    switch (input[*here]) { //Les booleens valides sont seulement #t et #f
+    case 't':
+        atom->val.boolean = True;
+        break;
+
+    case 'f':
+        atom->val.boolean = False;
+        break;
+
+    default:
+        WARNING_MSG("#%c is not a correct boolean value. Defaulting to FALSE",
+                    input[*here]);
+        atom->val.boolean = False;
+        break;
+    }
+
+    (*here)++;
+    return atom;
+}
+
+object sfs_read_char(char *input, uint *here) {
+    if (input[*here] != '\\') {
+        ERROR_MSG("Invalid call to %s", __func__);
+    }
+
+    object atom = make_object(SFS_CHARACTER);
+    atom->val.character = input[++(*here)];
+    (*here)++;
+
+    return atom;
 }
