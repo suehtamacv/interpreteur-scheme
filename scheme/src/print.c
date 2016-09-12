@@ -21,6 +21,10 @@ void sfs_print_atom(object o) {
     case SFS_BOOLEAN:
         sfs_print_bool(o);
         break;
+
+    case SFS_NUMBER:
+        sfs_print_number(o);
+        break;
     }
 
     return;
@@ -57,5 +61,21 @@ void sfs_print_bool(object o) {
         printf("#f ");
     } else {
         ERROR_MSG("Found weird boolean who is nor true neither false.");
+    }
+}
+
+void sfs_print_number(object o) {
+    if (o->type != SFS_NUMBER) {
+        ERROR_MSG("Trying to print object of type %d as number (%d).", o->type, SFS_NUMBER);
+    }
+
+    switch (o->val.number.numtype) {
+    case NUM_INTEGER:
+        printf("%d ", o->val.number.val.integer);
+        break;
+
+    case NUM_REAL:
+        printf("%lg ", o->val.number.val.real);
+        break;
     }
 }

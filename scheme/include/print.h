@@ -31,6 +31,10 @@ void sfs_print_char(object);
  * @brief sfs_print_bool prints an object of boolean type.
  */
 void sfs_print_bool(object);
+/**
+ * @brief sfs_print_number prints an object of number type.
+ */
+void sfs_print_number(object);
 
 #ifdef __cplusplus
 }
