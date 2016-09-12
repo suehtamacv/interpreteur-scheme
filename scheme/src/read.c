@@ -320,6 +320,8 @@ object sfs_read_atom(char *input, uint *here) {
         }
     } else if (isdigit(input[*here]) || input[*here] == '-' || input[*here] == '+') { //C'est un nombre
         atom = sfs_read_number(input, here);
+    } else if (input[*here] == '"') {
+        atom = sfs_read_string(input, here);
     }
 
     return atom;
@@ -437,6 +439,34 @@ object sfs_read_number(char *input, uint *here) {
         //Considere que le nombre peut etre negatif
         atom->val.number.val.real = cur_number * k;
     }
+
+    return atom;
+}
+
+object sfs_read_string(char *input, uint *here) {
+    if (input[*here] != '"') {
+        ERROR_MSG("Invalid call to %s", __func__);
+    }
+
+    object atom = make_object(SFS_STRING);
+    (*here)++;
+
+    size_t p;
+    for (p = 0; input[*here] != '"' && p < STRLEN - 1; (*here)++, p++) {
+        if (input[*here] == '\\' && input[(*here) + 1] == '"') { //C'est un \"
+            (*here)++;
+        }
+
+        atom->val.string[p] = input[*here];
+    }
+
+    if (p == STRLEN - 1) {
+        WARNING_MSG("String larger than %d characters has been truncated.",STRLEN - 1);
+        while (input[*here] != '"') {
+            (*here)++;
+        }
+    }
+    atom->val.string[p] = '\0';
 
     return atom;
 }

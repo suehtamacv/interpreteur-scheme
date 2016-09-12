@@ -25,6 +25,10 @@ void sfs_print_atom(object o) {
     case SFS_NUMBER:
         sfs_print_number(o);
         break;
+
+    case SFS_STRING:
+        sfs_print_string(o);
+        break;
     }
 
     return;
@@ -78,4 +82,12 @@ void sfs_print_number(object o) {
         printf("%lg ", o->val.number.val.real);
         break;
     }
+}
+
+void sfs_print_string(object o) {
+    if (o->type != SFS_STRING) {
+        ERROR_MSG("Trying to print object of type %d as string (%d).", o->type, SFS_STRING);
+    }
+
+    printf("\"%s\" ",o->val.string);
 }
