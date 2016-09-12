@@ -15,15 +15,11 @@
 void sfs_print_atom(object o) {
     switch (o->type) {
     case SFS_CHARACTER:
-        printf("#\\%c ", o->val.character);
+        sfs_print_char(o);
         break;
 
     case SFS_BOOLEAN:
-        if (o->val.boolean == True) {
-            printf("#t ");
-        } else {
-            printf("#f ");
-        }
+        sfs_print_bool(o);
         break;
     }
 
@@ -40,5 +36,26 @@ void sfs_print(object o) {
         sfs_print_pair(o);
     } else {
         sfs_print_atom(o);
+    }
+}
+
+void sfs_print_char(object o) {
+    if (o->type != SFS_CHARACTER) {
+        ERROR_MSG("Trying to print object of type %d as character (%d).", o->type, SFS_CHARACTER);
+    }
+    printf("#\\%c ", o->val.character);
+}
+
+void sfs_print_bool(object o) {
+    if (o->type != SFS_BOOLEAN) {
+        ERROR_MSG("Trying to print object of type %d as boolean (%d).", o->type, SFS_BOOLEAN);
+    }
+
+    if (o->val.boolean == True) {
+        printf("#t ");
+    } else if (o->val.boolean == False) {
+        printf("#f ");
+    } else {
+        ERROR_MSG("Found weird boolean who is nor true neither false.");
     }
 }
