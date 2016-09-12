@@ -3,6 +3,9 @@ CONFIG += console
 CONFIG -= app_bundle
 CONFIG -= qt
 
+QMAKE_CXX = gcc
+QMAKE_CXXFLAGS = -x c
+
 HEADERS += include/basic.h \
            include/eval.h \
            include/mem.h \

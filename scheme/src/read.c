@@ -307,7 +307,7 @@ object sfs_read( char *input, uint *here ) {
 object sfs_read_atom(char *input, uint *here) {
     object atom = NULL;
 
-    while (input[*here] == ' ') {
+    while (input[*here] == ' ' || input[*here] == '\t') {
         (*here)++;
     };
 

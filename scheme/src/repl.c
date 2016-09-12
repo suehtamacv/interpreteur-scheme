@@ -83,7 +83,6 @@ int main (int argc, char *argv[]) {
         mode = SCRIPT;
     }
 
-
     while (1) {
         input[0] = '\0';
         here = 0;
@@ -137,7 +136,7 @@ int main (int argc, char *argv[]) {
             continue ;
         }
 
-        /*printf( "==> " );*/
+        printf( "==> " );
         sfs_print( output );
         printf( "\n" );
     }
