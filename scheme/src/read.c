@@ -307,6 +307,10 @@ object sfs_read( char *input, uint *here ) {
 object sfs_read_atom(char *input, uint *here) {
     object atom = NULL;
 
+    while (input[*here] == ' ') {
+        (*here)++;
+    };
+
     if (input[*here] == '#') {
         (*here)++;
         if (input[*here] == '\\') { //C'est un char
@@ -314,7 +318,7 @@ object sfs_read_atom(char *input, uint *here) {
         } else { //C'est un boolean
             atom = sfs_read_bool(input, here);
         }
-    } else if (isdigit(input[*here]) || input[*here] == '-') { //C'est un nombre
+    } else if (isdigit(input[*here]) || input[*here] == '-' || input[*here] == '+') { //C'est un nombre
         atom = sfs_read_number(input, here);
     }
 
@@ -367,6 +371,8 @@ object sfs_read_number(char *input, uint *here) {
     short k = 1;
     if (input[*here] == '-') {
         k = -1; //une constante pour considerer les nombres negatifs
+        (*here)++;
+    } else if (input[*here] == '+') {
         (*here)++;
     }
 
