@@ -313,12 +313,12 @@ object sfs_read_atom(char *input, uint *here) {
 
     if (input[*here] == '#') {
         (*here)++;
-        if (input[*here] == '\\') { //C'est un char
+        if (input[*here] == '\\') { /* C'est un char */
             atom = sfs_read_char(input, here);
-        } else { //C'est un boolean
+        } else { /* C'est un boolean */
             atom = sfs_read_bool(input, here);
         }
-    } else if (isdigit(input[*here]) || input[*here] == '-' || input[*here] == '+') { //C'est un nombre
+    } else if (isdigit(input[*here]) || input[*here] == '-' || input[*here] == '+') { /* C'est un nombre */
         atom = sfs_read_number(input, here);
     } else if (input[*here] == '"') {
         atom = sfs_read_string(input, here);
@@ -337,7 +337,7 @@ object sfs_read_pair(char *input, uint *here) {
 object sfs_read_bool(char *input, uint *here) {
     object atom = make_object(SFS_BOOLEAN);
 
-    switch (input[*here]) { //Les booleens valides sont seulement #t et #f
+    switch (input[*here]) { /* Les booleens valides sont seulement #t et #f */
     case 't':
         atom->val.boolean = True;
         break;
@@ -347,9 +347,8 @@ object sfs_read_bool(char *input, uint *here) {
         break;
 
     default:
-        WARNING_MSG("#%c is not a correct boolean value. Defaulting to FALSE",
-                    input[*here]);
-        atom->val.boolean = False;
+        WARNING_MSG("#%c is not a correct boolean value.", input[*here]);
+        return NULL;
         break;
     }
 
@@ -359,7 +358,8 @@ object sfs_read_bool(char *input, uint *here) {
 
 object sfs_read_char(char *input, uint *here) {
     if (input[*here] != '\\') {
-        ERROR_MSG("Invalid call to %s", __func__);
+        WARNING_MSG("Invalid call to %s", __func__);
+        return NULL;
     }
 
     object atom = make_object(SFS_CHARACTER);
@@ -372,7 +372,7 @@ object sfs_read_char(char *input, uint *here) {
 object sfs_read_number(char *input, uint *here) {
     short k = 1;
     if (input[*here] == '-') {
-        k = -1; //une constante pour considerer les nombres negatifs
+        k = -1; /* Une constante pour considerer les nombres negatifs */
         (*here)++;
     } else if (input[*here] == '+') {
         (*here)++;
@@ -380,14 +380,15 @@ object sfs_read_number(char *input, uint *here) {
 
     object atom = make_object(SFS_NUMBER);
 
-    //Cherche un point pour decider si c'est un reel ou un entier
+    /* Cherche un point pour decider si c'est un reel ou un entier */
     Bool isReal = False;
-    for (uint i = *here; ; ++i) {
+    uint i;
+    for (i = *here; ; ++i) {
         if (input[i] == ' ' || input[i] == '\n' ||
-                input[i] == '\0') { //C'est la fin du nombre
+                input[i] == '\0' || input[i] == EOF) { /* C'est la fin du nombre */
             break;
         }
-        if (input[i] == '.') { //On a trouvé un point
+        if (input[i] == '.') { /* On a trouvé un point */
             isReal = True;
             break;
         }
@@ -397,46 +398,50 @@ object sfs_read_number(char *input, uint *here) {
         atom->val.number.numtype = NUM_INTEGER;
 
         int cur_num = 0;
-        do { //Ca lit la partie entiere chiffre par chiffre
+        do { /* Ca lit la partie entiere chiffre par chiffre */
             if (!isdigit(input[*here])) {
-                ERROR_MSG("Invalid number found. \"%c\" is not a valid character in a number",
-                          input[*here]);
+                WARNING_MSG("Invalid number found. \"%c\" is not a valid character in a number", input[*here]);
+                return NULL;
             }
-            cur_num = 10 * cur_num + (input[*here] - '0'); //Char - '0' => l'entier
+            cur_num = 10 * cur_num + (input[*here] - '0'); /* Char - '0' => l'entier */
             (*here)++;
         } while (input[*here] != ' ' &&
                  input[*here] != '\n' &&
-                 input[*here] != '\0');
+                 input[*here] != '\0' &&
+                 input[*here] != EOF);
 
-        //Considere que le nombre peut etre negatif
+        /* Considere que le nombre peut etre negatif */
         atom->val.number.val.integer = cur_num * k;
     } else {
         atom->val.number.numtype = NUM_REAL;
 
         double cur_number = 0;
-        do { //Ca lit la partie entiere chiffre par chiffre
+        do { /* Ca lit la partie entiere chiffre par chiffre */
             if (!isdigit(input[*here])) {
-                ERROR_MSG("Invalid number found. \"%c\" is not a valid character in a number", input[*here]);
+                WARNING_MSG("Invalid number found. \"%c\" is not a valid character in a number", input[*here]);
+                return NULL;
             }
             cur_number  = 10 * cur_number  + (input[*here] - '0');
             (*here)++;
         } while (input[*here] != '.');
 
-        (*here)++; //Apres le point
+        (*here)++; /* Apres le point */
 
         double frac_constant = 0.1;
-        do { //Ca lit la partie fractionnaire chiffre par chiffre
+        do { /* Ca lit la partie fractionnaire chiffre par chiffre */
             if (!isdigit(input[*here])) {
-                ERROR_MSG("Invalid number found. \"%c\" is not a valid character in a number", input[*here]);
+                WARNING_MSG("Invalid number found. \"%c\" is not a valid character in a number", input[*here]);
+                return NULL;
             }
             cur_number  = cur_number  + frac_constant * (input[*here] - '0');
             frac_constant /= 10.0;
             (*here)++;
         } while (input[*here] != ' ' &&
                  input[*here] != '\n' &&
-                 input[*here] != '\0');
+                 input[*here] != '\0' &&
+                 input[*here] != EOF);
 
-        //Considere que le nombre peut etre negatif
+        /* Considere que le nombre peut etre negatif */
         atom->val.number.val.real = cur_number * k;
     }
 
@@ -445,7 +450,8 @@ object sfs_read_number(char *input, uint *here) {
 
 object sfs_read_string(char *input, uint *here) {
     if (input[*here] != '"') {
-        ERROR_MSG("Invalid call to %s", __func__);
+        WARNING_MSG("Invalid call to %s", __func__);
+        return NULL;
     }
 
     object atom = make_object(SFS_STRING);
@@ -453,7 +459,7 @@ object sfs_read_string(char *input, uint *here) {
 
     size_t p;
     for (p = 0; input[*here] != '"' && p < STRLEN - 1; (*here)++, p++) {
-        if (input[*here] == '\\' && input[(*here) + 1] == '"') { //C'est un \"
+        if (input[*here] == '\\' && input[(*here) + 1] == '"') { /* C'est un \" */
             (*here)++;
         }
 
@@ -461,7 +467,7 @@ object sfs_read_string(char *input, uint *here) {
     }
 
     if (p == STRLEN - 1) {
-        WARNING_MSG("String larger than %d characters has been truncated.",STRLEN - 1);
+        WARNING_MSG("String larger than %d characters has been truncated.", STRLEN - 1);
         while (input[*here] != '"') {
             (*here)++;
         }

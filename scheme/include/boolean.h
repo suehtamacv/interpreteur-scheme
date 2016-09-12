@@ -27,4 +27,4 @@ typedef enum bool_t Bool;
 #endif
 
 
-#endif // BOOLEAN_H
+#endif /* BOOLEAN_H */

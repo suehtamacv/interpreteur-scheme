@@ -51,7 +51,7 @@ void sfs_print_char(object o) {
     if (o->type != SFS_CHARACTER) {
         ERROR_MSG("Trying to print object of type %d as character (%d).", o->type, SFS_CHARACTER);
     }
-    printf("#\\%c ", o->val.character);
+    printf("#\\%c", o->val.character);
 }
 
 void sfs_print_bool(object o) {
@@ -60,9 +60,9 @@ void sfs_print_bool(object o) {
     }
 
     if (o->val.boolean == True) {
-        printf("#t ");
+        printf("#t");
     } else if (o->val.boolean == False) {
-        printf("#f ");
+        printf("#f");
     } else {
         ERROR_MSG("Found weird boolean who is nor true neither false.");
     }
@@ -75,11 +75,11 @@ void sfs_print_number(object o) {
 
     switch (o->val.number.numtype) {
     case NUM_INTEGER:
-        printf("%d ", o->val.number.val.integer);
+        printf("%d", o->val.number.val.integer);
         break;
 
     case NUM_REAL:
-        printf("%lg ", o->val.number.val.real);
+        printf("%lg", o->val.number.val.real);
         break;
     }
 }
@@ -89,5 +89,5 @@ void sfs_print_string(object o) {
         ERROR_MSG("Trying to print object of type %d as string (%d).", o->type, SFS_STRING);
     }
 
-    printf("\"%s\" ",o->val.string);
+    printf("\"%s\"", o->val.string);
 }
