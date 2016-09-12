@@ -40,7 +40,16 @@ object sfs_read_bool(char *input, uint *here);
  * @return a character object.
  */
 object sfs_read_char(char *input, uint *here);
-
+/**
+ * @brief sfs_read_number reads a value of number type from the input pointer.
+ *
+ * This function shall consider negative and positive numbers, and the different
+ * types of numbers (integers, reals, complex)
+ * @param input is the pointer to the beginning of the character chain being read.
+ * @param here is the pointer to the current position on the character chain.
+ * @return a number object.
+ */
+object sfs_read_number(char *input, uint *here);
 
 #ifdef __cplusplus
 }

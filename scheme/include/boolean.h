@@ -17,7 +17,7 @@ extern "C" {
 #include "basic.h"
 
 enum bool_t {
-    False, True
+    False = 0, True = 1
 };
 
 typedef enum bool_t Bool;
