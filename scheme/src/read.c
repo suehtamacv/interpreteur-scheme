@@ -322,6 +322,8 @@ object sfs_read_atom(char *input, uint *here) {
         atom = sfs_read_number(input, here);
     } else if (input[*here] == '"') {
         atom = sfs_read_string(input, here);
+    } else {
+        atom = sfs_read_symbol(input, here);
     }
 
     return atom;
@@ -473,6 +475,29 @@ object sfs_read_string(char *input, uint *here) {
         }
     }
     atom->val.string[p] = '\0';
+
+    return atom;
+}
+
+object sfs_read_symbol(char *input, uint *here) {
+    object atom = make_object(SFS_SYMBOL);
+
+    size_t p;
+    for (p = 0;
+            input[*here] != ' ' && input[*here] != '\n' &&
+            input[*here] != '\t' && input[*here] != '\0' && p < STRLEN - 1; /* Ce sont les chars que peuvent finir une symbole */
+            (*here)++, p++) {
+        atom->val.symbol[p] = input[*here];
+    }
+
+    if (p == STRLEN - 1) {
+        WARNING_MSG("Symbol name larger than %d characters has been truncated.", STRLEN - 1);
+        while (input[*here] != ' ' && input[*here] != '\n' &&
+                input[*here] != '\t' && input[*here] != '\0') {
+            (*here)++;
+        }
+    }
+    atom->val.symbol[p] = '\0';
 
     return atom;
 }

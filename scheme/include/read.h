@@ -57,6 +57,13 @@ object sfs_read_number(char *input, uint *here);
  * @return a string object.
  */
 object sfs_read_string(char *input, uint *here);
+/**
+ * @brief sfs_read_symbol reads a value of symbol type from the input pointer.
+ * @param input is the pointer to the beginning of the character chain being read.
+ * @param here is the pointer to the current position on the character chain.
+ * @return a symbol object.
+ */
+object sfs_read_symbol(char *input, uint *here);
 
 #ifdef __cplusplus
 }

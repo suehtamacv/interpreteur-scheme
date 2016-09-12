@@ -136,7 +136,7 @@ int main (int argc, char *argv[]) {
             continue ;
         }
 
-        printf( "==> " );
+        /*printf( "==> " );*/
         sfs_print( output );
         printf( "\n" );
     }

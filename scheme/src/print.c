@@ -29,6 +29,9 @@ void sfs_print_atom(object o) {
     case SFS_STRING:
         sfs_print_string(o);
         break;
+
+    case SFS_SYMBOL:
+        sfs_print_symbol(o);
     }
 
     return;
@@ -90,4 +93,12 @@ void sfs_print_string(object o) {
     }
 
     printf("\"%s\"", o->val.string);
+}
+
+void sfs_print_symbol(object o) {
+    if (o->type != SFS_SYMBOL) {
+        ERROR_MSG("Trying to print object of type %d as symbol (%d).", o->type, SFS_SYMBOL);
+    }
+
+    printf("%s", o->val.symbol);
 }
