@@ -308,6 +308,7 @@ object sfs_read_atom(char *input, uint *here) {
     object atom = NULL;
 
     while (input[*here] == ' ' || input[*here] == '\t') {
+        printf("%c", input[*here]);
         (*here)++;
     };
 
@@ -402,9 +403,6 @@ object sfs_read_number(char *input, uint *here) {
     short k = 1;
     if (input[*here] == '-') {
         k = -1; /* Une constante pour considerer les nombres negatifs */
-        (*here)++;
-    } else if (input[*here] == '+') {
-        (*here)++;
     }
 
     object atom = make_object(SFS_NUMBER);
@@ -424,7 +422,12 @@ object sfs_read_number(char *input, uint *here) {
     }
 
     if (!isReal) {
-        atom->val.number.numtype = NUM_INTEGER;
+        if (input[*here] == '+' || input[*here] == '-') {
+            atom->val.number.numtype = NUM_INTEGER;
+            (*here)++;
+        } else {
+            atom->val.number.numtype = NUM_UINTEGER;
+        }
 
         int cur_num = 0;
         do { /* Ca lit la partie entiere chiffre par chiffre */
@@ -489,7 +492,10 @@ object sfs_read_string(char *input, uint *here) {
     size_t p;
     for (p = 0; input[*here] != '"' && p < STRLEN - 1; (*here)++, p++) {
         if (input[*here] == '\\' && input[(*here) + 1] == '"') { /* C'est un \" */
+            atom->val.string[p] = '\\';
+            atom->val.string[++p] = '"';
             (*here)++;
+            continue;
         }
 
         atom->val.string[p] = input[*here];
