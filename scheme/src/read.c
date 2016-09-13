@@ -323,6 +323,8 @@ object sfs_read_atom(char *input, uint *here) {
         atom = sfs_read_number(input, here);
     } else if (input[*here] == '"') {
         atom = sfs_read_string(input, here);
+    } else if (input[*here] == '(') {
+        atom = sfs_read_pair(input, here);
     } else {
         atom = sfs_read_symbol(input, here);
     }
