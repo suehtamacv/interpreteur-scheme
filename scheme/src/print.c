@@ -54,7 +54,13 @@ void sfs_print_char(object o) {
     if (o->type != SFS_CHARACTER) {
         ERROR_MSG("Trying to print object of type %d as character (%d).", o->type, SFS_CHARACTER);
     }
-    printf("#\\%c", o->val.character);
+    if (o->val.character == ' ') {
+        printf("#\\space");
+    } else if (o->val.character == '\n') {
+        printf("#\\newline");
+    } else {
+        printf("#\\%c", o->val.character);
+    }
 }
 
 void sfs_print_bool(object o) {

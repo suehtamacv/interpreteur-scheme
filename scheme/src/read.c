@@ -349,7 +349,7 @@ object sfs_read_bool(char *input, uint *here) {
         break;
 
     default:
-        WARNING_MSG("#%c is not a correct boolean value.", input[*here]);
+        WARNING_MSG("#%c is not a correct boolean value", input[*here]);
         return NULL;
         break;
     }
@@ -365,7 +365,34 @@ object sfs_read_char(char *input, uint *here) {
     }
 
     object atom = make_object(SFS_CHARACTER);
-    atom->val.character = input[++(*here)];
+
+    (*here)++;
+    if (input[*here] == ' ' || input[*here] == '\n' || input[*here] == '\0') {
+        WARNING_MSG("Invalid character found");
+        return NULL;
+    } else {
+        string char_name;
+        size_t p;
+        for (p = 0;
+                input[*here] != ' ' && input[*here] != '\n' &&
+                input[*here] != '\t' && input[*here] != '\0' && p < 8; /* Ce sont les chars que peuvent finir le char */
+                p++) {
+            char_name[p] = input[*here + p];
+        }
+        char_name[p] = '\0';
+
+        if (strcmp(char_name, "space") == 0) {
+            atom->val.character = ' ';
+        } else if (strcmp(char_name, "newline") == 0) {
+            atom->val.character = '\n';
+        } else if (strlen(char_name) == 1) {
+            atom->val.character = input[*here];
+        } else {
+            WARNING_MSG("%s is not a valid character", char_name);
+            return NULL;
+        }
+    }
+
     (*here)++;
 
     return atom;
