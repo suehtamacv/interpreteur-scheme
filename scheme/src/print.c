@@ -32,6 +32,7 @@ void sfs_print_atom(object o) {
 
     case SFS_SYMBOL:
         sfs_print_symbol(o);
+        break;
     }
 
     return;
@@ -52,7 +53,8 @@ void sfs_print(object o) {
 
 void sfs_print_char(object o) {
     if (o->type != SFS_CHARACTER) {
-        ERROR_MSG("Trying to print object of type %d as character (%d).", o->type, SFS_CHARACTER);
+        ERROR_MSG("Trying to print object of type %d as character (%d).", o->type,
+                  SFS_CHARACTER);
     }
     if (o->val.character == ' ') {
         printf("#\\space");
@@ -65,7 +67,8 @@ void sfs_print_char(object o) {
 
 void sfs_print_bool(object o) {
     if (o->type != SFS_BOOLEAN) {
-        ERROR_MSG("Trying to print object of type %d as boolean (%d).", o->type, SFS_BOOLEAN);
+        ERROR_MSG("Trying to print object of type %d as boolean (%d).", o->type,
+                  SFS_BOOLEAN);
     }
 
     if (o->val.boolean == True) {
@@ -79,7 +82,8 @@ void sfs_print_bool(object o) {
 
 void sfs_print_number(object o) {
     if (o->type != SFS_NUMBER) {
-        ERROR_MSG("Trying to print object of type %d as number (%d).", o->type, SFS_NUMBER);
+        ERROR_MSG("Trying to print object of type %d as number (%d).", o->type,
+                  SFS_NUMBER);
     }
 
     switch (o->val.number.numtype) {
@@ -98,12 +102,23 @@ void sfs_print_number(object o) {
     case NUM_REAL:
         printf("%lg", o->val.number.val.real);
         break;
+
+    case NUM_COMPLEX:
+        if (o->val.number.val.complex.imag >= 0) {
+            printf("%lg+%lgj", o->val.number.val.complex.real,
+                   o->val.number.val.complex.imag);
+        } else {
+            printf("%lg%lgj", o->val.number.val.complex.real,
+                   o->val.number.val.complex.imag);
+        }
+        break;
     }
 }
 
 void sfs_print_string(object o) {
     if (o->type != SFS_STRING) {
-        ERROR_MSG("Trying to print object of type %d as string (%d).", o->type, SFS_STRING);
+        ERROR_MSG("Trying to print object of type %d as string (%d).", o->type,
+                  SFS_STRING);
     }
 
     printf("\"%s\"", o->val.string);
@@ -111,7 +126,8 @@ void sfs_print_string(object o) {
 
 void sfs_print_symbol(object o) {
     if (o->type != SFS_SYMBOL) {
-        ERROR_MSG("Trying to print object of type %d as symbol (%d).", o->type, SFS_SYMBOL);
+        ERROR_MSG("Trying to print object of type %d as symbol (%d).", o->type,
+                  SFS_SYMBOL);
     }
 
     printf("%s", o->val.symbol);

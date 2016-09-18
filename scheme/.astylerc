@@ -7,3 +7,4 @@
 
 --break-after-logical
 --pad-oper
+--max-code-length=80

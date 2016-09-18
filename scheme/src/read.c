@@ -319,7 +319,8 @@ object sfs_read_atom(char *input, uint *here) {
         } else { /* C'est un boolean */
             atom = sfs_read_bool(input, here);
         }
-    } else if (isdigit(input[*here]) || input[*here] == '-' || input[*here] == '+') { /* C'est un nombre */
+    } else if (isdigit(input[*here]) || input[*here] == '-' ||
+               input[*here] == '+') { /* C'est un nombre */
         atom = sfs_read_number(input, here);
     } else if (input[*here] == '"') {
         atom = sfs_read_string(input, here);
@@ -378,7 +379,8 @@ object sfs_read_char(char *input, uint *here) {
         size_t p;
         for (p = 0;
                 input[*here] != ' ' && input[*here] != '\n' &&
-                input[*here] != '\t' && input[*here] != '\0' && p < 8; /* Ce sont les chars que peuvent finir le char */
+                input[*here] != '\t' && input[*here] != '\0' &&
+                p < 8; /* Ce sont les chars que peuvent finir le char */
                 p++) {
             char_name[p] = input[*here + p];
         }
@@ -409,24 +411,120 @@ object sfs_read_number(char *input, uint *here) {
 
     object atom = make_object(SFS_NUMBER);
 
-    /* Cherche un point pour decider si c'est un reel ou un entier */
-    Bool isReal = False;
-    uint i;
-    for (i = *here; ; ++i) {
-        if (input[i] == ' ' || input[i] == '\n' ||
-                input[i] == '\0' || input[i] == EOF) { /* C'est la fin du nombre */
-            if (i == *here + 1) {
-                return sfs_read_symbol(input, here); /* Un seul '+' ou '-' est un symbole, pas un nombre */
+    /* Cherche un seul i ou j pour decider si c'est un nombre complexe */
+    /* Un nombre complexe doit etre ecrit comme a{+|-}bj */
+    Bool isComplex = False;
+    {
+        Bool foundSignal = False;
+        uint i;
+        for (i = *here; ; ++i) {
+            if (input[i] == ' ' || input[i] == '\n' ||
+                    input[i] == '\0' || input[i] == EOF) { /* C'est la fin du nombre */
+                break;
             }
-            break;
-        }
-        if (input[i] == '.') { /* On a trouvé un point */
-            isReal = True;
-            break;
+            if (input[i] == '+' || input[i] == '-') {
+                foundSignal = True;
+            }
+            if (input[i] == 'i' || input[i] == 'j') {
+                if (input[i + 1] != ' ' && input[i + 1] != '\0' &&
+                        input[i + 1] != ')' && input[i + 1] != '\n') {
+                    WARNING_MSG("Invalid complex number found: %c should be at the end of the number",
+                                input[i]);
+                    return NULL;
+                }
+                if (!foundSignal) {
+                    WARNING_MSG("Invalid complex number found: it should be written as {+|-}A{+|-}Bj");
+                    return NULL;
+                }
+                isComplex = True;
+            }
         }
     }
 
-    if (!isReal) {
+    /* Cherche un point pour decider si c'est un reel ou un entier */
+    Bool isReal = False;
+    if (!isComplex) {
+        uint i;
+        for (i = *here; ; ++i) {
+            if (input[i] == ' ' || input[i] == '\n' ||
+                    input[i] == '\0' || input[i] == EOF) { /* C'est la fin du nombre */
+                if (i == *here + 1) {
+                    return sfs_read_symbol(input,
+                                           here); /* Un seul '+' ou '-' est un symbole, pas un nombre */
+                }
+                break;
+            }
+            if (input[i] == '.') { /* On a trouvé un point */
+                isReal = True;
+                break;
+            }
+        }
+    }
+
+    if (isComplex) {
+        atom->val.number.numtype = NUM_COMPLEX;
+        double real = 0, imag = 0;
+
+        do { /* Ca lit la partie entiere de la partie reele chiffre par chiffre */
+            if (!isdigit(input[*here])) {
+                WARNING_MSG("Invalid number found. \"%c\" is not a valid character in a number",
+                            input[*here]);
+                return NULL;
+            }
+            real  = 10 * real  + (input[*here] - '0');
+            (*here)++;
+        } while (input[*here] != '.' && input[*here] != '+' && input[*here] != '-');
+
+        if (input[*here] == '.') {
+            (*here)++;
+            double frac_constant = 0.1;
+            do { /* Ca lit la partie fractionnaire de la partie reele chiffre par chiffre */
+                if (!isdigit(input[*here])) {
+                    WARNING_MSG("Invalid number found. \"%c\" is not a valid character in a number",
+                                input[*here]);
+                    return NULL;
+                }
+                real = real  + frac_constant * (input[*here] - '0');
+                frac_constant /= 10.0;
+                (*here)++;
+            } while (input[*here] != '+' &&
+                     input[*here] != '-');
+        }
+
+        (*here)++; /* Apres le plus ou le moins */
+
+        do { /* Ca lit la partie entiere de la partie reele chiffre par chiffre */
+            if (!isdigit(input[*here])) {
+                WARNING_MSG("Invalid number found. \"%c\" is not a valid character in a number",
+                            input[*here]);
+                return NULL;
+            }
+            imag = 10 * imag + (input[*here] - '0');
+            (*here)++;
+        } while (input[*here] != '.' && input[*here] != ' ' && input[*here] != ')' &&
+                 input[*here] != '\n' && input[*here] != '\0' && input[*here] != 'j' &&
+                 input[*here] != 'i');
+
+        if (input[*here] == '.') {
+            (*here)++;
+            double frac_constant = 0.1;
+            do { /* Ca lit la partie fractionnaire de la partie reele chiffre par chiffre */
+                if (!isdigit(input[*here])) {
+                    WARNING_MSG("Invalid number found. \"%c\" is not a valid character in a number",
+                                input[*here]);
+                    return NULL;
+                }
+                imag = imag + frac_constant * (input[*here] - '0');
+                frac_constant /= 10.0;
+                (*here)++;
+            } while (input[*here] != ' ' && input[*here] != ')' && input[*here] != '\n' &&
+                     input[*here] != '\0' && input[*here] != 'j' && input[*here] != 'i');
+        }
+
+        atom->val.number.val.complex.real = real;
+        atom->val.number.val.complex.imag = imag;
+
+    } else if (!isReal) {
         if (input[*here] == '+' || input[*here] == '-') {
             atom->val.number.numtype = NUM_INTEGER;
             (*here)++;
@@ -437,7 +535,8 @@ object sfs_read_number(char *input, uint *here) {
         int cur_num = 0;
         do { /* Ca lit la partie entiere chiffre par chiffre */
             if (!isdigit(input[*here])) {
-                WARNING_MSG("Invalid number found. \"%c\" is not a valid character in a number", input[*here]);
+                WARNING_MSG("Invalid number found. \"%c\" is not a valid character in a number",
+                            input[*here]);
                 return NULL;
             }
             cur_num = 10 * cur_num + (input[*here] - '0'); /* Char - '0' => l'entier */
@@ -455,7 +554,8 @@ object sfs_read_number(char *input, uint *here) {
         double cur_number = 0;
         do { /* Ca lit la partie entiere chiffre par chiffre */
             if (!isdigit(input[*here])) {
-                WARNING_MSG("Invalid number found. \"%c\" is not a valid character in a number", input[*here]);
+                WARNING_MSG("Invalid number found. \"%c\" is not a valid character in a number",
+                            input[*here]);
                 return NULL;
             }
             cur_number  = 10 * cur_number  + (input[*here] - '0');
@@ -467,7 +567,8 @@ object sfs_read_number(char *input, uint *here) {
         double frac_constant = 0.1;
         do { /* Ca lit la partie fractionnaire chiffre par chiffre */
             if (!isdigit(input[*here])) {
-                WARNING_MSG("Invalid number found. \"%c\" is not a valid character in a number", input[*here]);
+                WARNING_MSG("Invalid number found. \"%c\" is not a valid character in a number",
+                            input[*here]);
                 return NULL;
             }
             cur_number  = cur_number  + frac_constant * (input[*here] - '0');
@@ -523,13 +624,15 @@ object sfs_read_symbol(char *input, uint *here) {
     size_t p;
     for (p = 0;
             input[*here] != ' ' && input[*here] != '\n' &&
-            input[*here] != '\t' && input[*here] != '\0' && p < STRLEN - 1; /* Ce sont les chars que peuvent finir une symbole */
+            input[*here] != '\t' && input[*here] != '\0' &&
+            p < STRLEN - 1; /* Ce sont les chars que peuvent finir une symbole */
             (*here)++, p++) {
         atom->val.symbol[p] = input[*here];
     }
 
     if (p == STRLEN - 1) {
-        WARNING_MSG("Symbol name larger than %d characters has been truncated.", STRLEN - 1);
+        WARNING_MSG("Symbol name larger than %d characters has been truncated.",
+                    STRLEN - 1);
         while (input[*here] != ' ' && input[*here] != '\n' &&
                 input[*here] != '\t' && input[*here] != '\0') {
             (*here)++;

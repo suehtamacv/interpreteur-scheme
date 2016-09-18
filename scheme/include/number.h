@@ -24,12 +24,20 @@ extern "C" {
 #define NUM_PINFTY   0x05
 #define NUM_MINFTY   0x06
 
+typedef struct complex_t {
+
+    double real;
+    double imag;
+
+} complex;
+
 typedef struct num_t {
 
     uint numtype;
     union {
         double       real;
         int       integer;
+        complex   complex;
     } val;
 
 } num;
