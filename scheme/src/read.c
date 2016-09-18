@@ -465,6 +465,14 @@ object sfs_read_number(char *input, uint *here) {
         atom->val.number.numtype = NUM_COMPLEX;
         double real = 0, imag = 0;
 
+        if (input[*here] == '-') {
+            k = -1;
+            (*here)++;
+        } else if (input[*here] == '+') {
+            k = 1;
+            (*here)++;
+        }
+
         do { /* Ca lit la partie entiere de la partie reele chiffre par chiffre */
             if (!isdigit(input[*here])) {
                 WARNING_MSG("Invalid number found. \"%c\" is not a valid character in a number",
@@ -489,6 +497,13 @@ object sfs_read_number(char *input, uint *here) {
                 (*here)++;
             } while (input[*here] != '+' &&
                      input[*here] != '-');
+        }
+
+        real *= k;
+        if (input[*here] == '+') {
+            k = 1;
+        } else {
+            k = -1;
         }
 
         (*here)++; /* Apres le plus ou le moins */
@@ -520,6 +535,8 @@ object sfs_read_number(char *input, uint *here) {
             } while (input[*here] != ' ' && input[*here] != ')' && input[*here] != '\n' &&
                      input[*here] != '\0' && input[*here] != 'j' && input[*here] != 'i');
         }
+
+        imag *= k;
 
         atom->val.number.val.complex.real = real;
         atom->val.number.val.complex.imag = imag;
