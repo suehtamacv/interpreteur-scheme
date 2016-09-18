@@ -17,7 +17,7 @@ extern "C" {
 #include <string.h>
 #include "notify.h"
 
-#define STRLEN    256
+#define STRLEN    65536
 #define BIGSTRING 65536
 
 #define TRUE    1

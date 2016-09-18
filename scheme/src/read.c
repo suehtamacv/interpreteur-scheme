@@ -415,6 +415,9 @@ object sfs_read_number(char *input, uint *here) {
     for (i = *here; ; ++i) {
         if (input[i] == ' ' || input[i] == '\n' ||
                 input[i] == '\0' || input[i] == EOF) { /* C'est la fin du nombre */
+            if (i == *here + 1) {
+                return sfs_read_symbol(input, here); /* Un seul '+' ou '-' est un symbole, pas un nombre */
+            }
             break;
         }
         if (input[i] == '.') { /* On a trouvé un point */
