@@ -296,7 +296,6 @@ object sfs_read( char *input, uint *here ) {
             *here += 2;
             return nil;
         } else {
-            (*here)++;
             return sfs_read_pair( input, here );
         }
     } else {
@@ -323,8 +322,6 @@ object sfs_read_atom(char *input, uint *here) {
         atom = sfs_read_number(input, here);
     } else if (input[*here] == '"') {
         atom = sfs_read_string(input, here);
-    } else if (input[*here] == '(') {
-        atom = sfs_read_pair(input, here);
     } else {
         atom = sfs_read_symbol(input, here);
     }
@@ -335,7 +332,12 @@ object sfs_read_atom(char *input, uint *here) {
 object sfs_read_pair(char *input, uint *here) {
 
     object pair = make_object(SFS_PAIR);
-    pair->val.pair.car = sfs_read(input, here);
+    if (input[*here] == '(') {
+        pair->val.pair.car = NULL;
+        (*here)++;
+    } else {
+        pair->val.pair.car = sfs_read(input, here);
+    }
 
     while (input[*here] == ' ' || input[*here] == '\t') {
         (*here)++;
