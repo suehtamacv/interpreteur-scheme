@@ -337,9 +337,11 @@ object sfs_read_pair(char *input, uint *here) {
 
     object pair = make_object(SFS_PAIR);
     pair->val.pair.car = sfs_read(input, here);
-    if (input[*here] == ')') pair->val.pair.cdr = NULL;
-    else
-    pair->val.pair.cdr = sfs_read_pair(input, here);
+    if (input[*here] == ')') {
+        pair->val.pair.cdr = NULL;
+    } else {
+        pair->val.pair.cdr = sfs_read_pair(input, here);
+    }
     return pair;
 }
 
@@ -452,8 +454,8 @@ object sfs_read_number(char *input, uint *here) {
             if (input[i] == ' ' || input[i] == '\n' ||
                     input[i] == '\0' || input[i] == EOF) { /* C'est la fin du nombre */
                 if (i == *here + 1) {
-                    return sfs_read_symbol(input,
-                                           here); /* Un seul '+' ou '-' est un symbole, pas un nombre */
+                    /* Un seul '+' ou '-' est un symbole, pas un nombre */
+                    return sfs_read_symbol(input, here);
                 }
                 break;
             }
@@ -564,6 +566,7 @@ object sfs_read_number(char *input, uint *here) {
         } while (input[*here] != ' ' &&
                  input[*here] != '\n' &&
                  input[*here] != '\0' &&
+                 input[*here] != ')' &&
                  input[*here] != EOF);
 
         /* Considere que le nombre peut etre negatif */
@@ -645,6 +648,7 @@ object sfs_read_symbol(char *input, uint *here) {
     for (p = 0;
             input[*here] != ' ' && input[*here] != '\n' &&
             input[*here] != '\t' && input[*here] != '\0' &&
+            input[*here] != ')' &&
             p < STRLEN - 1; /* Ce sont les chars que peuvent finir une symbole */
             (*here)++, p++) {
         atom->val.symbol[p] = input[*here];
