@@ -33,6 +33,10 @@ void sfs_print_atom(object o) {
     case SFS_SYMBOL:
         sfs_print_symbol(o);
         break;
+
+    case SFS_NIL:
+        sfs_print_nil(o);
+        break;
     }
 
     return;
@@ -77,6 +81,13 @@ void sfs_print_char(object o) {
     } else {
         printf("#\\%c", o->val.character);
     }
+}
+
+void sfs_print_nil(object o) {
+    if (o->type != SFS_NIL) {
+        ERROR_MSG("Trying to print object of type %d as nil (%d).", o->type, SFS_NIL);
+    }
+    printf("()");
 }
 
 void sfs_print_bool(object o) {

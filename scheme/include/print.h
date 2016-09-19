@@ -43,6 +43,10 @@ void sfs_print_string(object);
  * @brief sfs_print_symbol prints an object of symbol type.
  */
 void sfs_print_symbol(object);
+/**
+ * @brief sfs_print_nil prints nil.
+ */
+void sfs_print_nil(object);
 
 #ifdef __cplusplus
 }
