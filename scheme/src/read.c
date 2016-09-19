@@ -335,8 +335,11 @@ object sfs_read_atom(char *input, uint *here) {
 
 object sfs_read_pair(char *input, uint *here) {
 
-    object pair = NULL;
-
+    object pair = make_object(SFS_PAIR);
+    pair->val.pair.car = sfs_read(input, here);
+    if (input[*here] == ')') pair->val.pair.cdr = NULL;
+    else
+    pair->val.pair.cdr = sfs_read(input, here);
     return pair;
 }
 
