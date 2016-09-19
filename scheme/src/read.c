@@ -308,7 +308,6 @@ object sfs_read_atom(char *input, uint *here) {
     object atom = NULL;
 
     while (input[*here] == ' ' || input[*here] == '\t') {
-        printf("%c", input[*here]);
         (*here)++;
     };
 
@@ -337,6 +336,10 @@ object sfs_read_pair(char *input, uint *here) {
 
     object pair = make_object(SFS_PAIR);
     pair->val.pair.car = sfs_read(input, here);
+
+    while (input[*here] == ' ' || input[*here] == '\t') {
+        (*here)++;
+    }
     if (input[*here] == ')') {
         pair->val.pair.cdr = NULL;
     } else {
@@ -383,8 +386,8 @@ object sfs_read_char(char *input, uint *here) {
         string char_name;
         size_t p;
         for (p = 0;
-                input[*here] != ' ' && input[*here] != '\n' &&
-                input[*here] != '\t' && input[*here] != '\0' &&
+                input[*here + p] != ' ' && input[*here + p] != '\n' &&
+                input[*here + p] != '\t' && input[*here + p] != ')' &&
                 p < 8; /* Ce sont les chars que peuvent finir le char */
                 p++) {
             char_name[p] = input[*here + p];
@@ -636,6 +639,7 @@ object sfs_read_string(char *input, uint *here) {
             (*here)++;
         }
     }
+    (*here)++;
     atom->val.string[p] = '\0';
 
     return atom;
