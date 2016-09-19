@@ -39,7 +39,12 @@ void sfs_print_atom(object o) {
 }
 
 void sfs_print_pair(object o) {
-    return;
+    printf("(");
+    sfs_print(o->val.pair.car);
+    printf(" ");
+    if (o->val.pair.cdr == NULL) printf(")");
+    else sfs_print(o->val.pair.cdr);
+
 }
 
 void sfs_print(object o) {

@@ -339,7 +339,7 @@ object sfs_read_pair(char *input, uint *here) {
     pair->val.pair.car = sfs_read(input, here);
     if (input[*here] == ')') pair->val.pair.cdr = NULL;
     else
-    pair->val.pair.cdr = sfs_read(input, here);
+    pair->val.pair.cdr = sfs_read_pair(input, here);
     return pair;
 }
 
