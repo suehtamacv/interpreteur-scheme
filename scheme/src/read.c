@@ -358,22 +358,29 @@ object sfs_read_pair(char *input, uint *here) {
 object sfs_read_bool(char *input, uint *here) {
     object atom = make_object(SFS_BOOLEAN);
 
-    switch (input[*here]) { /* Les booleens valides sont seulement #t et #f */
-    case 't':
+    string bool_name;
+    size_t p;
+    for (p = 0;
+            input[*here + p] != ' ' && input[*here + p] != '\n' &&
+            input[*here + p] != '\t' && p < 3;
+            /* Ce sont les chars que peuvent finir le bool */
+            p++) {
+        if (input[*here] == ')' && *here != 0 && input[*here - 1] != '\\') {
+            break;
+        }
+        bool_name[p] = input[*here + p];
+    }
+    bool_name[p] = '\0';
+
+    if (strcmp(bool_name, "t") == 0) {
         atom->val.boolean = True;
-        break;
-
-    case 'f':
+    } else if (strcmp(bool_name, "f") == 0) {
         atom->val.boolean = False;
-        break;
-
-    default:
-        WARNING_MSG("#%c is not a correct boolean value", input[*here]);
+    } else {
+        WARNING_MSG("%s is not a valid boolean", bool_name);
         return NULL;
-        break;
     }
 
-    (*here)++;
     return atom;
 }
 
