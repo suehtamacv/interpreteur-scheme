@@ -11,6 +11,7 @@
 #include <ctype.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+#include "print.h"
 #include "read.h"
 
 void flip( uint *i ) {
@@ -290,7 +291,6 @@ uint  sfs_get_sexpr( char *input, FILE *fp ) {
 
 
 object sfs_read( char *input, uint *here ) {
-
     if ( input[*here] == '(' ) {
         if ( input[(*here) + 1] == ')' ) {
             *here += 2;
@@ -305,7 +305,6 @@ object sfs_read( char *input, uint *here ) {
 
 object sfs_read_atom(char *input, uint *here) {
     object atom = NULL;
-
     while (input[*here] == ' ' || input[*here] == '\t') {
         (*here)++;
     };
@@ -333,8 +332,8 @@ object sfs_read_pair(char *input, uint *here) {
 
     object pair = make_object(SFS_PAIR);
     if (input[*here] == '(') {
-        pair->val.pair.car = NULL;
         (*here)++;
+        pair->val.pair.car = NULL;
     } else {
         pair->val.pair.car = sfs_read(input, here);
     }
@@ -343,12 +342,13 @@ object sfs_read_pair(char *input, uint *here) {
         (*here)++;
     }
 
-    if (input[*here] == ')' || input[*here] == '\0') {
-        pair->val.pair.cdr = NULL;
+    if (input[*here] == ')') {
         (*here)++;
+        pair->val.pair.cdr = NULL;
     } else {
         pair->val.pair.cdr = sfs_read_pair(input, here);
     }
+
     return pair;
 }
 
