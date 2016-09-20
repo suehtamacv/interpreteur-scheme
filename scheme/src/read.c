@@ -342,8 +342,10 @@ object sfs_read_pair(char *input, uint *here) {
     while (input[*here] == ' ' || input[*here] == '\t') {
         (*here)++;
     }
-    if (input[*here] == ')') {
+
+    if (input[*here] == ')' || input[*here] == '\0') {
         pair->val.pair.cdr = NULL;
+        (*here)++;
     } else {
         pair->val.pair.cdr = sfs_read_pair(input, here);
     }
@@ -459,9 +461,9 @@ object sfs_read_number(char *input, uint *here) {
     if (!isComplex) {
         uint i;
         for (i = *here; ; ++i) {
-            if (input[i] == ' ' || input[i] == '\n' ||
+            if (input[i] == ' ' || input[i] == '\n' || input[i] == ')' ||
                     input[i] == '\0' || input[i] == EOF) { /* C'est la fin du nombre */
-                if (i == *here + 1) {
+                if (i == *here + 1 && (input[*here] == '+' || input[*here] == '-')) {
                     /* Un seul '+' ou '-' est un symbole, pas un nombre */
                     return sfs_read_symbol(input, here);
                 }
