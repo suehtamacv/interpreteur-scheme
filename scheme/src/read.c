@@ -291,6 +291,10 @@ uint  sfs_get_sexpr( char *input, FILE *fp ) {
 
 
 object sfs_read( char *input, uint *here ) {
+    while (input[*here] == ' ' || input[*here] == '\t') {
+        (*here)++;
+    };
+
     if ( input[*here] == '(' ) {
         if ( input[(*here) + 1] == ')' ) {
             *here += 2;
