@@ -636,8 +636,7 @@ object sfs_read_string(char *input, uint *here) {
     size_t p;
     for (p = 0; input[*here] != '"' && p < STRLEN - 1; (*here)++, p++) {
         if (input[*here] == '\\' && input[(*here) + 1] == '"') { /* C'est un \" */
-            atom->val.string[p] = '\\';
-            atom->val.string[++p] = '"';
+            atom->val.string[p] = '"';
             (*here)++;
             continue;
         }
