@@ -445,7 +445,7 @@ object sfs_read_number(char *input, uint *here) {
             }
             if (input[i] == 'i' || input[i] == 'j') {
                 if (input[i + 1] != ' ' && input[i + 1] != '\0' &&
-                        input[i + 1] != ')' && input[i + 1] != '\n') {
+                        input[i + 1] != ')' && input[i + 1] != '(' && input[i + 1] != '\n') {
                     WARNING_MSG("Invalid complex number found: %c should be at the end of the number",
                                 input[i]);
                     return NULL;
@@ -464,7 +464,7 @@ object sfs_read_number(char *input, uint *here) {
     if (!isComplex) {
         uint i;
         for (i = *here; ; ++i) {
-            if (input[i] == ' ' || input[i] == '\n' || input[i] == ')' ||
+            if (input[i] == ' ' || input[i] == '\n' || input[i] == ')' || input[i] == '(' ||
                     input[i] == '\0' || input[i] == EOF) { /* C'est la fin du nombre */
                 if (i == *here + 1 && (input[*here] == '+' || input[*here] == '-')) {
                     /* Un seul '+' ou '-' est un symbole, pas un nombre */
@@ -535,8 +535,8 @@ object sfs_read_number(char *input, uint *here) {
             imag = 10 * imag + (input[*here] - '0');
             (*here)++;
         } while (input[*here] != '.' && input[*here] != ' ' && input[*here] != ')' &&
-                 input[*here] != '\n' && input[*here] != '\0' && input[*here] != 'j' &&
-                 input[*here] != 'i');
+                 input[*here] != '(' && input[*here] != '\n' && input[*here] != '\0' &&
+                 input[*here] != 'j' && input[*here] != 'i');
 
         if (input[*here] == '.') {
             (*here)++;
@@ -550,8 +550,9 @@ object sfs_read_number(char *input, uint *here) {
                 imag = imag + frac_constant * (input[*here] - '0');
                 frac_constant /= 10.0;
                 (*here)++;
-            } while (input[*here] != ' ' && input[*here] != ')' && input[*here] != '\n' &&
-                     input[*here] != '\0' && input[*here] != 'j' && input[*here] != 'i');
+            } while (input[*here] != ' ' && input[*here] != ')' && input[*here] != '(' &&
+                     input[*here] != '\n' && input[*here] != '\0' && input[*here] != 'j' &&
+                     input[*here] != 'i');
         }
 
         imag *= k;
@@ -580,6 +581,7 @@ object sfs_read_number(char *input, uint *here) {
                  input[*here] != '\n' &&
                  input[*here] != '\0' &&
                  input[*here] != ')' &&
+                 input[*here] != '(' &&
                  input[*here] != EOF);
 
         /* Considere que le nombre peut etre negatif */
