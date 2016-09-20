@@ -389,9 +389,12 @@ object sfs_read_char(char *input, uint *here) {
         size_t p;
         for (p = 0;
                 input[*here + p] != ' ' && input[*here + p] != '\n' &&
-                input[*here + p] != '\t' && input[*here + p] != ')' &&
-                p < 8; /* Ce sont les chars que peuvent finir le char */
+                input[*here + p] != '\t' && p < 8;
+                /* Ce sont les chars que peuvent finir le char */
                 p++) {
+            if (input[*here] == ')' && *here != 0 && input[*here - 1] != '\\') {
+                break;
+            }
             char_name[p] = input[*here + p];
         }
         char_name[p] = '\0';
