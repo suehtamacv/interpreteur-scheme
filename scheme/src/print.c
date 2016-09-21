@@ -113,11 +113,11 @@ void sfs_print_number(object o) {
 
     switch (o->val.number.numtype) {
     case NUM_UINTEGER:
-        printf("%d", o->val.number.val.integer);
+        printf("%ld", o->val.number.val.integer);
         break;
 
     case NUM_INTEGER:
-        printf("%d", o->val.number.val.integer);
+        printf("%ld", o->val.number.val.integer);
         break;
 
     case NUM_REAL:
@@ -132,6 +132,14 @@ void sfs_print_number(object o) {
             printf("%lg%lgj", o->val.number.val.complex.real,
                    o->val.number.val.complex.imag);
         }
+        break;
+
+    case NUM_PINFTY:
+        printf("+inf");
+        break;
+
+    case NUM_MINFTY:
+        printf("-inf");
         break;
     }
 }

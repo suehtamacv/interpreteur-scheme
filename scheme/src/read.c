@@ -11,6 +11,7 @@
 #include <ctype.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+#include <limits.h>
 #include "print.h"
 #include "read.h"
 
@@ -578,7 +579,7 @@ object sfs_read_number(char *input, uint *here) {
             atom->val.number.numtype = NUM_UINTEGER;
         }
 
-        int cur_num = 0;
+        long int cur_num = 0;
         do { /* Ca lit la partie entiere chiffre par chiffre */
             if (!isdigit(input[*here])) {
                 WARNING_MSG("Invalid number found. \"%c\" is not a valid character in a number",
@@ -587,6 +588,14 @@ object sfs_read_number(char *input, uint *here) {
             }
             cur_num = 10 * cur_num + (input[*here] - '0'); /* Char - '0' => l'entier */
             (*here)++;
+
+            if (cur_num > INT_MAX) { /* Test si un overflow a eu lieu. */
+                if (k == 1) {
+                    atom->val.number.numtype = NUM_PINFTY;
+                } else {
+                    atom->val.number.numtype = NUM_MINFTY;
+                }
+            }
         } while (input[*here] != ' ' &&
                  input[*here] != '\n' &&
                  input[*here] != '\0' &&

@@ -36,8 +36,8 @@ typedef struct num_t {
     uint numtype;
     union {
         double       real;
-        int       integer;
-        complex   complex;
+        long int     integer;
+        complex      complex;
     } val;
 
 } num;
