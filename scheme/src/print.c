@@ -113,11 +113,11 @@ void sfs_print_number(object o) {
 
     switch (o->val.number.numtype) {
     case NUM_UINTEGER:
-        printf("%ld", o->val.number.val.integer);
+        printf("%d", o->val.number.val.integer);
         break;
 
     case NUM_INTEGER:
-        printf("%ld", o->val.number.val.integer);
+        printf("%d", o->val.number.val.integer);
         break;
 
     case NUM_REAL:

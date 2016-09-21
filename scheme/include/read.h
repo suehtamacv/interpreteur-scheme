@@ -41,16 +41,6 @@ object sfs_read_bool(char *input, uint *here);
  */
 object sfs_read_char(char *input, uint *here);
 /**
- * @brief sfs_read_number reads a value of number type from the input pointer.
- *
- * This function shall consider negative and positive numbers, and the different
- * types of numbers (integers, reals, complex)
- * @param input is the pointer to the beginning of the character chain being read.
- * @param here is the pointer to the current position on the character chain.
- * @return a number object.
- */
-object sfs_read_number(char *input, uint *here);
-/**
  * @brief sfs_read_string reads a value of string type from the input pointer.
  * @param input is the pointer to the beginning of the character chain being read.
  * @param here is the pointer to the current position on the character chain.
@@ -64,6 +54,42 @@ object sfs_read_string(char *input, uint *here);
  * @return a symbol object.
  */
 object sfs_read_symbol(char *input, uint *here);
+
+/**
+ * @brief sfs_read_number reads a value of number type from the input pointer.
+ *
+ * This function shall consider negative and positive numbers, and the different
+ * types of numbers (integers, reals, complex)
+ * @param input is the pointer to the beginning of the character chain being read.
+ * @param here is the pointer to the current position on the character chain.
+ * @return a number object.
+ */
+object sfs_read_number(char *input, uint *here);
+/**
+ * @brief sfs_read_integer_number reads a value of integer type from the input pointer.
+ *
+ * If the number is too large to fit into INT_MAX, then the number is saved as +inf or -inf.
+ * @param input is the pointer to the beginning of the character chain being read.
+ * @param here is the pointer to the current position on the character chain.
+ * @return a integer number (signed or unsigned) object.
+ */
+object sfs_read_integer_number(char *input, uint *here);
+/**
+ * @brief sfs_read_complex_number reads a value of complex type from the input pointer.
+ *
+ * The complex number should be written as [+|-]A{+|-}B{i|j}.
+ * @param input is the pointer to the beginning of the character chain being read.
+ * @param here is the pointer to the current position on the character chain.
+ * @return a complex number object.
+ */
+object sfs_read_complex_number(char *input, uint *here);
+/**
+ * @brief sfs_read_real_number reads a value of real type from the input pointer.
+ * @param input is the pointer to the beginning of the character chain being read.
+ * @param here is the pointer to the current position on the character chain.
+ * @return a real number object.
+ */
+object sfs_read_real_number(char *input, uint *here);
 
 #ifdef __cplusplus
 }
