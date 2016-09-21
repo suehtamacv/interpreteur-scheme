@@ -302,7 +302,7 @@ object sfs_read( char *input, uint *here ) {
         } else {
             (*here)++;
             object o = make_object(SFS_PAIR);
-            o->val.pair.car = NULL;
+            o->val.pair.car = nil;
             o->val.pair.cdr = sfs_read_pair( input, here );
             return o;
         }
@@ -347,7 +347,7 @@ object sfs_read_pair(char *input, uint *here) {
 
     if (input[*here] == ')') {
         (*here)++;
-        pair->val.pair.cdr = NULL;
+        pair->val.pair.cdr = nil;
     } else {
         pair->val.pair.cdr = sfs_read_pair(input, here);
     }

@@ -43,16 +43,16 @@ void sfs_print_atom(object o) {
 }
 
 void sfs_print_pair(object o) {
-    if (!o->val.pair.car) {
+    if (o->val.pair.car == nil) {
         printf("(");
     } else {
         sfs_print(o->val.pair.car);
     }
 
-    if (!o->val.pair.cdr) {
+    if (o->val.pair.cdr == nil) {
         printf(")");
     } else {
-        if (o->val.pair.car) {
+        if (o->val.pair.car != nil) {
             printf(" ");
         }
         sfs_print(o->val.pair.cdr);
