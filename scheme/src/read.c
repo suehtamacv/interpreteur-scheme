@@ -444,7 +444,8 @@ object sfs_read_number(char *input, uint *here) {
         uint i;
         for (i = *here; ; ++i) {
             if (input[i] == ' ' || input[i] == '\n' ||
-                    input[i] == '\0' || input[i] == EOF) { /* C'est la fin du nombre */
+                    input[i] == '\0' || input[i] == '"' ||
+                    input[i] == EOF) { /* C'est la fin du nombre */
                 break;
             }
             if (input[i] == '+' || input[i] == '-') {
@@ -452,7 +453,8 @@ object sfs_read_number(char *input, uint *here) {
             }
             if (input[i] == 'i' || input[i] == 'j') {
                 if (input[i + 1] != ' ' && input[i + 1] != '\0' &&
-                        input[i + 1] != ')' && input[i + 1] != '(' && input[i + 1] != '\n') {
+                        input[i + 1] != ')' && input[i + 1] != '(' &&
+                        input[i + 1] != '\n' && input[i + 1] != '"') {
                     WARNING_MSG("Invalid complex number found: %c should be at the end of the number",
                                 input[i]);
                     return NULL;
@@ -471,8 +473,9 @@ object sfs_read_number(char *input, uint *here) {
     if (!isComplex) {
         uint i;
         for (i = *here; ; ++i) {
+            /* C'est la fin du nombre */
             if (input[i] == ' ' || input[i] == '\n' || input[i] == ')' || input[i] == '(' ||
-                    input[i] == '\0' || input[i] == EOF) { /* C'est la fin du nombre */
+                    input[i] == '\0' || input[i] == '"' || input[i] == EOF) {
                 if (i == *here + 1 && (input[*here] == '+' || input[*here] == '-')) {
                     /* Un seul '+' ou '-' est un symbole, pas un nombre */
                     return sfs_read_symbol(input, here);
@@ -543,7 +546,7 @@ object sfs_read_number(char *input, uint *here) {
             (*here)++;
         } while (input[*here] != '.' && input[*here] != ' ' && input[*here] != ')' &&
                  input[*here] != '(' && input[*here] != '\n' && input[*here] != '\0' &&
-                 input[*here] != 'j' && input[*here] != 'i');
+                 input[*here] != 'j' && input[*here] != 'i' && input[*here] != '"');
 
         if (input[*here] == '.') {
             (*here)++;
@@ -559,7 +562,7 @@ object sfs_read_number(char *input, uint *here) {
                 (*here)++;
             } while (input[*here] != ' ' && input[*here] != ')' && input[*here] != '(' &&
                      input[*here] != '\n' && input[*here] != '\0' && input[*here] != 'j' &&
-                     input[*here] != 'i');
+                     input[*here] != 'i' && input[*here] != '"');
         }
 
         imag *= k;
@@ -589,6 +592,7 @@ object sfs_read_number(char *input, uint *here) {
                  input[*here] != '\0' &&
                  input[*here] != ')' &&
                  input[*here] != '(' &&
+                 input[*here] != '"' &&
                  input[*here] != EOF);
 
         /* Considere que le nombre peut etre negatif */
@@ -622,6 +626,7 @@ object sfs_read_number(char *input, uint *here) {
         } while (input[*here] != ' ' &&
                  input[*here] != '\n' &&
                  input[*here] != '\0' &&
+                 input[*here] == '"' &&
                  input[*here] != EOF);
 
         /* Considere que le nombre peut etre negatif */
@@ -643,7 +648,8 @@ object sfs_read_string(char *input, uint *here) {
     size_t p;
     for (p = 0; input[*here] != '"' && p < STRLEN - 1; (*here)++, p++) {
         if (input[*here] == '\\' && input[(*here) + 1] == '"') { /* C'est un \" */
-            atom->val.string[p] = '"';
+            atom->val.string[p] = '\\';
+            atom->val.string[++p] = '"';
             (*here)++;
             continue;
         }
