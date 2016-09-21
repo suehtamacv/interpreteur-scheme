@@ -24,3 +24,15 @@ object make_nil(void) {
     t->val.special = t;
     return t;
 }
+
+object make_true() {
+    object t = make_object(SFS_BOOLEAN);
+    t->val.boolean = True;
+    return t;
+}
+
+object make_false() {
+    object f = make_object(SFS_BOOLEAN);
+    f->val.boolean = False;
+    return f;
+}

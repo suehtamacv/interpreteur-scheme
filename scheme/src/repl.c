@@ -29,11 +29,16 @@ void usage_error( char *command ) {
             command);
 }
 
-
+/* Singletons */
 object nil;
+object true;
+object false;
 
 void init_interpreter (void) {
+    /* Crée les singletons */
     nil = make_nil();
+    true = make_true();
+    false = make_false();
 }
 
 int main (int argc, char *argv[]) {

@@ -38,6 +38,8 @@ typedef struct object_t {
 
 object make_object(uint type);
 object make_nil(void);
+object make_true(void);
+object make_false(void);
 
 #define SFS_NUMBER       0x00
 #define SFS_CHARACTER    0x01
@@ -49,6 +51,8 @@ object make_nil(void);
 
 
 extern object nil;
+extern object true;
+extern object false;
 
 #ifdef __cplusplus
 }

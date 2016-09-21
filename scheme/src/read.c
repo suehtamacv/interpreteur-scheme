@@ -356,8 +356,6 @@ object sfs_read_pair(char *input, uint *here) {
 }
 
 object sfs_read_bool(char *input, uint *here) {
-    object atom = make_object(SFS_BOOLEAN);
-
     string bool_name;
     size_t p;
     for (p = 0;
@@ -373,22 +371,20 @@ object sfs_read_bool(char *input, uint *here) {
     }
     bool_name[p] = '\0';
 
-    if (strcmp(bool_name, "t") == 0) {
-        atom->val.boolean = True;
-    } else if (strcmp(bool_name, "f") == 0) {
-        atom->val.boolean = False;
-    } else {
-        WARNING_MSG("%s is not a valid boolean", bool_name);
-        return NULL;
-    }
-
     while (input[*here] != ' ' && input[*here] != '\n' &&
              input[*here] != '\t' && input[*here] != '"' &&
              input[*here] != ')' && input[*here] != '\0') {
         (*here)++;
     }
 
-    return atom;
+    if (strcmp(bool_name, "t") == 0) {
+        return true;
+    } else if (strcmp(bool_name, "f") == 0) {
+        return false;
+    } else {
+        WARNING_MSG("%s is not a valid boolean", bool_name);
+        return NULL;
+    }
 }
 
 object sfs_read_char(char *input, uint *here) {
