@@ -29,8 +29,8 @@
 ==> 43
 ==> "this is a string"
 ==> " "
-==> "another string with an anti-slash " "
-==> "another string with an anti-slash #" "
+==> "another string with an anti-slash \" "
+==> "another string with an anti-slash #\" "
 ==> "another string with some scheme char inside #\t "
 ==> "   another string with some scheme char inside #\space "
 ==> "another string ( ) () a"

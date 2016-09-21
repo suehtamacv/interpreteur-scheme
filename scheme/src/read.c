@@ -362,7 +362,8 @@ object sfs_read_bool(char *input, uint *here) {
     size_t p;
     for (p = 0;
             input[*here + p] != ' ' && input[*here + p] != '\n' &&
-            input[*here + p] != '\t' && p < 3;
+            input[*here + p] != '\t' && input[*here + p] != '"' &&
+            input[*here + p] != ')' && p < 3;
             /* Ce sont les chars que peuvent finir le bool */
             p++) {
         if (input[*here] == ')' && *here != 0 && input[*here - 1] != '\\') {
@@ -379,6 +380,12 @@ object sfs_read_bool(char *input, uint *here) {
     } else {
         WARNING_MSG("%s is not a valid boolean", bool_name);
         return NULL;
+    }
+
+    while (input[*here] != ' ' && input[*here] != '\n' &&
+             input[*here] != '\t' && input[*here] != '"' &&
+             input[*here] != ')' && input[*here] != '\0') {
+        (*here)++;
     }
 
     return atom;
