@@ -46,22 +46,20 @@ void sfs_print_pair(object o, Bool isBeginList) {
     if (isBeginList == True) {
         printf("(");
     }
-    sfs_print(o->val.pair.car);
+    sfs_print(o->val.pair.car, False);
 
     if (o->val.pair.cdr == nil) {
-        printf(") ");
+        printf(")");
     } else {
-        if (isBeginList == False) {
-            printf(" ");
-        }
-        sfs_print(o->val.pair.cdr);
+        printf(" ");
+        sfs_print(o->val.pair.cdr, False);
     }
 }
 
-void sfs_print(object o) {
+void sfs_print(object o, Bool isBeginList) {
 
     if (o->type == SFS_PAIR) {
-        if (o->val.pair.car->type == SFS_PAIR) {
+        if (o->val.pair.car->type == SFS_PAIR || isBeginList == True) {
             sfs_print_pair(o, True);
         } else {
            sfs_print_pair(o, False);
