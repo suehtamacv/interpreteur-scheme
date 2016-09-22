@@ -21,7 +21,7 @@ extern "C" {
 void sfs_print(object);
 
 void sfs_print_atom(object);
-void sfs_print_pair(object);
+void sfs_print_pair(object, Bool isBeginList);
 
 /**
  * @brief sfs_print_char prints an object of character type.

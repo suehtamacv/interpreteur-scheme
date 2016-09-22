@@ -301,10 +301,7 @@ object sfs_read( char *input, uint *here ) {
             return nil;
         } else {
             (*here)++;
-            object o = make_object(SFS_PAIR);
-            o->val.pair.car = nil;
-            o->val.pair.cdr = sfs_read_pair( input, here );
-            return o;
+            return sfs_read_pair( input, here );
         }
     } else {
         return sfs_read_atom( input, here );

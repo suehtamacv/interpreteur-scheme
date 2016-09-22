@@ -42,28 +42,30 @@ void sfs_print_atom(object o) {
     return;
 }
 
-void sfs_print_pair(object o) {
-    if (o->val.pair.car == nil) {
+void sfs_print_pair(object o, Bool isBeginList) {
+    if (isBeginList == True) {
         printf("(");
-    } else {
-        sfs_print(o->val.pair.car);
     }
+    sfs_print(o->val.pair.car);
 
     if (o->val.pair.cdr == nil) {
-        printf(")");
+        printf(") ");
     } else {
-        if (o->val.pair.car != nil) {
+        if (isBeginList == False) {
             printf(" ");
         }
         sfs_print(o->val.pair.cdr);
     }
-
 }
 
 void sfs_print(object o) {
 
     if (o->type == SFS_PAIR) {
-        sfs_print_pair(o);
+        if (o->val.pair.car->type == SFS_PAIR) {
+            sfs_print_pair(o, True);
+        } else {
+           sfs_print_pair(o, False);
+        }
     } else {
         sfs_print_atom(o);
     }
