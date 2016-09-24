@@ -1,4 +1,3 @@
-
 /**
  * @file print.c
  * @author François Cayre <cayre@yiking.(null)>
@@ -9,10 +8,11 @@
  */
 
 #include "print.h"
-
 #include <stdio.h>
 
 void sfs_print_atom(object o) {
+    /* This switch is used to identify the type of object and then
+     * call the corresponding print function */
     switch (o->type) {
     case SFS_CHARACTER:
         sfs_print_char(o);
@@ -43,11 +43,13 @@ void sfs_print_atom(object o) {
 }
 
 void sfs_print_pair(object o, Bool isBeginList) {
+    /* Il s'agit du debut d'une liste : donc il faut aussi imprimer '(' */
     if (isBeginList == True) {
         printf("(");
     }
     sfs_print(o->val.pair.car, False);
 
+    /* Il s'agit du fin de la liste : donc il faut aussi imprimer ')' */
     if (o->val.pair.cdr == nil) {
         printf(")");
     } else {
@@ -59,10 +61,13 @@ void sfs_print_pair(object o, Bool isBeginList) {
 void sfs_print(object o, Bool isBeginList) {
 
     if (o->type == SFS_PAIR) {
+        /* Si le car du pair "o" est lui meme un pair, ou si on sait deja
+         * que on est au debut d'une liste, donc faut passer 'True' a
+         * sfs_print_pair, pour qu'elle sache qu'il faut imprimer '(' */
         if (o->val.pair.car->type == SFS_PAIR || isBeginList == True) {
             sfs_print_pair(o, True);
         } else {
-           sfs_print_pair(o, False);
+            sfs_print_pair(o, False);
         }
     } else {
         sfs_print_atom(o);
@@ -74,6 +79,9 @@ void sfs_print_char(object o) {
         ERROR_MSG("Trying to print object of type %d as character (%d).", o->type,
                   SFS_CHARACTER);
     }
+
+
+    /* Certains characteres ont une representation speciale */
     if (o->val.character == ' ') {
         printf("#\\space");
     } else if (o->val.character == '\n') {
@@ -101,7 +109,7 @@ void sfs_print_bool(object o) {
     } else if (o->val.boolean == False) {
         printf("#f");
     } else {
-        ERROR_MSG("Found weird boolean who is nor true neither false.");
+        ERROR_MSG("Found weird boolean who is neither true nor false.");
     }
 }
 

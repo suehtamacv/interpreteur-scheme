@@ -17,10 +17,24 @@ extern "C" {
 
 #include "object.h"
 
-
-void sfs_print(object, Bool);
-
+/**
+ * @brief sfs_print prints an object of any type.
+ * @param isBeginList is a flag used to indicate whether a pair is at the beginning
+ * of the list. If the object is not a pair, then this flag does nothing.
+ */
+void sfs_print(object, Bool isBeginList);
+/**
+ * @brief sfs_print_atom prints an atom.
+ */
 void sfs_print_atom(object);
+/**
+ * @brief sfs_print_pair prints a pair, i.e., prints its car and then prints its cdr
+ * iff it's not equal to nil.
+ * @param isBeginList is a flag used to indicate whether this pair is at the beginning
+ * of the list. In order to set this flag as true, the parent pair must himself have his
+ * car as a pair. Another case when this flag is true is when we're dealing with the first
+ * pair of the entire list, the one that does not have a parent pair.
+ */
 void sfs_print_pair(object, Bool isBeginList);
 
 /**

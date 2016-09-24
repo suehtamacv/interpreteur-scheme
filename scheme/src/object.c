@@ -13,7 +13,6 @@
 
 
 object make_object(uint type) {
-
     object t = sfs_malloc(sizeof(*t));
     t->type = type;
     return t;

@@ -24,11 +24,20 @@ extern "C" {
 #define NUM_PINFTY   0x05
 #define NUM_MINFTY   0x06
 
+/**
+ * @brief The complex_t struct is used to create the structure of a
+ * complex number. A complex number is a pair of two values, its real
+ * part and its imaginary part.
+ */
 typedef struct complex_t {
-
+    /**
+     * @brief real is the real part of the complex number.
+     */
     double real;
+    /**
+     * @brief imag is the imaginary part of the complex number.
+     */
     double imag;
-
 } complex;
 
 typedef struct num_t {

@@ -291,6 +291,7 @@ uint  sfs_get_sexpr( char *input, FILE *fp ) {
 
 
 object sfs_read( char *input, uint *here ) {
+    /* Ces caracteres doivent etre ignores */
     while (input[*here] == ' ' || input[*here] == '\t') {
         (*here)++;
     };
@@ -310,6 +311,7 @@ object sfs_read( char *input, uint *here ) {
 
 object sfs_read_atom(char *input, uint *here) {
     object atom = NULL;
+    /* Ces caracteres doivent etre ignores */
     while (input[*here] == ' ' || input[*here] == '\t') {
         (*here)++;
     };
@@ -325,9 +327,9 @@ object sfs_read_atom(char *input, uint *here) {
                input[*here] == '+') { /* C'est un nombre */
         atom = sfs_read_number(input, here);
     } else if (input[*here] == '"') {
-        atom = sfs_read_string(input, here);
+        atom = sfs_read_string(input, here); /* C'est une chaine de caracteres */
     } else {
-        atom = sfs_read_symbol(input, here);
+        atom = sfs_read_symbol(input, here); /* C'est un symbole */
     }
 
     return atom;
@@ -342,10 +344,11 @@ object sfs_read_pair(char *input, uint *here) {
         (*here)++;
     }
 
+    /* On a trouve la fin de la liste : cdr vaut nil */
     if (input[*here] == ')') {
         (*here)++;
         pair->val.pair.cdr = nil;
-    } else {
+    } else { /* On continue a lire la liste : le cdr de ce pair vaut lui meme un pair */
         pair->val.pair.cdr = sfs_read_pair(input, here);
     }
 
@@ -356,10 +359,14 @@ object sfs_read_bool(char *input, uint *here) {
     string bool_name;
     size_t p;
     for (p = 0;
+            /* Ce sont les chars que peuvent finir le bool */
             input[*here + p] != ' ' && input[*here + p] != '\n' &&
             input[*here + p] != '\t' && input[*here + p] != '"' &&
-            input[*here + p] != ')' && p < 3;
-            /* Ce sont les chars que peuvent finir le bool */
+            input[*here + p] != ')'
+            /* Apres la diese, on a dans un boolean maximale d'un caractere. Donc si
+             * on compte deux caracteres apres la diese (p < 3), on sait ou non s'il s'agit
+             * d'un boolean correcte */
+            && p < 3;
             p++) {
         if (input[*here] == ')' && *here != 0 && input[*here - 1] != '\\') {
             break;
@@ -369,10 +376,10 @@ object sfs_read_bool(char *input, uint *here) {
     bool_name[p] = '\0';
 
     while (input[*here] != ' ' && input[*here] != '\n' &&
-             input[*here] != '\t' && input[*here] != '"' &&
-             input[*here] != ')' && input[*here] != '\0') {
+            input[*here] != '\t' && input[*here] != '"' &&
+            input[*here] != ')' && input[*here] != '\0') {
         (*here)++;
-    }
+    } /* Faut continuer jusqu'a la fin de ce faux caractere */
 
     if (strcmp(bool_name, "t") == 0) {
         return true;
@@ -411,6 +418,7 @@ object sfs_read_char(char *input, uint *here) {
         }
         char_name[p] = '\0';
 
+        /* Certains caracteres ont une representation special */
         if (strcmp(char_name, "space") == 0) {
             atom->val.character = ' ';
         } else if (strcmp(char_name, "newline") == 0) {
@@ -463,7 +471,7 @@ object sfs_read_number(char *input, uint *here) {
 
     /* Cherche un point pour decider si c'est un reel ou un entier */
     Bool isReal = False;
-    if (!isComplex) {
+    if (isComplex == False) {
         uint i;
         for (i = *here; ; ++i) {
             /* C'est la fin du nombre */
@@ -482,9 +490,9 @@ object sfs_read_number(char *input, uint *here) {
         }
     }
 
-    if (isComplex) {
+    if (isComplex == True) {
         return sfs_read_complex_number(input, here);
-    } else if (isReal) {
+    } else if (isReal == True) {
         return sfs_read_real_number(input, here);
     } else {
         return sfs_read_integer_number(input, here);
@@ -502,7 +510,8 @@ object sfs_read_string(char *input, uint *here) {
 
     size_t p;
     for (p = 0; input[*here] != '"' && p < STRLEN - 1; (*here)++, p++) {
-        if (input[*here] == '\\' && input[(*here) + 1] == '"') { /* C'est un \" */
+        /* On a trouve un \". Ces guillemets n'indiquent pas la fin de la chaine */
+        if (input[*here] == '\\' && input[(*here) + 1] == '"') {
             atom->val.string[p] = '\\';
             atom->val.string[++p] = '"';
             (*here)++;

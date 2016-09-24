@@ -49,7 +49,6 @@ object make_false(void);
 #define SFS_BOOLEAN      0x05
 #define SFS_SYMBOL       0x06
 
-
 extern object nil;
 extern object true;
 extern object false;
