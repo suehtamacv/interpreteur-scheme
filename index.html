@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=640">
+
+    <link rel="stylesheet" href="stylesheets/core.css" media="screen">
+    <link rel="stylesheet" href="stylesheets/mobile.css" media="handheld, only screen and (max-device-width:640px)">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+
+    <script type="text/javascript" src="javascripts/modernizr.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="javascripts/headsmart.min.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function () {
+        $('#main_content').headsmart()
+      })
+    </script>
+    <title>Programmation fonctionnelle et interpréteur Scheme by suehtamacv</title>
+  </head>
+
+  <body>
+    <a id="forkme_banner" href="https://github.com/suehtamacv/interpreteur-scheme">View on GitHub</a>
+    <div class="shell">
+
+      <header>
+        <span class="ribbon-outer">
+          <span class="ribbon-inner">
+            <h1>Programmation fonctionnelle et interpréteur Scheme</h1>
+            <h2>Interpreteur de la langage Scheme en C.</h2>
+          </span>
+          <span class="left-tail"></span>
+          <span class="right-tail"></span>
+        </span>
+      </header>
+
+      <section id="downloads">
+        <span class="inner">
+          <a href="https://github.com/suehtamacv/interpreteur-scheme/zipball/master" class="zip"><em>download</em> .ZIP</a><a href="https://github.com/suehtamacv/interpreteur-scheme/tarball/master" class="tgz"><em>download</em> .TGZ</a>
+        </span>
+      </section>
+
+
+      <span class="banner-fix"></span>
+
+
+      <section id="main_content">
+        <h1>
+<a id="présentation" class="anchor" href="#pr%C3%A9sentation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Présentation</h1>
+
+<p>Le but du projet informatique est de créer un interpréteur de la langage de programmation <em>Scheme</em>, en <em>C</em>. Pour faciliter sa exécution, le projet a été divisé entre quatre livrables.</p>
+
+<h1>
+<a id="livrable-1--interpréteur-et-environnement" class="anchor" href="#livrable-1--interpr%C3%A9teur-et-environnement" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Livrable 1 : Interpréteur et environnement</h1>
+
+<p>Deux des fonctionnalités peut-être les plus délicates à implanter sont sans doute l'analyse lexicale d'une commande pour construire « l'arbre syntaxique » correspondant (« <em>parsing</em> ») et l'affichage de l'arbre qui encode le résultat de cette commande. Il est donc intéressant de commencer par réaliser une fonction de lecture (qui construit « l'arbre syntaxique» correspondant à la commande) et une fonction d'écriture (qui affiche un arbre donné à l'écran). C'était le but du premier incrément.</p>
+
+<p>Donc, pendant l'exécution du premier livrable, faut que les étudiants prennent un code base et écrivent les fonctions pour lire les atomes et les paires, concepts inhérent de la grammaire de <em>Scheme</em>. Ces objets ne seront pas encore interprétés, mais seulement sauvegardés et ensuite imprimés.</p>
+
+<p>Ce livrable peut être trouvé <a href="https://github.com/suehtamacv/interpreteur-scheme/releases/tag/v1-premierLivrable">ici</a>.</p>
+      </section>
+
+      <footer>
+        <span class="ribbon-outer">
+          <span class="ribbon-inner">
+            <p>this project by <a href="https://github.com/suehtamacv">suehtamacv</a> can be found on <a href="https://github.com/suehtamacv/interpreteur-scheme">GitHub</a></p>
+          </span>
+          <span class="left-tail"></span>
+          <span class="right-tail"></span>
+        </span>
+        <p>Generated with <a href="https://pages.github.com">GitHub Pages</a> using Merlot</p>
+        <span class="octocat"></span>
+      </footer>
+
+    </div>
+
+    
+  </body>
+</html>
