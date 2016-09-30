@@ -47,14 +47,14 @@ void sfs_print_pair(object o, Bool isBeginList) {
     if (isBeginList == True) {
         printf("(");
     }
-    sfs_print(o->val.pair.car, False);
+    sfs_print(car(o), False);
 
     /* Il s'agit du fin de la liste : donc il faut aussi imprimer ')' */
-    if (o->val.pair.cdr == nil) {
+    if (cdr(o) == nil) {
         printf(")");
     } else {
         printf(" ");
-        sfs_print(o->val.pair.cdr, False);
+        sfs_print(cdr(o), False);
     }
 }
 
@@ -64,7 +64,7 @@ void sfs_print(object o, Bool isBeginList) {
         /* Si le car du pair "o" est lui meme un pair, ou si on sait deja
          * que on est au debut d'une liste, donc faut passer 'True' a
          * sfs_print_pair, pour qu'elle sache qu'il faut imprimer '(' */
-        if (o->val.pair.car->type == SFS_PAIR || isBeginList == True) {
+        if (car(o)->type == SFS_PAIR || isBeginList == True) {
             sfs_print_pair(o, True);
         } else {
             sfs_print_pair(o, False);
