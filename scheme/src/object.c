@@ -115,3 +115,11 @@ Bool is_Symbol(object o) {
     }
     return False;
 }
+
+Bool is_AutoEvaluable(object o) {
+    if (is_Boolean(o) || is_Char(o) || is_Nil(o) || is_Number(o) || is_String(o)) {
+        return True;
+    } else {
+        return False;
+    }
+}

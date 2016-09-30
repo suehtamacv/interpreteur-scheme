@@ -17,19 +17,13 @@ extern "C" {
 #include "basic.h"
 
 /**
- * @brief The bool_t enum est utiliser pour decrire les valeurs Vrai et Faux qui n'existent
- * pas dans la langage C.
- */
-enum bool_t {
-    False = FALSE,
-    True = TRUE
-};
-
-/**
  * @brief Bool est le type de variable utilise pour sauvegarder
  * une valeur boolean.
  */
-typedef enum bool_t Bool;
+typedef enum {
+    False = FALSE,
+    True = TRUE
+} Bool;
 
 #ifdef __cplusplus
 }

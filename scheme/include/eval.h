@@ -18,6 +18,18 @@ extern "C" {
 
 object sfs_eval(object);
 
+/**
+ * @brief is_Form is used to verify whether the object is equal to
+ * a certain form.
+ * @return True iff the object is equal to the form.
+ */
+Bool is_Form(char *, object);
+
+Bool is_If(object);
+Bool is_Define(object);
+Bool is_Set(object);
+Bool is_Quote(object);
+
 #ifdef __cplusplus
 }
 #endif

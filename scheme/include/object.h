@@ -73,6 +73,7 @@ Bool is_Pair(object o);
 Bool is_Nil(object o);
 Bool is_Boolean(object o);
 Bool is_Symbol(object o);
+Bool is_AutoEvaluable(object o);
 
 #define SFS_NUMBER       0x00
 #define SFS_CHARACTER    0x01
