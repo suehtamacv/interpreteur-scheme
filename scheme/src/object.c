@@ -18,6 +18,13 @@ object make_object(uint type) {
     return t;
 }
 
+object make_pair(object car, object cdr) {
+    object p = make_object(SFS_PAIR);
+    p->val.pair.car = car;
+    p->val.pair.cdr = cdr;
+    return p;
+}
+
 object make_nil(void) {
     object t = make_object(SFS_NIL);
     t->val.special = t;
@@ -34,6 +41,20 @@ object make_false() {
     object f = make_object(SFS_BOOLEAN);
     f->val.boolean = False;
     return f;
+}
+
+void make_forms() {
+    _quote = make_object(SFS_SYMBOL);
+    strncpy(_quote->val.symbol, "quote", sizeof(_quote->val.symbol));
+
+    _if = make_object(SFS_SYMBOL);
+    strncpy(_if->val.symbol, "if", sizeof(_if->val.symbol));
+
+    _set = make_object(SFS_SYMBOL);
+    strncpy(_set->val.symbol, "set!", sizeof(_set->val.symbol));
+
+    _define = make_object(SFS_SYMBOL);
+    strncpy(_define->val.symbol, "define", sizeof(_define->val.symbol));
 }
 
 object car(object o) {

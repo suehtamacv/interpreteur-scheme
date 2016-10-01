@@ -31,14 +31,19 @@ void usage_error( char *command ) {
 
 /* Singletons */
 object nil;
-object true;
-object false;
+object _true;
+object _false;
+object _quote;
+object _if;
+object _define;
+object _set;
 
 void init_interpreter (void) {
     /* Crée les singletons */
+    make_forms();
     nil = make_nil();
-    true = make_true();
-    false = make_false();
+    _true = make_true();
+    _false = make_false();
 }
 
 int main (int argc, char *argv[]) {

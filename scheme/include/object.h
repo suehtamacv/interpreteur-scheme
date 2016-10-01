@@ -38,9 +38,11 @@ typedef struct object_t {
 } *object;
 
 object make_object(uint type);
+object make_pair(object car, object cdr);
 object make_nil(void);
 object make_true(void);
 object make_false(void);
+void make_forms(void);
 
 /**
  * @brief car returns the car of the object o, given that it is a pair.
@@ -84,8 +86,12 @@ Bool is_AutoEvaluable(object o);
 #define SFS_SYMBOL       0x06
 
 extern object nil;
-extern object true;
-extern object false;
+extern object _true;
+extern object _false;
+extern object _quote;
+extern object _if;
+extern object _define;
+extern object _set;
 
 #ifdef __cplusplus
 }

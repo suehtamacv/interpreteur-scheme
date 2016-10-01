@@ -14,7 +14,7 @@ object sfs_eval(object input) {
     restart:
 
     if (is_Quote(input)) {
-        input = cadr(input);
+        return cdr(input);
     }
 
     if (is_AutoEvaluable(input) == False) {

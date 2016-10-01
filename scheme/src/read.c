@@ -304,6 +304,9 @@ object sfs_read( char *input, uint *here ) {
             (*here)++;
             return sfs_read_pair( input, here );
         }
+    } else if (input[*here] == '\'') {
+        (*here)++;
+        return make_pair(_quote, make_pair(sfs_read(input, here), nil));
     } else {
         return sfs_read_atom( input, here );
     }
@@ -382,9 +385,9 @@ object sfs_read_bool(char *input, uint *here) {
     } /* Faut continuer jusqu'a la fin de ce faux caractere */
 
     if (strcmp(bool_name, "t") == 0) {
-        return true;
+        return _true;
     } else if (strcmp(bool_name, "f") == 0) {
-        return false;
+        return _false;
     } else {
         WARNING_MSG("%s is not a valid boolean", bool_name);
         return NULL;
