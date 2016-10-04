@@ -295,6 +295,10 @@ object sfs_read( char *input, uint *here ) {
     while (input[*here] == ' ' || input[*here] == '\t') {
         (*here)++;
     };
+    if (input[*here] == '\0' || input[*here] == EOF) {
+        ERROR_MSG("Trying to read besides the end of the line");
+        return NULL;
+    }
 
     if ( input[*here] == '(' ) {
         if ( input[(*here) + 1] == ')' ) {
@@ -729,7 +733,9 @@ object sfs_read_real_number(char *input, uint *here) {
     } while (input[*here] != ' ' &&
              input[*here] != '\n' &&
              input[*here] != '\0' &&
-             input[*here] == '"' &&
+             input[*here] != '(' &&
+             input[*here] != ')' &&
+             input[*here] != '"' &&
              input[*here] != EOF);
 
     /* Considere que le nombre peut etre negatif */

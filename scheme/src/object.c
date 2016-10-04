@@ -138,9 +138,21 @@ Bool is_Symbol(object o) {
 }
 
 Bool is_AutoEvaluable(object o) {
-    if (is_Boolean(o) || is_Char(o) || is_Nil(o) || is_Number(o) || is_String(o)) {
+    if (is_Boolean(o)) {
         return True;
-    } else {
-        return False;
     }
+    if (is_Char(o)) {
+        return True;
+    }
+    if (is_Nil(o)) {
+        return True;
+    }
+    if (is_Number(o)) {
+        return True;
+    }
+    if (is_String(o)) {
+        return True;
+    }
+
+    return False;
 }

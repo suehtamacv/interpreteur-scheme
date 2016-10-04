@@ -11,13 +11,15 @@
 #include <strings.h>
 
 object sfs_eval(object input) {
-    restart:
+restart:
 
-    if (is_Quote(input)) {
-        return cdr(input);
+    if (is_Quote(input) == True) {
+        return cadr(input);
     }
 
     if (is_AutoEvaluable(input) == False) {
+        printf("not auto eval\n");
+        return input;
         goto restart;
     }
     return input;
@@ -35,17 +37,29 @@ Bool is_Form(char *form, object o) {
 }
 
 Bool is_If(object o) {
+    if (is_Pair(o) == False) {
+        return False;
+    }
     return is_Form("if", car(o));
 }
 
 Bool is_Define(object o) {
+    if (is_Pair(o) == False) {
+        return False;
+    }
     return is_Form("define", car(o));
 }
 
 Bool is_Set(object o) {
+    if (is_Pair(o) == False) {
+        return False;
+    }
     return is_Form("set!", car(o));
 }
 
 Bool is_Quote(object o) {
+    if (is_Pair(o) == False) {
+        return False;
+    }
     return is_Form("quote", car(o));
 }
