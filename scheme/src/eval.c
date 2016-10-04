@@ -24,12 +24,46 @@ restart:
             input = caddr(input);
             goto restart;
         }
+    } else if (is_And(input) == True) {
+        input = eval_And(cdr(input));
+    } else if (is_Or(input) == True) {
+        input = eval_Or(cdr(input));
     }
 
     if (is_AutoEvaluable(input) == False) {
         goto restart;
     }
     return input;
+}
+
+object eval_And(object o) {
+restart:
+
+    if (is_True(sfs_eval(car(o))) == False) {
+        return _false;
+    }
+
+    o = cdr(o);
+    if (o != nil) {
+        goto restart;
+    }
+
+    return _true;
+}
+
+object eval_Or(object o) {
+restart:
+
+    if (is_True(sfs_eval(car(o))) == True) {
+        return _true;
+    }
+
+    o = cdr(o);
+    if (o != nil) {
+        goto restart;
+    }
+
+    return _false;
 }
 
 Bool is_Form(char *form, object o) {
@@ -69,4 +103,18 @@ Bool is_Quote(object o) {
         return False;
     }
     return is_Form("quote", car(o));
+}
+
+Bool is_And(object o) {
+    if (is_Pair(o) == False) {
+        return False;
+    }
+    return is_Form("and", car(o));
+}
+
+Bool is_Or(object o) {
+    if (is_Pair(o) == False) {
+        return False;
+    }
+    return is_Form("or", car(o));
 }

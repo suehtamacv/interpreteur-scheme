@@ -29,6 +29,11 @@ Bool is_If(object);
 Bool is_Define(object);
 Bool is_Set(object);
 Bool is_Quote(object);
+Bool is_And(object);
+Bool is_Or(object);
+
+object eval_And(object);
+object eval_Or(object);
 
 #ifdef __cplusplus
 }
