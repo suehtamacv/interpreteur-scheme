@@ -18,8 +18,6 @@ restart:
     }
 
     if (is_AutoEvaluable(input) == False) {
-        printf("not auto eval\n");
-        return input;
         goto restart;
     }
     return input;

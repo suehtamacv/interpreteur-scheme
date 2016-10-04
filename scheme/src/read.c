@@ -369,7 +369,7 @@ object sfs_read_bool(char *input, uint *here) {
             /* Ce sont les chars que peuvent finir le bool */
             input[*here + p] != ' ' && input[*here + p] != '\n' &&
             input[*here + p] != '\t' && input[*here + p] != '"' &&
-            input[*here + p] != ')'
+            input[*here + p] != ')' && input[*here + p] != '('
             /* Apres la diese, on a dans un boolean maximale d'un caractere. Donc si
              * on compte deux caracteres apres la diese (p < 3), on sait ou non s'il s'agit
              * d'un boolean correcte */
@@ -384,7 +384,7 @@ object sfs_read_bool(char *input, uint *here) {
 
     while (input[*here] != ' ' && input[*here] != '\n' &&
             input[*here] != '\t' && input[*here] != '"' &&
-            input[*here] != ')' && input[*here] != '\0') {
+            input[*here] != '(' && input[*here] != ')' && input[*here] != '\0') {
         (*here)++;
     } /* Faut continuer jusqu'a la fin de ce faux caractere */
 
@@ -547,7 +547,7 @@ object sfs_read_symbol(char *input, uint *here) {
     for (p = 0;
             input[*here] != ' ' && input[*here] != '\n' &&
             input[*here] != '\t' && input[*here] != '\0' &&
-            input[*here] != ')' &&
+            input[*here] != '(' && input[*here] != ')' &&
             p < STRLEN - 1; /* Ce sont les chars que peuvent finir une symbole */
             (*here)++, p++) {
         atom->val.symbol[p] = input[*here];
@@ -557,7 +557,8 @@ object sfs_read_symbol(char *input, uint *here) {
         WARNING_MSG("Symbol name larger than %d characters has been truncated.",
                     STRLEN - 1);
         while (input[*here] != ' ' && input[*here] != '\n' &&
-                input[*here] != '\t' && input[*here] != '\0') {
+                input[*here] != '\t' && input[*here] != '\0' && input[*here] != '(' &&
+                input[*here] != ')') {
             (*here)++;
         }
     }
