@@ -13,6 +13,10 @@
 object sfs_eval(object input) {
 restart:
 
+    if (is_AutoEvaluable(input) == True) {
+        return input;
+    }
+
     if (is_Quote(input) == True) {
         return cadr(input);
     } else if (is_If(input) == True) {
@@ -30,20 +34,19 @@ restart:
         input = eval_Or(cdr(input));
     }
 
-    if (is_AutoEvaluable(input) == False) {
-        goto restart;
-    }
-    return input;
+    goto restart;
 }
 
 object eval_And(object o) {
 restart:
 
+    /* Court circuit si on trouve un #f */
     if (is_True(sfs_eval(car(o))) == False) {
         return _false;
     }
 
     o = cdr(o);
+    /* Liste pas encore finie */
     if (o != nil) {
         goto restart;
     }
@@ -54,11 +57,13 @@ restart:
 object eval_Or(object o) {
 restart:
 
+    /* Court circuit si on trouve un #t */
     if (is_True(sfs_eval(car(o))) == True) {
         return _true;
     }
 
     o = cdr(o);
+    /* Liste pas encore finie */
     if (o != nil) {
         goto restart;
     }

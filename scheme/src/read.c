@@ -301,11 +301,16 @@ object sfs_read( char *input, uint *here ) {
     }
 
     if ( input[*here] == '(' ) {
-        if ( input[(*here) + 1] == ')' ) {
-            *here += 2;
+        (*here)++;
+        /* Ces caracteres doivent etre ignores */
+        while (input[*here] == ' ' || input[*here] == '\t') {
+            (*here)++;
+        };
+
+        if ( input[*here] == ')' ) {
+            (*here)++;
             return nil;
         } else {
-            (*here)++;
             return sfs_read_pair( input, here );
         }
     } else if (input[*here] == '\'') {

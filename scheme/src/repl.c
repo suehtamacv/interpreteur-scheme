@@ -147,7 +147,7 @@ int main (int argc, char *argv[]) {
         }
 
         printf( "==> " );
-        sfs_print( output, True );
+        sfs_print( output );
         printf( "\n" );
     }
 

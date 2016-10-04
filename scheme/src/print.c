@@ -10,67 +10,55 @@
 #include "print.h"
 #include <stdio.h>
 
-void sfs_print_atom(object o) {
-    /* This switch is used to identify the type of object and then
-     * call the corresponding print function */
-    switch (o->type) {
-    case SFS_CHARACTER:
-        sfs_print_char(o);
-        break;
-
-    case SFS_BOOLEAN:
-        sfs_print_bool(o);
-        break;
-
-    case SFS_NUMBER:
-        sfs_print_number(o);
-        break;
-
-    case SFS_STRING:
-        sfs_print_string(o);
-        break;
-
-    case SFS_SYMBOL:
-        sfs_print_symbol(o);
-        break;
-
-    case SFS_NIL:
-        sfs_print_nil(o);
-        break;
-    }
-
-    return;
-}
-
-void sfs_print_pair(object o, Bool isBeginList) {
-    /* Il s'agit du debut d'une liste : donc il faut aussi imprimer '(' */
-    if (isBeginList == True) {
+void sfs_print(object o) {
+    /* Le premier paranthèse ouvrante des listes */
+    if (is_Pair(o) == True) {
         printf("(");
     }
-    sfs_print(car(o), False);
 
-    /* Il s'agit du fin de la liste : donc il faut aussi imprimer ')' */
-    if (cdr(o) == nil) {
-        printf(")");
-    } else {
-        printf(" ");
-        sfs_print(cdr(o), False);
-    }
-}
-
-void sfs_print(object o, Bool isBeginList) {
+restart:
 
     if (is_Pair(o) == True) {
-        /* Si le car du pair "o" est lui meme un pair, ou si on sait deja
-         * que on est au debut d'une liste, donc faut passer 'True' a
-         * sfs_print_pair, pour qu'elle sache qu'il faut imprimer '(' */
-        if (is_Pair(car(o)) == True || isBeginList == True) {
-            sfs_print_pair(o, True);
+
+        sfs_print(car(o));
+        o = cdr(o); /* On part au prochain element de la liste */
+
+        /* Le cdr vaut nil, donc il s'agit de la fin de la liste */
+        if (o == nil) {
+            printf(")");
+            return;
         } else {
-            sfs_print_pair(o, False);
+            printf(" ");
+            /* Il faut encore imprimer le prochain element */
+            goto restart;
         }
+
     } else {
-        sfs_print_atom(o);
+        switch (o->type) {
+        case SFS_CHARACTER:
+            sfs_print_char(o);
+            break;
+
+        case SFS_BOOLEAN:
+            sfs_print_bool(o);
+            break;
+
+        case SFS_NUMBER:
+            sfs_print_number(o);
+            break;
+
+        case SFS_STRING:
+            sfs_print_string(o);
+            break;
+
+        case SFS_SYMBOL:
+            sfs_print_symbol(o);
+            break;
+
+        case SFS_NIL:
+            sfs_print_nil(o);
+            break;
+        }
     }
 }
 
