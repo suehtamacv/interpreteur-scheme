@@ -156,3 +156,17 @@ Bool is_AutoEvaluable(object o) {
 
     return False;
 }
+
+Bool is_False(object o) {
+    if (is_Boolean(o) == True && o->val.boolean == False) {
+        return True;
+    }
+    return False;
+}
+
+Bool is_True(object o) {
+    if (is_False(o) == True) {
+        return False;
+    }
+    return True;
+}

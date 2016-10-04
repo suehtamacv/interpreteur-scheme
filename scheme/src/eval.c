@@ -15,6 +15,15 @@ restart:
 
     if (is_Quote(input) == True) {
         return cadr(input);
+    } else if (is_If(input) == True) {
+        input = cdr(input);
+        if (is_True(sfs_eval(car(input))) == True) {
+            input = cadr(input);
+            goto restart;
+        } else {
+            input = caddr(input);
+            goto restart;
+        }
     }
 
     if (is_AutoEvaluable(input) == False) {

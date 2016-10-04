@@ -60,11 +60,11 @@ void sfs_print_pair(object o, Bool isBeginList) {
 
 void sfs_print(object o, Bool isBeginList) {
 
-    if (o->type == SFS_PAIR) {
+    if (is_Pair(o) == True) {
         /* Si le car du pair "o" est lui meme un pair, ou si on sait deja
          * que on est au debut d'une liste, donc faut passer 'True' a
          * sfs_print_pair, pour qu'elle sache qu'il faut imprimer '(' */
-        if (car(o)->type == SFS_PAIR || isBeginList == True) {
+        if (is_Pair(car(o)) == True || isBeginList == True) {
             sfs_print_pair(o, True);
         } else {
             sfs_print_pair(o, False);
