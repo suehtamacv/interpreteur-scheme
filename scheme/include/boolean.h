@@ -1,6 +1,6 @@
 /**
  * @file boolean.h
- * @author Matheus Cavalcante <matheus.de-araujo-cavalcante@minatec.grenoble-inp.fr>
+ * @author Matheus Cavalcante <matheus.de-araujo-cavalcante@phelma.grenoble-inp.fr>
  * @date Dom Set 11 22:18:07 2016
  * @brief Boolean handling.
  *

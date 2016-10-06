@@ -42,6 +42,7 @@ object make_pair(object car, object cdr);
 object make_nil(void);
 object make_true(void);
 object make_false(void);
+object make_symbol_table(void);
 void make_forms(void);
 
 /**
@@ -94,6 +95,7 @@ extern object _quote;
 extern object _if;
 extern object _define;
 extern object _set;
+extern object symbol_table;
 
 #ifdef __cplusplus
 }

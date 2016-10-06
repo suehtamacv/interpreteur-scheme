@@ -37,6 +37,7 @@ object _quote;
 object _if;
 object _define;
 object _set;
+object symbol_table;
 
 void init_interpreter (void) {
     /* Crée les singletons */
@@ -44,6 +45,7 @@ void init_interpreter (void) {
     nil = make_nil();
     _true = make_true();
     _false = make_false();
+    symbol_table = make_symbol_table();
 }
 
 int main (int argc, char *argv[]) {

@@ -64,8 +64,9 @@ restart:
 
 void sfs_print_char(object o) {
     if (o->type != SFS_CHARACTER) {
-        ERROR_MSG("Trying to print object of type %d as character (%d).", o->type,
-                  SFS_CHARACTER);
+        WARNING_MSG("Trying to print object of type %d as character (%d).", o->type,
+                    SFS_CHARACTER);
+        return sfs_print(o);
     }
 
 
@@ -81,15 +82,17 @@ void sfs_print_char(object o) {
 
 void sfs_print_nil(object o) {
     if (o->type != SFS_NIL) {
-        ERROR_MSG("Trying to print object of type %d as nil (%d).", o->type, SFS_NIL);
+        WARNING_MSG("Trying to print object of type %d as nil (%d).", o->type, SFS_NIL);
+        return sfs_print(o);
     }
     printf("()");
 }
 
 void sfs_print_bool(object o) {
     if (o->type != SFS_BOOLEAN) {
-        ERROR_MSG("Trying to print object of type %d as boolean (%d).", o->type,
-                  SFS_BOOLEAN);
+        WARNING_MSG("Trying to print object of type %d as boolean (%d).", o->type,
+                    SFS_BOOLEAN);
+        return sfs_print(o);
     }
 
     if (o->val.boolean == True) {
@@ -103,8 +106,9 @@ void sfs_print_bool(object o) {
 
 void sfs_print_number(object o) {
     if (o->type != SFS_NUMBER) {
-        ERROR_MSG("Trying to print object of type %d as number (%d).", o->type,
-                  SFS_NUMBER);
+        WARNING_MSG("Trying to print object of type %d as number (%d).", o->type,
+                    SFS_NUMBER);
+        sfs_print(o);
     }
 
     switch (o->val.number.numtype) {
@@ -142,8 +146,9 @@ void sfs_print_number(object o) {
 
 void sfs_print_string(object o) {
     if (o->type != SFS_STRING) {
-        ERROR_MSG("Trying to print object of type %d as string (%d).", o->type,
-                  SFS_STRING);
+        WARNING_MSG("Trying to print object of type %d as string (%d).", o->type,
+                    SFS_STRING);
+        sfs_print(o);
     }
 
     printf("\"%s\"", o->val.string);
@@ -151,8 +156,9 @@ void sfs_print_string(object o) {
 
 void sfs_print_symbol(object o) {
     if (o->type != SFS_SYMBOL) {
-        ERROR_MSG("Trying to print object of type %d as symbol (%d).", o->type,
-                  SFS_SYMBOL);
+        WARNING_MSG("Trying to print object of type %d as symbol (%d).", o->type,
+                    SFS_SYMBOL);
+        sfs_print(o);
     }
 
     printf("%s", o->val.symbol);

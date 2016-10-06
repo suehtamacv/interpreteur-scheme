@@ -43,6 +43,13 @@ object make_false() {
     return f;
 }
 
+object make_symbol_table() {
+    object symb = make_object(SFS_PAIR);
+    symb->val.pair.car = nil;
+    symb->val.pair.cdr = nil;
+    return symb;
+}
+
 void make_forms() {
     _quote = make_object(SFS_SYMBOL);
     strncpy(_quote->val.symbol, "quote", sizeof(_quote->val.symbol));
