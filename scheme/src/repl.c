@@ -46,6 +46,9 @@ void init_interpreter (void) {
     _true = make_true();
     _false = make_false();
     symbol_table = make_symbol_table();
+
+    /* Crée l'environment top-level */
+    create_environment();
 }
 
 int main (int argc, char *argv[]) {

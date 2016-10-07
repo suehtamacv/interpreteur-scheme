@@ -56,7 +56,7 @@ object locate_symbol(string name, int starting_env_number) {
         object curr_obj = env;
         while (curr_obj != nil) {
             if (strcasecmp(car(car(curr_obj))->val.string, name) == 0) {
-                return cdr(car(curr_obj)); //TODO: CAR CDR?? CDR CAR??
+                return car(cdr(curr_obj)); //TODO: CAR CDR?? CDR CAR??
             }
             curr_obj = cdr(curr_obj);
         }
@@ -90,7 +90,7 @@ void set_symbol(string name, object obj, int env_number) {
     object old_symbol = locate_symbol(name, env_number);
 
     if (old_symbol == NULL) {
-        WARNING_MSG("It is not possible to use \"set!\" in a symbol that does not exist.");
+        WARNING_MSG("It is not possible to use \"set!\" in a symbol that does not exist");
     } else {
         old_symbol->val.pair.cdr = obj;
     }

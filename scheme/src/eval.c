@@ -15,6 +15,14 @@ restart:
 
     if (is_AutoEvaluable(input) == True) {
         return input;
+    } else if (is_Symbol(input) == True) {
+        object loc_symbol = locate_symbol(input->val.symbol, 0);
+        if (loc_symbol == NULL) {
+            ERROR_MSG("Symbol %s not found", input->val.symbol);
+        } else {
+            input = loc_symbol;
+        }
+        goto restart;
     }
 
     if (is_Quote(input) == True) {
@@ -32,6 +40,12 @@ restart:
         input = eval_And(cdr(input));
     } else if (is_Or(input) == True) {
         input = eval_Or(cdr(input));
+    } else if (is_Define(input) == True) {
+        define_symbol(cadr(input)->val.symbol, caddr(input), 0);
+        return NULL;
+    } else if (is_Set(input) == True) {
+        set_symbol(cadr(input)->val.symbol, caddr(input), 0);
+        return NULL;
     }
 
     goto restart;

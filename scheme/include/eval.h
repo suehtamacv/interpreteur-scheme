@@ -15,6 +15,7 @@ extern "C" {
 #endif
 
 #include "object.h"
+#include "symbols.h"
 
 object sfs_eval(object);
 
