@@ -295,15 +295,27 @@ object sfs_read( char *input, uint *here ) {
     while (input[*here] == ' ' || input[*here] == '\t') {
         (*here)++;
     };
+    if (input[*here] == '\0' || input[*here] == EOF) {
+        ERROR_MSG("Trying to read besides the end of the line");
+        return NULL;
+    }
 
     if ( input[*here] == '(' ) {
-        if ( input[(*here) + 1] == ')' ) {
-            *here += 2;
+        (*here)++;
+        /* Ces caracteres doivent etre ignores */
+        while (input[*here] == ' ' || input[*here] == '\t') {
+            (*here)++;
+        };
+
+        if ( input[*here] == ')' ) {
+            (*here)++;
             return nil;
         } else {
-            (*here)++;
             return sfs_read_pair( input, here );
         }
+    } else if (input[*here] == '\'') {
+        (*here)++;
+        return make_pair(_quote, make_pair(sfs_read(input, here), nil));
     } else {
         return sfs_read_atom( input, here );
     }
@@ -362,7 +374,7 @@ object sfs_read_bool(char *input, uint *here) {
             /* Ce sont les chars que peuvent finir le bool */
             input[*here + p] != ' ' && input[*here + p] != '\n' &&
             input[*here + p] != '\t' && input[*here + p] != '"' &&
-            input[*here + p] != ')'
+            input[*here + p] != ')' && input[*here + p] != '('
             /* Apres la diese, on a dans un boolean maximale d'un caractere. Donc si
              * on compte deux caracteres apres la diese (p < 3), on sait ou non s'il s'agit
              * d'un boolean correcte */
@@ -377,14 +389,14 @@ object sfs_read_bool(char *input, uint *here) {
 
     while (input[*here] != ' ' && input[*here] != '\n' &&
             input[*here] != '\t' && input[*here] != '"' &&
-            input[*here] != ')' && input[*here] != '\0') {
+            input[*here] != '(' && input[*here] != ')' && input[*here] != '\0') {
         (*here)++;
     } /* Faut continuer jusqu'a la fin de ce faux caractere */
 
     if (strcmp(bool_name, "t") == 0) {
-        return true;
+        return _true;
     } else if (strcmp(bool_name, "f") == 0) {
-        return false;
+        return _false;
     } else {
         WARNING_MSG("%s is not a valid boolean", bool_name);
         return NULL;
@@ -540,7 +552,7 @@ object sfs_read_symbol(char *input, uint *here) {
     for (p = 0;
             input[*here] != ' ' && input[*here] != '\n' &&
             input[*here] != '\t' && input[*here] != '\0' &&
-            input[*here] != ')' &&
+            input[*here] != '(' && input[*here] != ')' &&
             p < STRLEN - 1; /* Ce sont les chars que peuvent finir une symbole */
             (*here)++, p++) {
         atom->val.symbol[p] = input[*here];
@@ -550,7 +562,8 @@ object sfs_read_symbol(char *input, uint *here) {
         WARNING_MSG("Symbol name larger than %d characters has been truncated.",
                     STRLEN - 1);
         while (input[*here] != ' ' && input[*here] != '\n' &&
-                input[*here] != '\t' && input[*here] != '\0') {
+                input[*here] != '\t' && input[*here] != '\0' && input[*here] != '(' &&
+                input[*here] != ')') {
             (*here)++;
         }
     }
@@ -726,7 +739,9 @@ object sfs_read_real_number(char *input, uint *here) {
     } while (input[*here] != ' ' &&
              input[*here] != '\n' &&
              input[*here] != '\0' &&
-             input[*here] == '"' &&
+             input[*here] != '(' &&
+             input[*here] != ')' &&
+             input[*here] != '"' &&
              input[*here] != EOF);
 
     /* Considere que le nombre peut etre negatif */

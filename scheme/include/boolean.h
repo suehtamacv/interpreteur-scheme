@@ -1,6 +1,6 @@
 /**
  * @file boolean.h
- * @author Matheus Cavalcante <matheus.de-araujo-cavalcante@minatec.grenoble-inp.fr>
+ * @author Matheus Cavalcante <matheus.de-araujo-cavalcante@phelma.grenoble-inp.fr>
  * @date Dom Set 11 22:18:07 2016
  * @brief Boolean handling.
  *
@@ -17,19 +17,13 @@ extern "C" {
 #include "basic.h"
 
 /**
- * @brief The bool_t enum est utiliser pour decrire les valeurs Vrai et Faux qui n'existent
- * pas dans la langage C.
- */
-enum bool_t {
-    False = FALSE,
-    True = TRUE
-};
-
-/**
  * @brief Bool est le type de variable utilise pour sauvegarder
  * une valeur boolean.
  */
-typedef enum bool_t Bool;
+typedef enum {
+    False = FALSE,
+    True = TRUE
+} Bool;
 
 #ifdef __cplusplus
 }

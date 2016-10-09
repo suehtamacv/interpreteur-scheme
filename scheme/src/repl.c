@@ -31,14 +31,24 @@ void usage_error( char *command ) {
 
 /* Singletons */
 object nil;
-object true;
-object false;
+object _true;
+object _false;
+object _quote;
+object _if;
+object _define;
+object _set;
+object symbol_table;
 
 void init_interpreter (void) {
     /* Crée les singletons */
+    make_forms();
     nil = make_nil();
-    true = make_true();
-    false = make_false();
+    _true = make_true();
+    _false = make_false();
+    symbol_table = make_symbol_table();
+
+    /* Crée l'environment top-level */
+    create_environment();
 }
 
 int main (int argc, char *argv[]) {
@@ -142,7 +152,7 @@ int main (int argc, char *argv[]) {
         }
 
         printf( "==> " );
-        sfs_print( output, True );
+        sfs_print( output );
         printf( "\n" );
     }
 
