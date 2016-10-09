@@ -6,7 +6,7 @@
 
 ; another comment
 ;; with a new line char
-(set! bob ’’replace’’)
+(set! bob "replace")
 
 ;; another comment
 
