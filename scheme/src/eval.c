@@ -16,11 +16,11 @@ restart:
     if (is_AutoEvaluable(input) == True) {
         return input;
     } else if (is_Symbol(input) == True) {
-        object loc_symbol = locate_symbol(input->val.symbol, 0);
+        object *loc_symbol = locate_symbol(input->val.symbol, 0);
         if (loc_symbol == NULL) {
             ERROR_MSG("Symbol %s not found", input->val.symbol);
         } else {
-            input = loc_symbol;
+            input = *loc_symbol;
         }
         goto restart;
     }

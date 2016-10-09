@@ -19,11 +19,11 @@ extern "C" {
 #include "object.h"
 
 void create_environment();
-object get_environment(int);
+object* get_environment(int);
 
 void define_symbol(string, object, int);
 void set_symbol(string, object, int);
-object locate_symbol(string, int);
+object *locate_symbol(string, int);
 
 #ifdef __cplusplus
 }
