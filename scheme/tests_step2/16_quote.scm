@@ -7,6 +7,6 @@
 ; another comment
 ;; with a new line char
 
-(quote(1 (2 3)))
+(quote (1 (2 3)))
 ;; another comment
 

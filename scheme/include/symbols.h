@@ -30,4 +30,4 @@ object *locate_symbol(string, int);
 #endif
 
 
-#endif // SYMBOLS_H
+#endif /* SYMBOLS_H */

@@ -6,8 +6,8 @@
 
 ; another comment
 ;; with a new line char
-(define x 12)
-(set! x (+ 1 x))
+(define x "lunch")
+(set! x "dinner")
 x
 ;; another comment
 

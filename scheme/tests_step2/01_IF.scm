@@ -8,7 +8,7 @@
 ;; with a new line char
 
 (define x -4)
-(if (< x 0) (- x) x )
+(if #t '(1 2 x) x)
 
 ;; another comment
 

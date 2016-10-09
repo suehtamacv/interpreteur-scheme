@@ -1,2 +1,2 @@
-==> (quote(1) quote(2) quote(3))
+==> ((quote 1) (quote 2) (quote 3))
 

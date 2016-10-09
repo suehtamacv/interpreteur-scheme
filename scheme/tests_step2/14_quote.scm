@@ -6,6 +6,6 @@
 
 ; another comment
 ;; with a new line char
-'('1 quote(2) '3 )
+'('1 (quote 2) '3 )
 ;; another comment
 

@@ -7,7 +7,7 @@
 ; another comment
 ;; with a new line char
 
- (if (and (< 2 8) (< 7 5)) 4 6)
+(if (and #t #f 8) 5 6)
 
 ;; another comment
 

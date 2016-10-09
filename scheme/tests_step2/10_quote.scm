@@ -8,14 +8,13 @@
 ;; with a new line char
 
 '()
-(quote())
-(quote(()))
+(quote ())
+(quote (()))
 (define x 2)
-(quote(3 x))
+(quote (3 x))
 '('1 '2 '3 )
-'('1 quote(2) '3 )
-'(define '(y) 3)
+'('1 (quote 2) '3 )
 '''''''4
-(quote(1 (2 3)))
+(quote (1 (2 3)))
 ;; another comment
 

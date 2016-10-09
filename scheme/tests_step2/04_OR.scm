@@ -7,7 +7,7 @@
 ; another comment
 ;; with a new line char
 
-(or (= 2 3) 10 (number? "yes"))
+(or 1 #t #f #f #f)
 
 ;; another comment
 

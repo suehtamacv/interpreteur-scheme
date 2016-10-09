@@ -8,9 +8,10 @@
  * table of symbols, and functions to add, remove and look for a symbol.
  */
 
-#include "include/symbols.h"
-#include "include/print.h"
+#include "symbols.h"
+#include "print.h"
 #include <stdio.h>
+#include <strings.h>
 
 void create_environment() {
     object* last_env = &symbol_table;
@@ -47,7 +48,8 @@ object* locate_symbol(string name, int starting_env_number) {
         return NULL;
     }
 
-    for (int curr_env = starting_env_number; curr_env != -1; curr_env--) {
+    int curr_env = starting_env_number;
+    for (; curr_env != -1; curr_env--) {
         object* env = get_environment(curr_env);
 
         object* curr_obj = env;
