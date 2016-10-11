@@ -24,7 +24,7 @@ restart:
             in = *l_symb;
         }
         goto restart;
-    } else if (is_Pair(in) == True) {
+    } else if (0 && is_Pair(in) == True) {
         if (is_Symbol(in) == False) {
             ERROR_MSG("Ill-formed expression: first list element is not a defined primitive");
         }
