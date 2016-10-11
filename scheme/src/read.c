@@ -348,8 +348,9 @@ object sfs_read_atom(char *input, uint *here) {
 }
 
 object sfs_read_pair(char *input, uint *here) {
-
     object pair = make_object(SFS_PAIR);
+    DEBUG_MSG("Reading a pair");
+    DEBUG_MSG("Reading the CAR");
     pair->val.pair.car = sfs_read(input, here);
 
     while (input[*here] == ' ' || input[*here] == '\t') {
@@ -359,8 +360,10 @@ object sfs_read_pair(char *input, uint *here) {
     /* On a trouve la fin de la liste : cdr vaut nil */
     if (input[*here] == ')') {
         (*here)++;
+        DEBUG_MSG("Reading the CDR: nil");
         pair->val.pair.cdr = nil;
     } else { /* On continue a lire la liste : le cdr de ce pair vaut lui meme un pair */
+        DEBUG_MSG("Reading the CDR");
         pair->val.pair.cdr = sfs_read_pair(input, here);
     }
 
@@ -394,8 +397,10 @@ object sfs_read_bool(char *input, uint *here) {
     } /* Faut continuer jusqu'a la fin de ce faux caractere */
 
     if (strcmp(bool_name, "t") == 0) {
+        DEBUG_MSG("Reading a SFS_BOOLEAN: #t");
         return _true;
     } else if (strcmp(bool_name, "f") == 0) {
+        DEBUG_MSG("Reading a SFS_BOOLEAN: #f");
         return _false;
     } else {
         WARNING_MSG("%s is not a valid boolean", bool_name);
@@ -432,10 +437,13 @@ object sfs_read_char(char *input, uint *here) {
 
         /* Certains caracteres ont une representation special */
         if (strcmp(char_name, "space") == 0) {
+            DEBUG_MSG("Reading a SFS_CHARACTER: space");
             atom->val.character = ' ';
         } else if (strcmp(char_name, "newline") == 0) {
+            DEBUG_MSG("Reading a SFS_CHARACTER: newline");
             atom->val.character = '\n';
         } else if (strlen(char_name) == 1) {
+            DEBUG_MSG("Reading a SFS_CHARACTER: %c", input[*here]);
             atom->val.character = input[*here];
         } else {
             WARNING_MSG("%s is not a valid character", char_name);
@@ -449,6 +457,8 @@ object sfs_read_char(char *input, uint *here) {
 }
 
 object sfs_read_number(char *input, uint *here) {
+    DEBUG_MSG("Reading a SFS_NUMBER");
+
     /* Cherche un seul i ou j pour decider si c'est un nombre complexe */
     /* Un nombre complexe doit etre ecrit comme [+|-]a{+|-}b{i|j} */
     Bool isComplex = False;
@@ -542,6 +552,8 @@ object sfs_read_string(char *input, uint *here) {
     (*here)++;
     atom->val.string[p] = '\0';
 
+    DEBUG_MSG("Reading a SFS_STRING: %s", atom->val.string);
+
     return atom;
 }
 
@@ -568,6 +580,8 @@ object sfs_read_symbol(char *input, uint *here) {
         }
     }
     atom->val.symbol[p] = '\0';
+
+    DEBUG_MSG("Reading a SFS_SYMBOL: %s", atom->val.symbol);
 
     return atom;
 }
@@ -615,6 +629,11 @@ object sfs_read_integer_number(char *input, uint *here) {
     /* Considere que le nombre peut etre negatif */
     atom->val.number.val.integer = cur_num * k;
 
+    if (atom->val.number.numtype == NUM_INTEGER) {
+        DEBUG_MSG("Reading a NUM_INTEGER: %d", atom->val.number.val.integer);
+    } else if (atom->val.number.numtype == NUM_UINTEGER) {
+        DEBUG_MSG("Reading a NUM_UINTEGER: %d", atom->val.number.val.integer);
+    }
     return atom;
 }
 
@@ -700,6 +719,7 @@ object sfs_read_complex_number(char *input, uint *here) {
     atom->val.number.val.complex.real = real;
     atom->val.number.val.complex.imag = imag;
 
+    DEBUG_MSG("Reading a NUM_COMPLEX: (%f) + j (%f)", real, imag);
     return atom;
 }
 
@@ -747,5 +767,6 @@ object sfs_read_real_number(char *input, uint *here) {
     /* Considere que le nombre peut etre negatif */
     atom->val.number.val.real = cur_number * k;
 
+    DEBUG_MSG("Reading a NUM_REAL: %f", atom->val.number.val.real);
     return atom;
 }

@@ -19,7 +19,7 @@ Bool is_True(object o);
 Bool is_False(object o);
 
 /* Those are basic arithmetic functions */
-object arith_Plus(object o);
+object arith_Plus(object);
 
 
 #endif /* FORMS_H */

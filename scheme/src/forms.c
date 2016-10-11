@@ -3,28 +3,15 @@
 
 void create_basic_forms() {
     /* Those are the basic forms */
-    _quote = make_object(SFS_SYMBOL);
-    strncpy(_quote->val.symbol, "quote", sizeof(_quote->val.symbol));
-
-    _if = make_object(SFS_SYMBOL);
-    strncpy(_if->val.symbol, "if", sizeof(_if->val.symbol));
-
-    _set = make_object(SFS_SYMBOL);
-    strncpy(_set->val.symbol, "set!", sizeof(_set->val.symbol));
-
-    _define = make_object(SFS_SYMBOL);
-    strncpy(_define->val.symbol, "define", sizeof(_define->val.symbol));
+    _quote = make_symbol("quote");
+    _if = make_symbol("if");
+    _set = make_symbol("set!");
+    _define = make_symbol("define");
 }
 
 void create_basic_primitives() {
     /* Those are the basic arithmetic primitives */
-    object pr_Plus_Symb = make_object(SFS_SYMBOL);
-    object pr_Plus = make_object(SFS_PRIMITIVE);
-
-    pr_Plus->val.primitive.f = arith_Plus;
-    strncpy(pr_Plus_Symb->val.symbol, "+", sizeof(pr_Plus_Symb->val.symbol));
-
-    define_symbol(pr_Plus_Symb, pr_Plus, 0);
+    define_symbol(make_symbol("+"), make_primitive(arith_Plus), 0);
 }
 
 Bool is_Boolean(object o) {
@@ -84,5 +71,5 @@ Bool is_Primitive(object o) {
 }
 
 object arith_Plus(object o) {
-    return o;
+    return nil;
 }

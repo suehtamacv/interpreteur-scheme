@@ -50,6 +50,12 @@ object make_primitive(object (*func)(object)) {
     return f;
 }
 
+object make_symbol(string s) {
+    object o = make_object(SFS_SYMBOL);
+    strncpy(o->val.symbol,  s, sizeof(o->val.symbol));
+    return o;
+}
+
 object make_symbol_table() {
     object symb = make_object(SFS_PAIR);
     symb->val.pair.car = nil;

@@ -47,6 +47,7 @@ object make_true(void);
 object make_false(void);
 object make_primitive(object (*f)(object));
 object make_symbol_table(void);
+object make_symbol(string);
 
 /**
  * @brief car returns the car of the object o, given that it is a pair.

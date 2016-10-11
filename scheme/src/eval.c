@@ -10,29 +10,38 @@
 #include "eval.h"
 #include "forms.h"
 #include <strings.h>
+#include "print.h"
 
 object sfs_eval(object in) {
 restart:
 
     if (is_AutoEvaluable(in) == True) {
+        DEBUG_MSG("Evaluating auto-evaluable object");
         return in;
     } else if (is_Symbol(in) == True) {
+        DEBUG_MSG("Resolving a symbol by searching for it in the symbol table");
         object *l_symb = locate_symbol(in, 0);
         if (l_symb == NULL) {
-            ERROR_MSG("Symbol %s not found", in->val.symbol);
+            WARNING_MSG("Symbol %s not found", in->val.symbol);
+            return NULL;
         } else {
             in = *l_symb;
         }
         goto restart;
-    } else if (0 && is_Pair(in) == True) {
-        if (is_Symbol(in) == False) {
-            ERROR_MSG("Ill-formed expression: first list element is not a defined primitive");
+    } else if (is_Pair(in) == True) {
+        if (is_Symbol(car(in)) == False) {
+            WARNING_MSG("Ill-formed expression: first list element can not be resolved into a primitive");
+            return NULL;
         }
 
-        object *l_symb = locate_symbol(in, 0);
-        if (is_Primitive(*l_symb) == False) {
-            ERROR_MSG("Primitive \"%s\" not found", in->val.symbol);
+        object *l_symb = locate_symbol(car(in), 0);
+        if (!l_symb || is_Primitive(*l_symb) == False) {
+            WARNING_MSG("Primitive \"%s\" not found", car(in)->val.symbol);
+            return NULL;
         }
+        in = (*l_symb)->val.primitive.f(cdr(in));
+
+        goto restart;
     }
 
     if (is_Quote(in) == True) {
