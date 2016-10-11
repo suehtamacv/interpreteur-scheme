@@ -41,7 +41,7 @@ restart:
     } else if (is_Or(input) == True) {
         input = eval_Or(cdr(input));
     } else if (is_Define(input) == True) {
-        define_symbol(cadr(input)->val.symbol, caddr(input), 0);
+        define_symbol(cadr(input)->val.symbol, sfs_eval(caddr(input)), 0);
         return NULL;
     } else if (is_Set(input) == True) {
         set_symbol(cadr(input)->val.symbol, caddr(input), 0);
