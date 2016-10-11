@@ -8,10 +8,11 @@
  * table of symbols, and functions to add, remove and look for a symbol.
  */
 
-#include "symbols.h"
-#include "print.h"
 #include <stdio.h>
 #include <strings.h>
+#include "symbols.h"
+#include "print.h"
+#include "forms.h"
 
 void create_environment() {
     object* last_env = &symbol_table;
@@ -42,10 +43,13 @@ object *get_environment(int env_number) {
     return &((*env)->val.pair.car);
 }
 
-object* locate_symbol(string name, int starting_env_number) {
+object* locate_symbol(object symbol_name, int starting_env_number) {
     if (starting_env_number < 0) {
         ERROR_MSG("Invalid environment requested: %d", starting_env_number);
         return NULL;
+    }
+    if (is_Symbol(symbol_name) == False) {
+        ERROR_MSG("An object can not be bound to another who is not a symbol");
     }
 
     int curr_env = starting_env_number;
@@ -54,7 +58,7 @@ object* locate_symbol(string name, int starting_env_number) {
 
         object* curr_obj = env;
         while (is_Nil(*curr_obj) == False) {
-            if (strcasecmp(car(car(*curr_obj))->val.string, name) == 0) {
+            if (strcasecmp(car(car(*curr_obj))->val.string, symbol_name->val.symbol) == 0) {
                 return &((*curr_obj)->val.pair.car->val.pair.cdr);
             }
             curr_obj = &((*curr_obj)->val.pair.cdr);
@@ -64,8 +68,8 @@ object* locate_symbol(string name, int starting_env_number) {
     return NULL;
 }
 
-void define_symbol(string name, object obj, int env_number) {
-    object *old_symbol = locate_symbol(name, env_number);
+void define_symbol(object symbol_name, object obj, int env_number) {
+    object *old_symbol = locate_symbol(symbol_name, env_number);
 
     /* Symbol already exists */
     if (old_symbol != NULL) {
@@ -73,8 +77,8 @@ void define_symbol(string name, object obj, int env_number) {
     } else {
 
         /* Creates the object binding */
-        object binding = make_pair(make_object(SFS_STRING), obj);
-        strcpy(binding->val.pair.car->val.string, name);
+        object binding = make_pair(make_object(SFS_SYMBOL), obj);
+        strcpy(binding->val.pair.car->val.symbol, symbol_name->val.symbol);
 
         /* Looks for the last object */
         object* last_obj = get_environment(env_number);
@@ -85,8 +89,8 @@ void define_symbol(string name, object obj, int env_number) {
     }
 }
 
-void set_symbol(string name, object obj, int env_number) {
-    object *old_symbol = locate_symbol(name, env_number);
+void set_symbol(object symbol_name, object obj, int env_number) {
+    object *old_symbol = locate_symbol(symbol_name, env_number);
 
     if (old_symbol == NULL) {
         WARNING_MSG("It is not possible to use \"set!\" in a symbol that does not exist");

@@ -8,43 +8,53 @@
  */
 
 #include "eval.h"
+#include "forms.h"
 #include <strings.h>
 
-object sfs_eval(object input) {
+object sfs_eval(object in) {
 restart:
 
-    if (is_AutoEvaluable(input) == True) {
-        return input;
-    } else if (is_Symbol(input) == True) {
-        object *loc_symbol = locate_symbol(input->val.symbol, 0);
-        if (loc_symbol == NULL) {
-            ERROR_MSG("Symbol %s not found", input->val.symbol);
+    if (is_AutoEvaluable(in) == True) {
+        return in;
+    } else if (is_Symbol(in) == True) {
+        object *l_symb = locate_symbol(in, 0);
+        if (l_symb == NULL) {
+            ERROR_MSG("Symbol %s not found", in->val.symbol);
         } else {
-            input = *loc_symbol;
+            in = *l_symb;
         }
         goto restart;
+    } else if (is_Pair(in) == True) {
+        if (is_Symbol(in) == False) {
+            ERROR_MSG("Ill-formed expression: first list element is not a defined primitive");
+        }
+
+        object *l_symb = locate_symbol(in, 0);
+        if (is_Primitive(*l_symb) == False) {
+            ERROR_MSG("Primitive \"%s\" not found", in->val.symbol);
+        }
     }
 
-    if (is_Quote(input) == True) {
-        return cadr(input);
-    } else if (is_If(input) == True) {
-        input = cdr(input);
-        if (is_True(sfs_eval(car(input))) == True) {
-            input = cadr(input);
+    if (is_Quote(in) == True) {
+        return cadr(in);
+    } else if (is_If(in) == True) {
+        in = cdr(in);
+        if (is_True(sfs_eval(car(in))) == True) {
+            in = cadr(in);
             goto restart;
         } else {
-            input = caddr(input);
+            in = caddr(in);
             goto restart;
         }
-    } else if (is_And(input) == True) {
-        input = eval_And(cdr(input));
-    } else if (is_Or(input) == True) {
-        input = eval_Or(cdr(input));
-    } else if (is_Define(input) == True) {
-        define_symbol(cadr(input)->val.symbol, sfs_eval(caddr(input)), 0);
+    } else if (is_And(in) == True) {
+        in = eval_And(cdr(in));
+    } else if (is_Or(in) == True) {
+        in = eval_Or(cdr(in));
+    } else if (is_Define(in) == True) {
+        define_symbol(cadr(in), sfs_eval(caddr(in)), 0);
         return NULL;
-    } else if (is_Set(input) == True) {
-        set_symbol(cadr(input)->val.symbol, caddr(input), 0);
+    } else if (is_Set(in) == True) {
+        set_symbol(cadr(in), caddr(in), 0);
         return NULL;
     }
 

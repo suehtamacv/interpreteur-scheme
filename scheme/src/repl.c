@@ -13,10 +13,10 @@
 #include <stdio.h>
 #include <string.h>
 
-
 #include "object.h"
 #include "read.h"
 #include "eval.h"
+#include "forms.h"
 #include "print.h"
 
 /* mode d'interaction avec l'interpreteur (exemple)*/
@@ -41,7 +41,7 @@ object symbol_table;
 
 void init_interpreter (void) {
     /* Crée les singletons */
-    make_forms();
+    create_basic_forms();
     nil = make_nil();
     _true = make_true();
     _false = make_false();
@@ -49,6 +49,9 @@ void init_interpreter (void) {
 
     /* Crée l'environment top-level */
     create_environment();
+
+    /* Crée les primitives */
+    create_basic_primitives();
 }
 
 int main (int argc, char *argv[]) {

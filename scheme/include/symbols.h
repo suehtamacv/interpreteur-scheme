@@ -21,9 +21,9 @@ extern "C" {
 void create_environment();
 object* get_environment(int);
 
-void define_symbol(string, object, int);
-void set_symbol(string, object, int);
-object *locate_symbol(string, int);
+void define_symbol(object symbol_name, object, int);
+void set_symbol(object symbol_name, object, int);
+object *locate_symbol(object symbol_name, int);
 
 #ifdef __cplusplus
 }

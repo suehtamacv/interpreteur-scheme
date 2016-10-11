@@ -33,6 +33,9 @@ typedef struct object_t {
         } pair;
 
         struct object_t *special;
+        struct {
+            struct object_t* (*f)(struct object_t *);
+        } primitive;
     } val;
 
 } *object;
@@ -42,8 +45,8 @@ object make_pair(object car, object cdr);
 object make_nil(void);
 object make_true(void);
 object make_false(void);
+object make_primitive(object (*f)(object));
 object make_symbol_table(void);
-void make_forms(void);
 
 /**
  * @brief car returns the car of the object o, given that it is a pair.
@@ -68,16 +71,6 @@ object cadr(object o);
  */
 object caddr(object o);
 
-/* The following functions are to verify the type of object */
-Bool is_Number(object o);
-Bool is_Char(object o);
-Bool is_String(object o);
-Bool is_Pair(object o);
-Bool is_Nil(object o);
-Bool is_Boolean(object o);
-Bool is_Symbol(object o);
-Bool is_True(object o);
-Bool is_False(object o);
 Bool is_AutoEvaluable(object o);
 
 #define SFS_NUMBER       0x00
@@ -87,6 +80,7 @@ Bool is_AutoEvaluable(object o);
 #define SFS_NIL          0x04
 #define SFS_BOOLEAN      0x05
 #define SFS_SYMBOL       0x06
+#define SFS_PRIMITIVE    0x07
 
 extern object nil;
 extern object _true;

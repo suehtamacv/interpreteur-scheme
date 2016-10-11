@@ -46,6 +46,10 @@ void sfs_print_symbol(object);
  * @brief sfs_print_nil prints nil.
  */
 void sfs_print_nil(object);
+/**
+ * @brief sfs_print_primitive prints the definition of a primitive.
+ */
+void sfs_print_primitive(object);
 
 #ifdef __cplusplus
 }

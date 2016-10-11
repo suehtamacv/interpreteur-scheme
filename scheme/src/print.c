@@ -8,6 +8,7 @@
  */
 
 #include "print.h"
+#include "forms.h"
 #include <stdio.h>
 
 void sfs_print(object o) {
@@ -57,6 +58,10 @@ restart:
 
         case SFS_NIL:
             sfs_print_nil(o);
+            break;
+
+        case SFS_PRIMITIVE:
+            sfs_print_primitive(o);
             break;
         }
     }
@@ -162,4 +167,14 @@ void sfs_print_symbol(object o) {
     }
 
     printf("%s", o->val.symbol);
+}
+
+void sfs_print_primitive(object o) {
+    if (o->type != SFS_PRIMITIVE) {
+        WARNING_MSG("Trying to print object of type %d as primitive (%d).", o->type,
+                    SFS_PRIMITIVE);
+        sfs_print(o);
+    }
+
+    printf("[PRIMITIVE]");
 }
