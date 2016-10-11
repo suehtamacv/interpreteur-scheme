@@ -1,5 +1,5 @@
 ;;;; En tete pour script de test ;;;;;;;;;;
-; TEST_RETURN_CODE=PASS
+; TEST_RETURN_CODE=TRUE
 ; TEST_COMMENT=Basic tests of AND and OR functionalities 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -18,3 +18,7 @@
 (and #t #f (or #f CaNExistePas))
 
 (and (or #t #f) (or #f #f #f) (and #t #f) )
+
+;;Nombre incorrecte d'arguments
+(and)
+(or)

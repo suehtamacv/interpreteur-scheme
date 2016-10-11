@@ -36,6 +36,10 @@ restart:
     }
 
     if (is_Quote(in) == True) {
+        if (is_Nil(cdr(in)) == True || is_Nil(cdr(cdr(in))) == False) {
+            WARNING_MSG("Wrong number of arguments on \"quote\"");
+            return NULL;
+        }
         return cadr(in);
     } else if (is_If(in) == True) {
         in = cdr(in);
@@ -62,37 +66,41 @@ restart:
 }
 
 object eval_And(object o) {
+    object result = _true;
+
 restart:
+    /* Liste finie */
+    if (is_Nil(o) == True) {
+        return result;
+    }
+    result = sfs_eval(car(o));
 
     /* Court circuit si on trouve un #f */
-    if (is_True(sfs_eval(car(o))) == False) {
+    if (is_True(result) == False) {
         return _false;
     }
 
     o = cdr(o);
-    /* Liste pas encore finie */
-    if (o != nil) {
-        goto restart;
-    }
-
-    return _true;
+    goto restart;
 }
 
 object eval_Or(object o) {
+    object result = _false;
+
 restart:
+    /* Liste finie */
+    if (is_Nil(o) == True) {
+        return result;
+    }
+    result = sfs_eval(car(o));
 
     /* Court circuit si on trouve un #t */
-    if (is_True(sfs_eval(car(o))) == True) {
-        return _true;
+    if (is_True(result) == True) {
+        return result;
     }
 
     o = cdr(o);
-    /* Liste pas encore finie */
-    if (o != nil) {
-        goto restart;
-    }
-
-    return _false;
+    goto restart;
 }
 
 Bool is_Form(char *form, object o) {
