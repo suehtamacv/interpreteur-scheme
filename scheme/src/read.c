@@ -473,6 +473,27 @@ object sfs_read_number(char *input, uint *here) {
             }
             if (input[i] == '+' || input[i] == '-') {
                 foundSignal = True;
+
+                /* Found an infinity */
+                if (strncasecmp(input + i + 1, "inf", 3) == 0) {
+                    if (input[i + 4] != ' ' && input[i + 4] != '\0' &&
+                            input[i + 4] != ')' && input[i + 4] != '(' &&
+                            input[i + 4] != '\n' && input[i + 4] != '"') {
+                        WARNING_MSG("Invalid number found");
+                        while (input[*here] != ' ' && input[*here] != '\n' &&
+                                input[*here] != '\t' && input[*here] != '"' &&
+                                input[*here] != '(' && input[*here] != ')' && input[*here] != '\0') {
+                            (*here)++;
+                        } /* Faut continuer jusqu'a la fin de ce faux infini */
+                        return NULL;
+                    }
+                    (*here) += 4;
+                    if (input[i] == '+') {
+                        return make_number(NUM_PINFTY);
+                    } else {
+                        return make_number(NUM_MINFTY);
+                    }
+                }
             }
             if (input[i] == 'i' || input[i] == 'j') {
                 if (input[i + 1] != ' ' && input[i + 1] != '\0' &&

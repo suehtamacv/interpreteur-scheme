@@ -48,6 +48,10 @@ object make_false(void);
 object make_primitive(object (*f)(object));
 object make_symbol_table(void);
 object make_symbol(string);
+object make_number(uint type);
+
+Bool is_True(object o);
+Bool is_False(object o);
 
 /**
  * @brief car returns the car of the object o, given that it is a pair.

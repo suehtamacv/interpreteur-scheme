@@ -146,6 +146,10 @@ void sfs_print_number(object o) {
     case NUM_MINFTY:
         printf("-inf");
         break;
+
+    case NUM_UNDEF:
+        printf("NaN");
+        break;
     }
 }
 

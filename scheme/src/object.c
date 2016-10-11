@@ -56,6 +56,12 @@ object make_symbol(string s) {
     return o;
 }
 
+object make_number(uint type) {
+    object o = make_object(SFS_NUMBER);
+    o->val.number.numtype = type;
+    return o;
+}
+
 object make_symbol_table() {
     object symb = make_object(SFS_PAIR);
     symb->val.pair.car = nil;

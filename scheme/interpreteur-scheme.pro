@@ -4,7 +4,7 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 QMAKE_CXX = gcc
-QMAKE_CFLAGS = -x c
+QMAKE_CFLAGS = -x c -g -DDEBUG
 
 HEADERS += include/basic.h \
            include/eval.h \
