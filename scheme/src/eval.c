@@ -14,6 +14,11 @@
 
 object sfs_eval(object in) {
 restart:
+    /* NULL pointer handling */
+    if (!in) {
+        return NULL;
+    }
+
     if (is_AutoEvaluable(in) == True) {
         DEBUG_MSG("Evaluating auto-evaluable object");
         return in;
@@ -21,7 +26,7 @@ restart:
         DEBUG_MSG("Resolving a symbol by searching for it in the symbol table");
         object *l_symb = locate_symbol(in, 0);
         if (l_symb == NULL) {
-            WARNING_MSG("Symbol %s not found", in->val.symbol);
+            WARNING_MSG("Unbound variable '%s'", in->val.symbol);
             return NULL;
         } else {
             in = *l_symb;
@@ -62,7 +67,7 @@ restart:
 
         /* Can't have a definition inside an IF */
         if (is_Define(in) == True) {
-            ERROR_MSG("Definitions not allowed in expression context");
+            WARNING_MSG("Definitions not allowed in expression context");
             return NULL;
         }
         goto restart;
@@ -96,7 +101,7 @@ restart:
     }
 
     if (is_Define(car(o)) == True) {
-        ERROR_MSG("Definitions not allowed in expression context");
+        WARNING_MSG("Definitions not allowed in expression context");
         return NULL;
     }
     result = sfs_eval(car(o));
@@ -125,7 +130,7 @@ restart:
     }
 
     if (is_Define(car(o)) == True) {
-        ERROR_MSG("Definitions not allowed in expression context");
+        WARNING_MSG("Definitions not allowed in expression context");
         return NULL;
     }
     result = sfs_eval(car(o));
