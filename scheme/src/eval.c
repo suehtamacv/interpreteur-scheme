@@ -95,7 +95,6 @@ object eval_And(object o) {
     if (is_Pair(o) == True && is_Nil(cdr(o)) == True) {
         return car(o);
     }
-
     object result = _true;
 
 restart:

@@ -56,6 +56,12 @@ object make_symbol(string s) {
     return o;
 }
 
+object make_string(string s) {
+    object o = make_object(SFS_STRING);
+    strncpy(o->val.string,  s, sizeof(o->val.symbol));
+    return o;
+}
+
 object make_number(uint type) {
     object o = make_object(SFS_NUMBER);
     o->val.number.numtype = type;

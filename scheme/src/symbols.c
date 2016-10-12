@@ -48,34 +48,45 @@ object* locate_symbol(object symbol_name, int starting_env_number) {
         ERROR_MSG("Invalid environment requested: %d", starting_env_number);
         return NULL;
     }
-    if (is_Symbol(symbol_name) == False) {
-        ERROR_MSG("An object can not be bound to another who is not a symbol");
-    }
 
     int curr_env = starting_env_number;
     for (; curr_env != -1; curr_env--) {
-        object* env = get_environment(curr_env);
-
-        object* curr_obj = env;
-        while (is_Nil(*curr_obj) == False) {
-            if (strcasecmp(car(car(*curr_obj))->val.string, symbol_name->val.symbol) == 0) {
-                return &((*curr_obj)->val.pair.car->val.pair.cdr);
-            }
-            curr_obj = &((*curr_obj)->val.pair.cdr);
+        object* obj = locate_symbol_in_environment(symbol_name, curr_env);
+        if (obj != NULL) {
+            return obj;
         }
     }
 
     return NULL;
 }
 
+object* locate_symbol_in_environment(object symbol_name, int env_number) {
+    if (is_Symbol(symbol_name) == False) {
+        ERROR_MSG("An object can not be bound to another who is not a symbol");
+    }
+
+    object* env = get_environment(env_number);
+    object* curr_obj = env;
+    while (is_Nil(*curr_obj) == False) {
+        if (strcasecmp(car(car(*curr_obj))->val.string, symbol_name->val.symbol) == 0) {
+            return &((*curr_obj)->val.pair.car->val.pair.cdr);
+        }
+        curr_obj = &((*curr_obj)->val.pair.cdr);
+    }
+
+    return NULL;
+}
+
 void define_symbol(object symbol_name, object obj, int env_number) {
-    object *old_symbol = locate_symbol(symbol_name, env_number);
+    DEBUG_MSG("Defining object '%s' at environment %d", symbol_name->val.string,
+              env_number);
+    object *old_symbol = locate_symbol_in_environment(symbol_name, env_number);
 
     /* Symbol already exists */
     if (old_symbol != NULL) {
+        DEBUG_MSG("Symbol %s already exists", symbol_name->val.string);
         *old_symbol = obj;
     } else {
-
         /* Creates the object binding */
         object binding = make_pair(make_object(SFS_SYMBOL), obj);
         strcpy(binding->val.pair.car->val.symbol, symbol_name->val.symbol);

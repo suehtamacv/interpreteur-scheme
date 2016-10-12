@@ -24,6 +24,7 @@ object* get_environment(int);
 void define_symbol(object symbol_name, object, int);
 void set_symbol(object symbol_name, object, int);
 object *locate_symbol(object symbol_name, int);
+object *locate_symbol_in_environment(object symbol_name, int);
 
 #ifdef __cplusplus
 }

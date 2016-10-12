@@ -29,6 +29,28 @@ void usage_error( char *command ) {
             command);
 }
 
+void test_environments(void) {
+    create_environment();
+    create_environment();
+
+    define_symbol(make_symbol("SYMB"), make_string("toto 0"), 0);
+    define_symbol(make_symbol("SYMB"), make_string("toto 2"), 2);
+    define_symbol(make_symbol("SYMB"), make_string("toto 1"), 1);
+
+    if (strcasecmp((*locate_symbol(make_symbol("SYMB"), 0))->val.string,
+                   "toto 0")) {
+        ERROR_MSG("Error in environment definition");
+    }
+    if (strcasecmp((*locate_symbol(make_symbol("SYMB"), 1))->val.string,
+                   "toto 1")) {
+        ERROR_MSG("Error in environment definition");
+    }
+    if (strcasecmp((*locate_symbol(make_symbol("SYMB"), 2))->val.string,
+                   "toto 2")) {
+        ERROR_MSG("Error in environment definition");
+    }
+}
+
 /* Singletons */
 object nil;
 object _true;
@@ -87,6 +109,8 @@ int main (int argc, char *argv[]) {
     }
 
     init_interpreter();
+
+    test_environments();
 
     /*par defaut : mode shell interactif */
     fp = stdin;

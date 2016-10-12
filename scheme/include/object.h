@@ -48,6 +48,7 @@ object make_false(void);
 object make_primitive(object (*f)(object));
 object make_symbol_table(void);
 object make_symbol(string);
+object make_string(string);
 object make_number(uint type);
 
 Bool is_True(object o);
