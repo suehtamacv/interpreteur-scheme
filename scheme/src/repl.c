@@ -145,7 +145,7 @@ int main (int argc, char *argv[]) {
         output = sfs_eval( sexpr );
         if( NULL == output) {
             /* si fichier alors on sort*/
-            if (mode == SCRIPT) {
+            if (0 && mode == SCRIPT) {
                 fclose( fp );
                 /*macro ERROR_MSG : message d'erreur puis fin de programme ! */
                 ERROR_MSG("Error while evaluating input --- Aborts");

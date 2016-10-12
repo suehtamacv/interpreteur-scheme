@@ -1,5 +1,5 @@
 ;;;; En tete pour script de test ;;;;;;;;;;
-; TEST_RETURN_CODE=TRUE
+; TEST_RETURN_CODE=PASS
 ; TEST_COMMENT=Basic tests of AND and OR functionalities 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

@@ -76,7 +76,11 @@ restart:
     } else if (is_Or(in) == True) {
         in = eval_Or(cdr(in));
     } else if (is_Define(in) == True) {
-        define_symbol(cadr(in), sfs_eval(caddr(in)), 0);
+        if (is_Quote(caddr(in)) == True) {
+            define_symbol(cadr(in), caddr(in), 0);
+        } else {
+            define_symbol(cadr(in), sfs_eval(caddr(in)), 0);
+        }
         return NULL;
     } else if (is_Set(in) == True) {
         set_symbol(cadr(in), caddr(in), 0);
@@ -118,7 +122,7 @@ restart:
 object eval_Or(object o) {
     /* An or with one element is the element itself */
     if (is_Pair(o) == True && is_Nil(cdr(o)) == True) {
-       return car(o);
+        return car(o);
     }
 
     object result = _false;

@@ -5,7 +5,7 @@
 
 (define x 2)
 (quote (3 x))
-(define x 'y)
-(define y 3)
+(define x (quote y)) 
+(define y 3)         
 y
-x
+x                    

@@ -11,5 +11,5 @@
 (set! x #f)
 (if (and #t 1 x) x "X EST FAUX")
 
-(if (and #t 1 x) 'x CaNExistePas)
+(if (and #t 1 x) CaNExistePas 'x)
 (if #f CaNExistePas x)

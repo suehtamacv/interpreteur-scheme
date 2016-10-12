@@ -15,8 +15,8 @@ HEADERS += include/basic.h \
            include/print.h \
            include/read.h \
            include/boolean.h \
-    include/symbols.h \
-    include/forms.h
+           include/symbols.h \
+           include/forms.h
 
 SOURCES += src/eval.c \
            src/mem.c \
