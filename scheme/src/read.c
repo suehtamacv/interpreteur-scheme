@@ -734,6 +734,7 @@ object sfs_read_complex_number(char *input, uint *here) {
                  input[*here] != '\n' && input[*here] != '\0' && input[*here] != 'j' &&
                  input[*here] != 'i' && input[*here] != '"');
     }
+    (*here)++;
 
     imag *= k;
 

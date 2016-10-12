@@ -137,13 +137,17 @@ restart:
             res->val.number.val.real = res->val.number.val.integer +
                                        car(o)->val.number.val.real;
         } else {
-            res->val.number.val.integer += car(o)->val.number.val.integer;
-        }
-        if (res->val.number.val.integer > INT_MAX) { /* Test si un overflow a eu lieu. */
-            if (res->val.number.val.integer == 1) {
+            /* Test si un overflow se produirait. */
+            if (car(o)->val.number.val.integer > 0 &&
+                    res->val.number.val.integer > INT_MAX - car(o)->val.number.val.integer) {
                 res->val.number.numtype = NUM_PINFTY;
-            } else {
+            }
+            /* Test si un overflow se produirait. */
+            else if (car(o)->val.number.val.integer < 0 &&
+                       res->val.number.val.integer < INT_MIN - car(o)->val.number.val.integer){
                 res->val.number.numtype = NUM_MINFTY;
+            } else {
+                res->val.number.val.integer += car(o)->val.number.val.integer;
             }
         }
         break;
@@ -163,7 +167,6 @@ restart:
                                        car(o)->val.number.val.integer;
         }
         break;
-
     }
 
     o = cdr(o);
