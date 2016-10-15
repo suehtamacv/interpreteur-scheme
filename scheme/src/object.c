@@ -102,8 +102,17 @@ object cadr(object o) {
     return car(cdr(o));
 }
 
+object cddr(object o) {
+    object obj_temp = cdr(o);
+    if (obj_temp) {
+        return cdr(obj_temp);
+    } else {
+        return NULL;
+    }
+}
+
 object caddr(object o) {
-    return car(cdr(cdr(o)));
+    return car(cddr(o));
 }
 
 Bool is_AutoEvaluable(object o) {

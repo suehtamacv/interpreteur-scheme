@@ -14,13 +14,24 @@
 #include "print.h"
 #include "forms.h"
 
-void create_environment() {
+void create_environment(int depth) {
     object* last_env = &symbol_table;
-    while (cdr(*last_env) != nil) {
-        last_env = &((*last_env)->val.pair.cdr);
-    }
 
-    (*last_env)->val.pair.cdr = make_pair(nil, nil);
+    if (depth < 0) {
+        while (cdr(*last_env) != nil) {
+            last_env = &((*last_env)->val.pair.cdr);
+        }
+
+        (*last_env)->val.pair.cdr = make_pair(nil, nil);
+    } else {
+        int curr_env = 0;
+        do {
+            if (cdr(*last_env) == nil) {
+                (*last_env)->val.pair.cdr = make_pair(nil, nil);
+            }
+            last_env = &((*last_env)->val.pair.cdr);
+        } while (curr_env++ != depth);
+    }
 }
 
 object *get_environment(int env_number) {

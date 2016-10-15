@@ -18,7 +18,7 @@ extern "C" {
 #include "basic.h"
 #include "object.h"
 
-void create_environment();
+void create_environment(int depth);
 object* get_environment(int);
 
 void define_symbol(object symbol_name, object, int);

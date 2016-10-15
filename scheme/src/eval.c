@@ -59,18 +59,23 @@ restart:
         return cadr(in);
     } else if (is_If(in) == True) {
         in = cdr(in);
+        if (is_Nil(in) == True) {
+            WARNING_MSG("An if must specify a condition");
+            return NULL;
+        }
         if (is_Pair(in) == True &&
                 is_Pair(cdr(in)) == True &&
-                is_Pair(cdr(cdr(in))) == True && /* If has at most three arguments */
-                is_Nil(cdr(cdr(cdr(in)))) == False) {
+                is_Pair(cddr(in)) == True && /* If has at most three arguments */
+                is_Nil(cdr(cddr(in))) == False) {
             WARNING_MSG("Wrong number of arguments on \"if\"");
             return NULL;
         }
         if (is_Pair(in) == True && is_True(sfs_eval(car(in))) == True) {
             in = cadr(in);
-        } else if (is_Pair(cdr(in)) == True && is_Pair(cdr(cdr(in))) == True) {
+        } else if (is_Pair(cdr(in)) == True && is_Pair(cddr(in)) == True) {
             in = caddr(in);
         } else {
+            WARNING_MSG("Undefined return value");
             return NULL;
         }
 

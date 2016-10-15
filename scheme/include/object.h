@@ -65,6 +65,12 @@ object car(object o);
  */
 object cdr(object o);
 /**
+ * @brief cddr returns the cdr of the cdr of the object o, given
+ * that it is a pair.
+ * @return the cdr of the cdr.
+ */
+object cddr(object o);
+/**
  * @brief cadr returns the car of the cdr of the object o, i.e., the next
  * object in the list, given that it is a pair.
  * @return the car of the cdr of the pair.

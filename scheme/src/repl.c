@@ -30,8 +30,7 @@ void usage_error( char *command ) {
 }
 
 void test_environments(void) {
-    create_environment();
-    create_environment();
+    create_environment(2);
 
     define_symbol(make_symbol("SYMB"), make_string("toto 0"), 0);
     define_symbol(make_symbol("SYMB"), make_string("toto 2"), 2);
@@ -70,7 +69,7 @@ void init_interpreter (void) {
     symbol_table = make_symbol_table();
 
     /* Crée l'environment top-level */
-    create_environment();
+    create_environment(0);
 
     /* Crée les primitives */
     create_basic_primitives();
