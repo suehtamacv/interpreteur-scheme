@@ -59,10 +59,19 @@ restart:
         return cadr(in);
     } else if (is_If(in) == True) {
         in = cdr(in);
-        if (is_True(sfs_eval(car(in))) == True) {
+        if (is_Pair(in) == True &&
+                is_Pair(cdr(in)) == True &&
+                is_Pair(cdr(cdr(in))) == True && /* If has at most three arguments */
+                is_Nil(cdr(cdr(cdr(in)))) == False) {
+            WARNING_MSG("Wrong number of arguments on \"if\"");
+            return NULL;
+        }
+        if (is_Pair(in) == True && is_True(sfs_eval(car(in))) == True) {
             in = cadr(in);
-        } else {
+        } else if (is_Pair(cdr(in)) == True && is_Pair(cdr(cdr(in))) == True) {
             in = caddr(in);
+        } else {
+            return NULL;
         }
 
         /* Can't have a definition inside an IF */
@@ -81,10 +90,13 @@ restart:
         } else {
             define_symbol(cadr(in), sfs_eval(caddr(in)), 0);
         }
-        return NULL;
+        return cadr(in); /* Define returns symbol itself */
     } else if (is_Set(in) == True) {
-        set_symbol(cadr(in), caddr(in), 0);
-        return NULL;
+        if (set_symbol(cadr(in), caddr(in), 0) == 0) { /* Success */
+            return cadr(in);
+        } else {
+            return NULL;
+        }
     }
 
     goto restart;

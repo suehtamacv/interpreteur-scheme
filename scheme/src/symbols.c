@@ -100,12 +100,14 @@ void define_symbol(object symbol_name, object obj, int env_number) {
     }
 }
 
-void set_symbol(object symbol_name, object obj, int env_number) {
+int set_symbol(object symbol_name, object obj, int env_number) {
     object *old_symbol = locate_symbol(symbol_name, env_number);
 
     if (old_symbol == NULL) {
         WARNING_MSG("It is not possible to use \"set!\" in a symbol that does not exist");
+        return -1; /* Error */
     } else {
         *old_symbol = obj;
     }
+    return 0;
 }
