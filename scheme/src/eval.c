@@ -26,7 +26,7 @@ restart:
         DEBUG_MSG("Resolving a symbol by searching for it in the symbol table");
         object *l_symb = locate_symbol(in, 0);
         if (l_symb == NULL) {
-            WARNING_MSG("Unbound variable '%s'", in->val.symbol);
+            WARNING_MSG("Unbound variable: %s", in->val.symbol);
             return NULL;
         } else {
             in = *l_symb;
@@ -90,12 +90,15 @@ restart:
     } else if (is_Or(in) == True) {
         in = eval_Or(cdr(in));
     } else if (is_Define(in) == True) {
-        if (is_Quote(caddr(in)) == True) {
-            define_symbol(cadr(in), caddr(in), 0);
-        } else {
-            define_symbol(cadr(in), sfs_eval(caddr(in)), 0);
+        int define_result = (is_Quote(caddr(in)) == True) ?
+                            define_symbol(cadr(in), caddr(in), 0) :
+                            define_symbol(cadr(in), sfs_eval(caddr(in)), 0);
+
+        if (define_result == 0) {
+            return cadr(in);    /* Define returns symbol itself */
+        } else { /* Could not define */
+            return NULL;
         }
-        return cadr(in); /* Define returns symbol itself */
     } else if (is_Set(in) == True) {
         if (set_symbol(cadr(in), caddr(in), 0) == 0) { /* Success */
             return cadr(in);

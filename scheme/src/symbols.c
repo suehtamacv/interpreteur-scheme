@@ -88,10 +88,15 @@ object* locate_symbol_in_environment(object symbol_name, int env_number) {
     return NULL;
 }
 
-void define_symbol(object symbol_name, object obj, int env_number) {
+int define_symbol(object symbol_name, object obj, int env_number) {
     DEBUG_MSG("Defining object '%s' at environment %d", symbol_name->val.string,
               env_number);
     object *old_symbol = locate_symbol_in_environment(symbol_name, env_number);
+
+    if (!obj) {
+        WARNING_MSG("Must specify a value for the symbol. Symbol not defined");
+        return -1;
+    }
 
     /* Symbol already exists */
     if (old_symbol != NULL) {
@@ -109,6 +114,7 @@ void define_symbol(object symbol_name, object obj, int env_number) {
         }
         *last_obj = make_pair(binding, nil);
     }
+    return 0;
 }
 
 int set_symbol(object symbol_name, object obj, int env_number) {
@@ -117,6 +123,9 @@ int set_symbol(object symbol_name, object obj, int env_number) {
     if (old_symbol == NULL) {
         WARNING_MSG("It is not possible to use \"set!\" in a symbol that does not exist");
         return -1; /* Error */
+    } else if (!obj) {
+        WARNING_MSG("Must specify a value for the symbol. Symbol not set");
+        return -1;
     } else {
         *old_symbol = obj;
     }
