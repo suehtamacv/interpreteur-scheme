@@ -15,8 +15,26 @@ extern "C" {
 #endif
 
 #include "object.h"
+#include "symbols.h"
 
 object sfs_eval(object);
+
+/**
+ * @brief is_Form is used to verify whether the object is equal to
+ * a certain form.
+ * @return True iff the object is equal to the form.
+ */
+Bool is_Form(char *, object);
+
+Bool is_If(object);
+Bool is_Define(object);
+Bool is_Set(object);
+Bool is_Quote(object);
+Bool is_And(object);
+Bool is_Or(object);
+
+object eval_And(object);
+object eval_Or(object);
 
 #ifdef __cplusplus
 }

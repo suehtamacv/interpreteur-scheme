@@ -1,0 +1,6 @@
+==> (quote 4)
+==> (quote 4)
+==> ((quote 1) (quote 2) (quote ((quote 3) (quote 4))))
+==> (x y z)
+==> (/ 1 0)
+==> (if #t (/ 1 0) CaNExistePas)

@@ -13,10 +13,10 @@
 #include <stdio.h>
 #include <string.h>
 
-
 #include "object.h"
 #include "read.h"
 #include "eval.h"
+#include "forms.h"
 #include "print.h"
 
 /* mode d'interaction avec l'interpreteur (exemple)*/
@@ -29,16 +29,50 @@ void usage_error( char *command ) {
             command);
 }
 
+void test_environments(void) {
+    create_environment(2);
+
+    define_symbol(make_symbol("SYMB"), make_string("toto 0"), 0);
+    define_symbol(make_symbol("SYMB"), make_string("toto 2"), 2);
+    define_symbol(make_symbol("SYMB"), make_string("toto 1"), 1);
+
+    if (strcasecmp((*locate_symbol(make_symbol("SYMB"), 0))->val.string,
+                   "toto 0")) {
+        ERROR_MSG("Error in environment definition");
+    }
+    if (strcasecmp((*locate_symbol(make_symbol("SYMB"), 1))->val.string,
+                   "toto 1")) {
+        ERROR_MSG("Error in environment definition");
+    }
+    if (strcasecmp((*locate_symbol(make_symbol("SYMB"), 2))->val.string,
+                   "toto 2")) {
+        ERROR_MSG("Error in environment definition");
+    }
+}
+
 /* Singletons */
 object nil;
-object true;
-object false;
+object _true;
+object _false;
+object _quote;
+object _if;
+object _define;
+object _set;
+object symbol_table;
 
 void init_interpreter (void) {
     /* Crée les singletons */
+    create_basic_forms();
     nil = make_nil();
-    true = make_true();
-    false = make_false();
+    _true = make_true();
+    _false = make_false();
+    symbol_table = make_symbol_table();
+
+    /* Crée l'environment top-level */
+    create_environment(0);
+
+    /* Crée les primitives */
+    create_basic_primitives();
 }
 
 int main (int argc, char *argv[]) {
@@ -74,6 +108,8 @@ int main (int argc, char *argv[]) {
     }
 
     init_interpreter();
+
+    test_environments();
 
     /*par defaut : mode shell interactif */
     fp = stdin;
@@ -130,7 +166,7 @@ int main (int argc, char *argv[]) {
         }
 
         output = sfs_eval( sexpr );
-        if( NULL == output) {
+        if(NULL == output) {
             /* si fichier alors on sort*/
             if (mode == SCRIPT) {
                 fclose( fp );
@@ -142,7 +178,7 @@ int main (int argc, char *argv[]) {
         }
 
         printf( "==> " );
-        sfs_print( output, True );
+        sfs_print( output );
         printf( "\n" );
     }
 

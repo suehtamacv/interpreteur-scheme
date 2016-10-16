@@ -33,13 +33,57 @@ typedef struct object_t {
         } pair;
 
         struct object_t *special;
+        struct {
+            struct object_t* (*f)(struct object_t *);
+        } primitive;
     } val;
+
 } *object;
 
 object make_object(uint type);
+object make_pair(object car, object cdr);
 object make_nil(void);
 object make_true(void);
 object make_false(void);
+object make_primitive(object (*f)(object));
+object make_symbol_table(void);
+object make_symbol(string);
+object make_string(string);
+object make_number(uint type);
+
+Bool is_True(object o);
+Bool is_False(object o);
+
+/**
+ * @brief car returns the car of the object o, given that it is a pair.
+ * @return the car of the pair.
+ */
+object car(object o);
+/**
+ * @brief cdr returns the cdr of the object o, given that it is a pair.
+ * @return the cdr of the pair.
+ */
+object cdr(object o);
+/**
+ * @brief cddr returns the cdr of the cdr of the object o, given
+ * that it is a pair.
+ * @return the cdr of the cdr.
+ */
+object cddr(object o);
+/**
+ * @brief cadr returns the car of the cdr of the object o, i.e., the next
+ * object in the list, given that it is a pair.
+ * @return the car of the cdr of the pair.
+ */
+object cadr(object o);
+/**
+ * @brief caddr returns the car of the cdr of the cdr of the object o,
+ * i.e., the second next object in the list, given that it is a pair.
+ * @return the car of the cdr of the cdr of the pair.
+ */
+object caddr(object o);
+
+Bool is_AutoEvaluable(object o);
 
 #define SFS_NUMBER       0x00
 #define SFS_CHARACTER    0x01
@@ -48,10 +92,16 @@ object make_false(void);
 #define SFS_NIL          0x04
 #define SFS_BOOLEAN      0x05
 #define SFS_SYMBOL       0x06
+#define SFS_PRIMITIVE    0x07
 
 extern object nil;
-extern object true;
-extern object false;
+extern object _true;
+extern object _false;
+extern object _quote;
+extern object _if;
+extern object _define;
+extern object _set;
+extern object symbol_table;
 
 #ifdef __cplusplus
 }

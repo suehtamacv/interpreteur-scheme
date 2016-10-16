@@ -8,76 +8,70 @@
  */
 
 #include "print.h"
+#include "forms.h"
 #include <stdio.h>
 
-void sfs_print_atom(object o) {
-    /* This switch is used to identify the type of object and then
-     * call the corresponding print function */
-    switch (o->type) {
-    case SFS_CHARACTER:
-        sfs_print_char(o);
-        break;
-
-    case SFS_BOOLEAN:
-        sfs_print_bool(o);
-        break;
-
-    case SFS_NUMBER:
-        sfs_print_number(o);
-        break;
-
-    case SFS_STRING:
-        sfs_print_string(o);
-        break;
-
-    case SFS_SYMBOL:
-        sfs_print_symbol(o);
-        break;
-
-    case SFS_NIL:
-        sfs_print_nil(o);
-        break;
-    }
-
-    return;
-}
-
-void sfs_print_pair(object o, Bool isBeginList) {
-    /* Il s'agit du debut d'une liste : donc il faut aussi imprimer '(' */
-    if (isBeginList == True) {
+void sfs_print(object o) {
+    /* Le premier paranthèse ouvrante des listes */
+    if (is_Pair(o) == True) {
         printf("(");
     }
-    sfs_print(o->val.pair.car, False);
 
-    /* Il s'agit du fin de la liste : donc il faut aussi imprimer ')' */
-    if (o->val.pair.cdr == nil) {
-        printf(")");
-    } else {
-        printf(" ");
-        sfs_print(o->val.pair.cdr, False);
-    }
-}
+restart:
 
-void sfs_print(object o, Bool isBeginList) {
+    if (is_Pair(o) == True) {
 
-    if (o->type == SFS_PAIR) {
-        /* Si le car du pair "o" est lui meme un pair, ou si on sait deja
-         * que on est au debut d'une liste, donc faut passer 'True' a
-         * sfs_print_pair, pour qu'elle sache qu'il faut imprimer '(' */
-        if (o->val.pair.car->type == SFS_PAIR || isBeginList == True) {
-            sfs_print_pair(o, True);
+        sfs_print(car(o));
+        o = cdr(o); /* On part au prochain element de la liste */
+
+        /* Le cdr vaut nil, donc il s'agit de la fin de la liste */
+        if (o == nil) {
+            printf(")");
+            return;
         } else {
-            sfs_print_pair(o, False);
+            printf(" ");
+            /* Il faut encore imprimer le prochain element */
+            goto restart;
         }
+
     } else {
-        sfs_print_atom(o);
+        switch (o->type) {
+        case SFS_CHARACTER:
+            sfs_print_char(o);
+            break;
+
+        case SFS_BOOLEAN:
+            sfs_print_bool(o);
+            break;
+
+        case SFS_NUMBER:
+            sfs_print_number(o);
+            break;
+
+        case SFS_STRING:
+            sfs_print_string(o);
+            break;
+
+        case SFS_SYMBOL:
+            sfs_print_symbol(o);
+            break;
+
+        case SFS_NIL:
+            sfs_print_nil(o);
+            break;
+
+        case SFS_PRIMITIVE:
+            sfs_print_primitive(o);
+            break;
+        }
     }
 }
 
 void sfs_print_char(object o) {
     if (o->type != SFS_CHARACTER) {
-        ERROR_MSG("Trying to print object of type %d as character (%d).", o->type,
-                  SFS_CHARACTER);
+        WARNING_MSG("Trying to print object of type %d as character (%d).", o->type,
+                    SFS_CHARACTER);
+        return sfs_print(o);
     }
 
 
@@ -93,15 +87,17 @@ void sfs_print_char(object o) {
 
 void sfs_print_nil(object o) {
     if (o->type != SFS_NIL) {
-        ERROR_MSG("Trying to print object of type %d as nil (%d).", o->type, SFS_NIL);
+        WARNING_MSG("Trying to print object of type %d as nil (%d).", o->type, SFS_NIL);
+        return sfs_print(o);
     }
     printf("()");
 }
 
 void sfs_print_bool(object o) {
     if (o->type != SFS_BOOLEAN) {
-        ERROR_MSG("Trying to print object of type %d as boolean (%d).", o->type,
-                  SFS_BOOLEAN);
+        WARNING_MSG("Trying to print object of type %d as boolean (%d).", o->type,
+                    SFS_BOOLEAN);
+        return sfs_print(o);
     }
 
     if (o->val.boolean == True) {
@@ -115,8 +111,9 @@ void sfs_print_bool(object o) {
 
 void sfs_print_number(object o) {
     if (o->type != SFS_NUMBER) {
-        ERROR_MSG("Trying to print object of type %d as number (%d).", o->type,
-                  SFS_NUMBER);
+        WARNING_MSG("Trying to print object of type %d as number (%d).", o->type,
+                    SFS_NUMBER);
+        sfs_print(o);
     }
 
     switch (o->val.number.numtype) {
@@ -149,13 +146,18 @@ void sfs_print_number(object o) {
     case NUM_MINFTY:
         printf("-inf");
         break;
+
+    case NUM_UNDEF:
+        printf("NaN");
+        break;
     }
 }
 
 void sfs_print_string(object o) {
     if (o->type != SFS_STRING) {
-        ERROR_MSG("Trying to print object of type %d as string (%d).", o->type,
-                  SFS_STRING);
+        WARNING_MSG("Trying to print object of type %d as string (%d).", o->type,
+                    SFS_STRING);
+        sfs_print(o);
     }
 
     printf("\"%s\"", o->val.string);
@@ -163,9 +165,20 @@ void sfs_print_string(object o) {
 
 void sfs_print_symbol(object o) {
     if (o->type != SFS_SYMBOL) {
-        ERROR_MSG("Trying to print object of type %d as symbol (%d).", o->type,
-                  SFS_SYMBOL);
+        WARNING_MSG("Trying to print object of type %d as symbol (%d).", o->type,
+                    SFS_SYMBOL);
+        sfs_print(o);
     }
 
     printf("%s", o->val.symbol);
+}
+
+void sfs_print_primitive(object o) {
+    if (o->type != SFS_PRIMITIVE) {
+        WARNING_MSG("Trying to print object of type %d as primitive (%d).", o->type,
+                    SFS_PRIMITIVE);
+        sfs_print(o);
+    }
+
+    printf("[PRIMITIVE]");
 }
