@@ -19,5 +19,8 @@ Bool is_Primitive(object o);
 /* Those are basic arithmetic functions */
 object arith_Plus(object);
 
+/* Those are auxiliary functions */
+uint list_length(object);
+
 
 #endif /* FORMS_H */

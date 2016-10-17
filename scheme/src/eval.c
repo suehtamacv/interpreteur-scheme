@@ -52,30 +52,24 @@ restart:
     */
 
     if (is_Quote(in) == True) {
-        if (is_Nil(cdr(in)) == True || is_Nil(cdr(cdr(in))) == False) {
+        if (list_length(in) != 2) {
             WARNING_MSG("Wrong number of arguments on \"quote\"");
             return NULL;
         }
         return cadr(in);
     } else if (is_If(in) == True) {
-        in = cdr(in);
-        if (is_Nil(in) == True) {
-            WARNING_MSG("An if must specify a condition");
-            return NULL;
-        }
-        if (is_Pair(in) == True &&
-                is_Pair(cdr(in)) == True &&
-                is_Pair(cddr(in)) == True && /* If has at most three arguments */
-                is_Nil(cdr(cddr(in))) == False) {
+        if (list_length(in) != 4) {
             WARNING_MSG("Wrong number of arguments on \"if\"");
             return NULL;
         }
-        if (is_Pair(in) == True && is_True(sfs_eval(car(in))) == True) {
+        in = cdr(in);
+        object result = sfs_eval(car(in));
+
+        if (result && is_True(result) == True) {
             in = cadr(in);
-        } else if (is_Pair(cdr(in)) == True && is_Pair(cddr(in)) == True) {
+        } else if (result) {
             in = caddr(in);
         } else {
-            WARNING_MSG("Undefined return value");
             return NULL;
         }
 
@@ -90,6 +84,11 @@ restart:
     } else if (is_Or(in) == True) {
         in = eval_Or(cdr(in));
     } else if (is_Define(in) == True) {
+        if (list_length(in) != 3) {
+            WARNING_MSG("Wrong number of arguments on \"define\"");
+            return NULL;
+        }
+
         int define_result = (is_Quote(caddr(in)) == True) ?
                             define_symbol(cadr(in), caddr(in), 0) :
                             define_symbol(cadr(in), sfs_eval(caddr(in)), 0);
@@ -100,6 +99,11 @@ restart:
             return NULL;
         }
     } else if (is_Set(in) == True) {
+        if (list_length(in) != 3) {
+            WARNING_MSG("Wrong number of arguments on \"set!\"");
+            return NULL;
+        }
+
         if (set_symbol(cadr(in), caddr(in), 0) == 0) { /* Success */
             return cadr(in);
         } else {

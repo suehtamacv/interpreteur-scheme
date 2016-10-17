@@ -71,6 +71,21 @@ Bool is_Primitive(object o) {
     return False;
 }
 
+uint list_length(object o) {
+    uint length = 0;
+    do {
+        if (is_Pair(o) == True) {
+            length++;
+            o = cdr(o);
+        }
+        if (is_Nil(o) == True && is_Pair(o) == False) {
+            break;
+        }
+    } while(1);
+
+    return length;
+}
+
 object arith_Plus(object o) {
     object res = make_object(SFS_NUMBER);
     res->val.number.numtype = NUM_INTEGER;
@@ -144,7 +159,7 @@ restart:
             }
             /* Test si un overflow se produirait. */
             else if (car(o)->val.number.val.integer < 0 &&
-                       res->val.number.val.integer < INT_MIN - car(o)->val.number.val.integer){
+                     res->val.number.val.integer < INT_MIN - car(o)->val.number.val.integer) {
                 res->val.number.numtype = NUM_MINFTY;
             } else {
                 res->val.number.val.integer += car(o)->val.number.val.integer;
