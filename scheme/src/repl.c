@@ -11,7 +11,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
+#include <strings.h>
 
 #include "object.h"
 #include "read.h"

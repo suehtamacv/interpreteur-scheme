@@ -12,6 +12,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include <limits.h>
+#include <strings.h>
 #include "read.h"
 
 void flip( uint *i ) {

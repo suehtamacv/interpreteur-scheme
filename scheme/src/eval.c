@@ -116,7 +116,7 @@ restart:
 
 object eval_And(object o) {
     /* An and with one element is the element itself */
-    if (is_Pair(o) == True && is_Nil(cdr(o)) == True) {
+    if (list_length(o) == 1) {
         return car(o);
     }
     object result = _true;
@@ -144,7 +144,7 @@ restart:
 
 object eval_Or(object o) {
     /* An or with one element is the element itself */
-    if (is_Pair(o) == True && is_Nil(cdr(o)) == True) {
+    if (list_length(o) == 1) {
         return car(o);
     }
 
