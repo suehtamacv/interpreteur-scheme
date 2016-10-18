@@ -16,7 +16,8 @@ HEADERS += include/basic.h \
            include/read.h \
            include/boolean.h \
            include/symbols.h \
-           include/forms.h
+           include/forms.h \
+    include/primitives.h
 
 SOURCES += src/eval.c \
            src/mem.c \
@@ -25,7 +26,8 @@ SOURCES += src/eval.c \
            src/read.c \
            src/repl.c \
     src/symbols.c \
-    src/forms.c
+    src/forms.c \
+    src/primitives.c
 
 OTHER_FILES += .astylerc
 

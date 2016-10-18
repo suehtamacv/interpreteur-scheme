@@ -33,7 +33,6 @@ restart:
         }
         goto restart;
     }
-    /* Pas pour ce livrable
        else if (is_Pair(in) == True) {
         if (is_Symbol(car(in)) == False) {
             WARNING_MSG("Ill-formed expression: first list element can not be resolved into a primitive");
@@ -49,7 +48,6 @@ restart:
 
         goto restart;
     }
-    */
 
     if (is_Quote(in) == True) {
         if (list_length(in) != 2) {

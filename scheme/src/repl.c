@@ -18,6 +18,7 @@
 #include "eval.h"
 #include "forms.h"
 #include "print.h"
+#include "primitives.h"
 
 /* mode d'interaction avec l'interpreteur (exemple)*/
 typedef enum {INTERACTIF, SCRIPT} inter_mode;
