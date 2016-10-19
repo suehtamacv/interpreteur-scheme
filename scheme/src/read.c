@@ -316,7 +316,7 @@ object sfs_read( char *input, uint *h ) {
         }
     } else if (input[*h] == '\'') {
         (*h)++;
-        return make_pair(_quote, make_pair(sfs_read(input, h), nil));
+        return make_pair(make_symbol("quote"), make_pair(sfs_read(input, h), nil));
     } else {
         return sfs_read_atom( input, h );
     }

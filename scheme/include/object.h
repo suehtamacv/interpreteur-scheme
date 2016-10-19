@@ -83,9 +83,6 @@ Bool is_AutoEvaluable(object o);
 extern object nil;
 extern object _true;
 extern object _false;
-extern object _quote;
-extern object _if;
-extern object _set;
 extern object symbol_table;
 
 #ifdef __cplusplus

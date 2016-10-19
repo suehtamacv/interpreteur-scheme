@@ -5,11 +5,6 @@
 #include <limits.h>
 
 void create_basic_forms() {
-    /* Those are the basic forms */
-    _quote = make_symbol("quote");
-    _if = make_symbol("if");
-    _set = make_symbol("set!");
-
     /* Create associations in the symbol table */
     define_symbol(make_symbol("and"), make_form(form_and), 0);
     define_symbol(make_symbol("or"), make_form(form_or), 0);
