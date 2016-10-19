@@ -68,37 +68,6 @@ Bool is_Boolean(object o);
 Bool is_Symbol(object o);
 Bool is_Primitive(object o);
 Bool is_Form(object o);
-
-
-/**
- * @brief car returns the car of the object o, given that it is a pair.
- * @return the car of the pair.
- */
-object car(object o);
-/**
- * @brief cdr returns the cdr of the object o, given that it is a pair.
- * @return the cdr of the pair.
- */
-object cdr(object o);
-/**
- * @brief cddr returns the cdr of the cdr of the object o, given
- * that it is a pair.
- * @return the cdr of the cdr.
- */
-object cddr(object o);
-/**
- * @brief cadr returns the car of the cdr of the object o, i.e., the next
- * object in the list, given that it is a pair.
- * @return the car of the cdr of the pair.
- */
-object cadr(object o);
-/**
- * @brief caddr returns the car of the cdr of the cdr of the object o,
- * i.e., the second next object in the list, given that it is a pair.
- * @return the car of the cdr of the cdr of the pair.
- */
-object caddr(object o);
-
 Bool is_AutoEvaluable(object o);
 
 #define SFS_NUMBER       0x00

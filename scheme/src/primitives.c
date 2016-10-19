@@ -2,6 +2,7 @@
 #include <forms.h>
 #include <limits.h>
 #include <symbols.h>
+#include <lists.h>
 
 void create_basic_primitives() {
     /* Those are the basic type comparison functions */

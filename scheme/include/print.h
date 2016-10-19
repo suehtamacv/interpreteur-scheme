@@ -50,6 +50,10 @@ void sfs_print_nil(object);
  * @brief sfs_print_primitive prints the definition of a primitive.
  */
 void sfs_print_primitive(object);
+/**
+ * @brief sfs_print_form prints the definition of a form.
+ */
+void sfs_print_form(object);
 
 #ifdef __cplusplus
 }

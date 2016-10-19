@@ -1,6 +1,7 @@
 #include "forms.h"
 #include "symbols.h"
 #include "eval.h"
+#include "lists.h"
 #include <limits.h>
 
 void create_basic_forms() {

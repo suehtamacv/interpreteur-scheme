@@ -9,6 +9,7 @@
 
 #include "print.h"
 #include "forms.h"
+#include "lists.h"
 #include <stdio.h>
 
 void sfs_print(object o) {
@@ -62,6 +63,10 @@ restart:
 
         case SFS_PRIMITIVE:
             sfs_print_primitive(o);
+            break;
+
+        case SFS_FORM:
+            sfs_print_form(o);
             break;
         }
     }
@@ -181,4 +186,14 @@ void sfs_print_primitive(object o) {
     }
 
     printf("<#primitive %p>", o->val.primitive.f);
+}
+
+void sfs_print_form(object o) {
+    if (o->type != SFS_FORM) {
+        WARNING_MSG("Trying to print object of type %d as form (%d).", o->type,
+                    SFS_FORM);
+        sfs_print(o);
+    }
+
+    printf("<#form %p>", o->val.form.f);
 }

@@ -11,8 +11,8 @@
 #include <stdio.h>
 #include <strings.h>
 #include "symbols.h"
-#include "print.h"
 #include "forms.h"
+#include "lists.h"
 
 void create_environment(int depth) {
     object* last_env = &symbol_table;

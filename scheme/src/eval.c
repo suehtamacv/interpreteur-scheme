@@ -9,8 +9,8 @@
 
 #include "eval.h"
 #include "forms.h"
+#include "lists.h"
 #include <strings.h>
-#include "print.h"
 
 object sfs_eval(object in) {
 restart:
@@ -35,22 +35,37 @@ restart:
     } else if (is_Pair(in) == True) {
         if (is_Symbol(car(in)) == False) {
             WARNING_MSG("Ill-formed expression: first list element "
-                        "can not be resolved into a primitive");
+                        "can not be resolved into a procedure");
             return NULL;
         }
 
-        object *l_symb = locate_symbol(car(in), 0);
-        if (!l_symb ||
-                (is_Primitive(*l_symb) == False &&
-                 is_Form(*l_symb) == False)) {
+        object *symb = locate_symbol(car(in), 0);
+        if (!symb ||
+                (is_Primitive(*symb) == False &&
+                 is_Form(*symb) == False)) {
             WARNING_MSG("Procedure \"%s\" not found", car(in)->val.symbol);
             return NULL;
         }
 
-        if ((*l_symb)->type == SFS_PRIMITIVE) {
-            return (*l_symb)->val.primitive.f(cdr(in));
-        } else if (((*l_symb)->type == SFS_FORM)) {
-            return (*l_symb)->val.form.f(cdr(in));
+        if ((*symb)->type == SFS_PRIMITIVE) {
+            /* Must evaluate the arguments */
+            object evaluated_list = nil;
+            in = cdr(in);
+            while (is_Nil(in) == False) {
+                object eval_element = sfs_eval(car(in));
+                if (eval_element) {
+                    evaluated_list = cons(sfs_eval(car(in)), evaluated_list);
+                } else {
+                    return NULL;
+                }
+                in = cdr(in);
+            }
+
+            /* Calls the function */
+            return (*symb)->val.primitive.f(evaluated_list);
+        } else if (((*symb)->type == SFS_FORM)) {
+            /* Calls the function */
+            return (*symb)->val.form.f(cdr(in));
         }
 
         goto restart;
