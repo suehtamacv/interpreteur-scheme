@@ -180,5 +180,5 @@ void sfs_print_primitive(object o) {
         sfs_print(o);
     }
 
-    printf("[PRIMITIVE]");
+    printf("<#primitive %p>", o->val.primitive.f);
 }

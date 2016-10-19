@@ -1,5 +1,6 @@
 #include "forms.h"
 #include "symbols.h"
+#include "eval.h"
 #include <limits.h>
 
 void create_basic_forms() {
@@ -7,63 +8,178 @@ void create_basic_forms() {
     _quote = make_symbol("quote");
     _if = make_symbol("if");
     _set = make_symbol("set!");
-    _define = make_symbol("define");
+
+    /* Create associations in the symbol table */
+    define_symbol(make_symbol("and"), make_form(form_and), 0);
+    define_symbol(make_symbol("or"), make_form(form_or), 0);
+    define_symbol(make_symbol("define"), make_form(form_define), 0);
+    define_symbol(make_symbol("quote"), make_form(form_quote), 0);
+    define_symbol(make_symbol("if"), make_form(form_if), 0);
+    define_symbol(make_symbol("set!"), make_form(form_set), 0);
 }
 
-Bool is_Boolean(object o) {
-    if (o && o->type == SFS_BOOLEAN) {
+object form_and(object o) {
+    /* An and with one element is the element itself */
+    if (list_length(o) == 1) {
+        return car(o);
+    }
+    object result = _true;
+
+restart:
+    /* Liste finie */
+    if (is_Nil(o) == True) {
+        return result;
+    }
+
+    if (is_Define(car(o)) == True) {
+        WARNING_MSG("Definitions not allowed in expression context");
+        return NULL;
+    }
+    result = sfs_eval(car(o));
+
+    /* Court circuit si on trouve un #f */
+    if (is_True(result) == False) {
+        return _false;
+    }
+
+    o = cdr(o);
+    goto restart;
+}
+
+object form_or(object o) {
+    /* An or with one element is the element itself */
+    if (list_length(o) == 1) {
+        return car(o);
+    }
+
+    object result = _false;
+
+restart:
+    /* Liste finie */
+    if (is_Nil(o) == True) {
+        return result;
+    }
+
+    if (is_Define(car(o)) == True) {
+        WARNING_MSG("Definitions not allowed in expression context");
+        return NULL;
+    }
+    result = sfs_eval(car(o));
+
+    /* Court circuit si on trouve un #t */
+    if (is_True(result) == True) {
+        return result;
+    }
+
+    o = cdr(o);
+    goto restart;
+}
+
+object form_define(object o) {
+    if (list_length(o) != 2) {
+        WARNING_MSG("Wrong number of arguments on \"define\"");
+        return NULL;
+    }
+
+    int define_result = (is_Quote(cadr(o)) == True) ?
+                        define_symbol(car(o), cadr(o), 0) :
+                        define_symbol(car(o), sfs_eval(cadr(o)), 0);
+
+    if (define_result == 0) {
+        return car(o);    /* Define returns symbol itself */
+    } else {
+        return NULL; /* Could not define */
+    }
+}
+
+object form_quote(object o) {
+    if (list_length(o) != 1) {
+        WARNING_MSG("Wrong number of arguments on \"quote\"");
+        return NULL;
+    }
+    return car(o);
+}
+
+object form_if(object o) {
+    if (list_length(o) != 3) {
+        WARNING_MSG("Wrong number of arguments on \"if\"");
+        return NULL;
+    }
+    object result = sfs_eval(car(o));
+
+    if (result && is_True(result) == True) {
+        o = sfs_eval(cadr(o));
+    } else if (result) {
+        o = sfs_eval(caddr(o));
+    } else {
+        return NULL;
+    }
+
+    /* Can't have a definition inside an IF */
+    if (is_Define(o) == True) {
+        WARNING_MSG("Definitions not allowed in expression context");
+        return NULL;
+    }
+    return o;
+}
+
+object form_set(object o) {
+    if (list_length(o) != 2) {
+        WARNING_MSG("Wrong number of arguments on \"set!\"");
+        return NULL;
+    }
+
+    if (set_symbol(car(o), cadr(o), 0) == 0) { /* Success */
+        return car(o);
+    } else {
+        return NULL;
+    }
+}
+
+Bool is_Form_Name(char *form, object o) {
+    if (is_Symbol(o) == False) {
+        return False;
+    }
+
+    if (strcasecmp(o->val.symbol, form) == 0) {
         return True;
     }
     return False;
 }
 
-Bool is_Char(object o) {
-    if (o && o->type == SFS_CHARACTER) {
-        return True;
+Bool is_Define(object o) {
+    if (is_Pair(o) == False) {
+        return False;
     }
-    return False;
+    return is_Form_Name("define", car(o));
 }
 
-Bool is_Nil(object o) {
-    if (o && o->type == SFS_NIL) {
-        return True;
+Bool is_Set(object o) {
+    if (is_Pair(o) == False) {
+        return False;
     }
-    return False;
+    return is_Form_Name("set!", car(o));
 }
 
-Bool is_Number(object o) {
-    if (o && o->type == SFS_NUMBER) {
-        return True;
+Bool is_Quote(object o) {
+    if (is_Pair(o) == False) {
+        return False;
     }
-    return False;
+    return is_Form_Name("quote", car(o));
 }
 
-Bool is_Pair(object o) {
-    if (o && o->type == SFS_PAIR) {
-        return True;
+Bool is_And(object o) {
+    if (is_Pair(o) == False) {
+        return False;
     }
-    return False;
+    return is_Form_Name("and", car(o));
 }
 
-Bool is_String(object o) {
-    if (o && o->type == SFS_STRING) {
-        return True;
+Bool is_Or(object o) {
+    if (is_Pair(o) == False) {
+        return False;
     }
-    return False;
-}
-
-Bool is_Symbol(object o) {
-    if (o && o->type == SFS_SYMBOL) {
-        return True;
-    }
-    return False;
-}
-
-Bool is_Primitive(object o) {
-    if (o && o->type == SFS_PRIMITIVE) {
-        return True;
-    }
-    return False;
+    return is_Form_Name("or", car(o));
 }
 
 uint list_length(object o) {
