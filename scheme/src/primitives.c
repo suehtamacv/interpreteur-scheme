@@ -8,15 +8,53 @@ void create_basic_primitives() {
     /* Those are the basic type comparison functions */
     define_symbol(make_symbol("boolean?"), make_primitive(prim_is_boolean), 0);
 
+    define_symbol(make_symbol("null?"), make_primitive(prim_is_null), 0);
+
+    define_symbol(make_symbol("string?"), make_primitive(prim_is_string), 0);
+
+    define_symbol(make_symbol("integer?"), make_primitive(prim_is_integer), 0);
+
+    define_symbol(make_symbol("pair?"), make_primitive(prim_is_pair), 0);
+
+    define_symbol(make_symbol("symbol?"), make_primitive(prim_is_symbol), 0);
+
+    define_symbol(make_symbol("char?"), make_primitive(prim_is_char), 0);
     /* Those are the basic arithmetic primitives */
     define_symbol(make_symbol("+"), make_primitive(prim_arith_plus), 0);
 }
+object prim_is_char(object o){
+    if(is_Pair(o)== True && is_Char(car(o)) == True) return _true;
+    return _false;
+}
 
+object prim_is_symbol(object o){
+    if(is_Pair(o)== True && is_Symbol(car(o)) == True) return _true;
+    return _false;
+}
+
+object prim_is_pair(object o){
+    if(is_Pair(o)== True && is_Pair(car(o)) == True) return _true;
+    return _false;
+}
+
+object prim_is_integer(object o){
+    if(is_Pair(o)== True && is_Integer(car(o)) == True) return _true;
+    return _false;
+}
 object prim_is_boolean(object o) {
     if (is_Pair(o) == True && is_Boolean(car(o)) == True) return _true;
     return _false;
 }
 
+object prim_is_null(object o){
+    if(is_Pair(o) == True && is_Nil(car(o))== True) return _true;
+    return _false;/*faut corrriger*/
+}
+
+object prim_is_string(object o){
+    if(is_Pair(o)== True && is_String(car(o))== True) return _true;
+    return _false;
+}
 object prim_arith_plus(object o) {
     object res = make_object(SFS_NUMBER);
     res->val.number.numtype = NUM_INTEGER;

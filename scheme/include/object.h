@@ -69,7 +69,7 @@ Bool is_Symbol(object o);
 Bool is_Primitive(object o);
 Bool is_Form(object o);
 Bool is_AutoEvaluable(object o);
-
+Bool is_Integer(object o);
 #define SFS_NUMBER       0x00
 #define SFS_CHARACTER    0x01
 #define SFS_STRING       0x02

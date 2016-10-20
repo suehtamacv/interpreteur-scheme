@@ -10,6 +10,7 @@
 #include "object.h"
 #include "forms.h"
 #include "mem.h"
+#include "number.h"
 
 
 object make_object(uint type) {
@@ -127,6 +128,13 @@ Bool is_Nil(object o) {
 
 Bool is_Number(object o) {
     if (o && o->type == SFS_NUMBER) {
+        return True;
+    }
+    return False;
+}
+
+Bool is_Integer(object o) {
+    if (o && o->val.number.numtype == NUM_UINTEGER) {
         return True;
     }
     return False;
