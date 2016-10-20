@@ -13,7 +13,9 @@ void create_basic_primitives() {
 }
 
 object prim_is_boolean(object o) {
-    if (is_Pair(o) == True && is_Boolean(car(o)) == True) return _true;
+    if (is_Pair(o) == True && is_Boolean(car(o)) == True) {
+        return _true;
+    }
     return _false;
 }
 

@@ -1,0 +1,11 @@
+==> #<procedure>
+==> #<procedure>
+==> #<procedure>
+==> #<procedure>
+==> #<procedure>
+==> #<procedure>
+==> #<procedure>
+==> #<procedure>
+==> #<procedure>
+==> #<procedure>
+==> #<procedure>
