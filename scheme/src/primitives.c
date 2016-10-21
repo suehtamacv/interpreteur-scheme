@@ -27,7 +27,7 @@ void create_basic_primitives() {
     define_symbol(make_symbol("car"), make_primitive(prim_car), 0);
     define_symbol(make_symbol("cdr"), make_primitive(prim_cdr), 0);
     define_symbol(make_symbol("set-car!"), make_primitive(prim_set_car), 0);
-    define_symbol(make_symbol("set-cdr!"), make_primitive(prim_set_car), 0);
+    define_symbol(make_symbol("set-cdr!"), make_primitive(prim_set_cdr), 0);
 
     /* Those are the basic arithmetic primitives */
     define_symbol(make_symbol("+"), make_primitive(prim_arith_plus), 0);
@@ -38,9 +38,9 @@ object prim_set_car(object o) {
 
     if (is_Pair(car(o)) == True) { /* Can only set the car of a list */
         object old_list = car(o);
-        object new_obj = cadr(o);
+        object new_car = cadr(o);
 
-        old_list->val.pair.car = new_obj;
+        old_list->val.pair.car = new_car;
         return old_list;
     }
     WARNING_MSG("Wrong type of arguments on \"set-car!\"");
@@ -49,11 +49,16 @@ object prim_set_car(object o) {
 
 object prim_set_cdr(object o) {
     TEST_NUMB_ARGUMENT_EQ(2, "set-cdr!");
-    if(is_Pair(cadr(o)) == True) { /* Can only set the cdr of a list */
-        object new_obj = car(o);
-        object old_list = cadr(o);
+    if(is_Pair(car(o)) == True) { /* Can only set the cdr of a list */
+        object old_list = car(o);
+        object new_cdr = cadr(o);
 
-        old_list->val.pair.cdr = new_obj;
+        if (is_Pair(new_cdr) == False && is_Nil(new_cdr) == False) {
+            WARNING_MSG("Can not set the cdr to something who is neither a pair nor nil");
+            return NULL;
+        }
+
+        old_list->val.pair.cdr = new_cdr;
         return old_list;
     }
     WARNING_MSG("Wrong type of arguments on \"set-cdr!\"");
