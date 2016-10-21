@@ -28,11 +28,20 @@ void create_basic_primitives() {
     define_symbol(make_symbol("cdr"), make_primitive(prim_cdr), 0);
     define_symbol(make_symbol("set-car!"), make_primitive(prim_set_car), 0);
     define_symbol(make_symbol("set-cdr!"), make_primitive(prim_set_cdr), 0);
+    define_symbol(make_symbol("cons"), make_primitive(prim_cons), 0);
+    define_symbol(make_symbol("list"), make_primitive(prim_list), 0);
 
     /* Those are the basic arithmetic primitives */
     define_symbol(make_symbol("+"), make_primitive(prim_arith_plus), 0);
 }
 
+object prim_list(object o){
+    return o;
+}
+object prim_cons(object o){
+    TEST_NUMB_ARGUMENT_EQ(2, "cons");
+    return cons(car(o), cadr(o));
+}
 object prim_set_car(object o) {
     TEST_NUMB_ARGUMENT_EQ(2, "set-car!");
 

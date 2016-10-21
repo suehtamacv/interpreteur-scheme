@@ -21,6 +21,9 @@ object prim_car(object);
 object prim_cdr(object);
 object prim_set_car(object);
 object prim_set_cdr(object);
+object prim_cons(object);
+object prim_list(object);
+
 
 /* Those are basic arithmetic functions */
 object prim_arith_plus(object);
