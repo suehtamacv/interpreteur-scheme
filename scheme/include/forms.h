@@ -4,6 +4,7 @@
 #include "object.h"
 
 void create_basic_forms(void);
+void create_form(string, object (*)(object));
 
 /* Those are the basic forms */
 object form_and(object);

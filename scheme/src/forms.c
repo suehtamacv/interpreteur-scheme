@@ -6,12 +6,16 @@
 
 void create_basic_forms() {
     /* Create associations in the symbol table */
-    define_symbol(make_symbol("and"), make_form(form_and), 0);
-    define_symbol(make_symbol("or"), make_form(form_or), 0);
-    define_symbol(make_symbol("define"), make_form(form_define), 0);
-    define_symbol(make_symbol("quote"), make_form(form_quote), 0);
-    define_symbol(make_symbol("if"), make_form(form_if), 0);
-    define_symbol(make_symbol("set!"), make_form(form_set), 0);
+    create_form("and", form_and);
+    create_form("or", form_or);
+    create_form("define", form_define);
+    create_form("quote", form_quote);
+    create_form("if", form_if);
+    create_form("set!", form_set);
+}
+
+void create_form(string form_name, object (*f)(object)) {
+    define_symbol(make_symbol(form_name), make_form(f, form_name), 0);
 }
 
 object form_and(object o) {

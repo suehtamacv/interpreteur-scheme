@@ -35,10 +35,12 @@ typedef struct object_t {
 
         struct {
             struct object_t* (*f)(struct object_t *);
+            string func_name;
         } primitive;
 
         struct {
             struct object_t* (*f)(struct object_t *);
+            string func_name;
         } form;
     } val;
 
@@ -49,8 +51,8 @@ object make_pair(object car, object cdr);
 object make_nil(void);
 object make_true(void);
 object make_false(void);
-object make_primitive(object (*f)(object));
-object make_form(object (*f)(object));
+object make_primitive(object (*f)(object), string func_name);
+object make_form(object (*f)(object), string func_name);
 object make_symbol_table(void);
 object make_symbol(string);
 object make_string(string);

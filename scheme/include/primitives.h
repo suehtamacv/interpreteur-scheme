@@ -4,6 +4,7 @@
 #include <object.h>
 
 void create_basic_primitives(void);
+void create_primitive(string, object (*)(object));
 
 /* Basic type testing function */
 object prim_is_boolean(object);

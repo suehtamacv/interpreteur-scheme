@@ -6,10 +6,14 @@
 
 void create_basic_primitives() {
     /* Those are the basic type comparison functions */
-    define_symbol(make_symbol("boolean?"), make_primitive(prim_is_boolean), 0);
+    create_primitive("boolean?", prim_is_boolean);
 
     /* Those are the basic arithmetic primitives */
-    define_symbol(make_symbol("+"), make_primitive(prim_arith_plus), 0);
+    create_primitive("+", prim_arith_plus);
+}
+
+void create_primitive(string prim_name, object (*func)(object)) {
+    define_symbol(make_symbol(prim_name), make_primitive(func, prim_name), 0);
 }
 
 object prim_is_boolean(object o) {
