@@ -7,46 +7,51 @@
 void create_basic_primitives() {
     /* Those are the basic type comparison functions */
     define_symbol(make_symbol("boolean?"), make_primitive(prim_is_boolean), 0);
-
     define_symbol(make_symbol("null?"), make_primitive(prim_is_null), 0);
-
     define_symbol(make_symbol("string?"), make_primitive(prim_is_string), 0);
-
     define_symbol(make_symbol("integer?"), make_primitive(prim_is_integer), 0);
-
     define_symbol(make_symbol("pair?"), make_primitive(prim_is_pair), 0);
-
     define_symbol(make_symbol("symbol?"), make_primitive(prim_is_symbol), 0);
-
     define_symbol(make_symbol("char?"), make_primitive(prim_is_char), 0);
-
     define_symbol(make_symbol("real?"), make_primitive(prim_is_real), 0);
+    define_symbol(make_symbol("car"), make_primitive(prim_is_car), 0);
 
-    define_symbol(make_symbol(">"), make_primitive(prim_is_plus), 0);
+
+    //define_symbol(make_symbol(">"), make_primitive(prim_is_greater_than), 0);
     /* Those are the basic arithmetic primitives */
     define_symbol(make_symbol("+"), make_primitive(prim_arith_plus), 0);
 }
-
-object prim_is_plus(object o){
+/*
+object prim_is_greater_than(object o){
 restart:
     if (is_Nil(o) == True) {
         return _true;
     }
     if(is_Pair(o) != True || is_Number(car(o)) != True)
         WARNING_MSG("Wrong!");
-    else{
-     if(car(o) < cadr(o)) return _false;
+    //else{
+           //if(sfs_eval(car(o)) < sfs_eval(cadr(o)) )return _false;
      else{
          goto restart;
      }
+}*/
+
+object prim_is_car(object o){
+    if (list_length(o) != 1) {
+        WARNING_MSG("Wrong number of arguments on \"car\"");
+        return NULL;
     }
-
-
+   if(is_Pair(o)== True && is_Pair(car(o)) == True) {
+       return car(car(o));
+   }
+   WARNING_MSG("Wrong type of arguments on \"car\"");
+   return NULL;
 }
+
 
 object prim_is_real(object o){
     if (list_length(o) != 1) {
-        WARNING_MSG("Wrong number of arguments on \"Real\"");
+        WARNING_MSG("Wrong number of arguments on \"real?\"");
         return NULL;
     }
     if(is_Pair(o)== True && is_Real(car(o)) == True) return _true;

@@ -47,7 +47,7 @@ restart:
             return NULL;
         }
 
-        if ((*symb)->type == SFS_PRIMITIVE) {//faut corriger
+        if ((*symb)->type == SFS_PRIMITIVE) {
             /* Must evaluate the arguments */
             object evaluated_list = nil;
             in = cdr(in);

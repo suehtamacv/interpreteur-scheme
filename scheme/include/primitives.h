@@ -14,7 +14,8 @@ object prim_is_pair(object);
 object prim_is_symbol(object);
 object prim_is_char(object);
 object prim_is_real(object);
-object prim_is_plus(object);
+object prim_is_greater_than(object);
+object prim_is_car(object);
 
 
 
