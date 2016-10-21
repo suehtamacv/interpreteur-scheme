@@ -29,32 +29,12 @@ void create_basic_primitives() {
     define_symbol(make_symbol("set-car!"), make_primitive(prim_set_car), 0);
     define_symbol(make_symbol("set-cdr!"), make_primitive(prim_set_car), 0);
 
-
-    //define_symbol(make_symbol(">"), make_primitive(prim_is_greater_than), 0);
     /* Those are the basic arithmetic primitives */
     define_symbol(make_symbol("+"), make_primitive(prim_arith_plus), 0);
 }
-/*
-object prim_is_greater_than(object o){
-restart:
-    if (is_Nil(o) == True) {
-        return _true;
-    }
-    if(is_Pair(o) != True || is_Number(car(o)) != True)
-        WARNING_MSG("Wrong!");
-    //else{
-           //if(sfs_eval(car(o)) < sfs_eval(cadr(o)) )return _false;
-     else{
-         goto restart;
-     }
-}*/
-object prim_set_car(object o){
-    TEST_NUMB_ARGUMENT_EQ(2, "set-car!");
 
-    printf("car: ");
-    sfs_print(car(o));
-    printf("\ncdr: ");
-    sfs_print(cadr(o));
+object prim_set_car(object o) {
+    TEST_NUMB_ARGUMENT_EQ(2, "set-car!");
 
     if (is_Pair(car(o)) == True) { /* Can only set the car of a list */
         object old_list = car(o);
@@ -67,9 +47,9 @@ object prim_set_car(object o){
     return NULL;
 }
 
-object prim_set_cdr(object o){
+object prim_set_cdr(object o) {
     TEST_NUMB_ARGUMENT_EQ(2, "set-cdr!");
-    if(is_Pair(cadr(o)) == True) /* Can only set the cdr of a list */ {
+    if(is_Pair(cadr(o)) == True) { /* Can only set the cdr of a list */
         object new_obj = car(o);
         object old_list = cadr(o);
 
