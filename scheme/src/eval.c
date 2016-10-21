@@ -54,7 +54,7 @@ restart:
             while (is_Nil(in) == False) {
                 object eval_element = sfs_eval(car(in));
                 if (eval_element) {
-                    evaluated_list = cons(sfs_eval(car(in)), evaluated_list);
+                    evaluated_list = cons(eval_element, evaluated_list);
                 } else {
                     return NULL;
                 }

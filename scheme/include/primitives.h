@@ -14,10 +14,15 @@ object prim_is_pair(object);
 object prim_is_symbol(object);
 object prim_is_char(object);
 object prim_is_real(object);
+object prim_is_procedure(object);
+
 object prim_is_greater_than(object);
-object prim_is_car(object);
 
-
+/* Thpose are the basic list handling functions */
+object prim_car(object);
+object prim_cdr(object);
+object prim_set_car(object);
+object prim_set_cdr(object);
 
 
 /* Those are basic arithmetic functions */
