@@ -4,6 +4,12 @@
 #include <symbols.h>
 #include <lists.h>
 
+#define EQ_ARGUMENT_NUMBER(n_Arg, nomFunction) \
+    if (list_length(o) != n_Arg) { \
+        WARNING_MSG("Wrong number of arguments on \"" nomFunction "\""); \
+        return NULL;\
+    }
+
 void create_basic_primitives() {
     /* Those are the basic type comparison functions */
     define_symbol(make_symbol("boolean?"), make_primitive(prim_is_boolean), 0);
@@ -14,6 +20,8 @@ void create_basic_primitives() {
     define_symbol(make_symbol("symbol?"), make_primitive(prim_is_symbol), 0);
     define_symbol(make_symbol("char?"), make_primitive(prim_is_char), 0);
     define_symbol(make_symbol("real?"), make_primitive(prim_is_real), 0);
+
+    /* Those are the basic list handling function */
     define_symbol(make_symbol("car"), make_primitive(prim_is_car), 0);
 
 
@@ -36,84 +44,79 @@ restart:
      }
 }*/
 
-object prim_is_car(object o){
-    if (list_length(o) != 1) {
-        WARNING_MSG("Wrong number of arguments on \"car\"");
-        return NULL;
+object prim_is_car(object o) {
+    EQ_ARGUMENT_NUMBER(1, "car");
+    if(is_Pair(o) == True && is_Pair(car(o)) == True) {
+        return car(car(o));
     }
-   if(is_Pair(o)== True && is_Pair(car(o)) == True) {
-       return car(car(o));
-   }
-   WARNING_MSG("Wrong type of arguments on \"car\"");
-   return NULL;
+    WARNING_MSG("Wrong type of arguments on \"car\"");
+    return NULL;
 }
 
 
-object prim_is_real(object o){
-    if (list_length(o) != 1) {
-        WARNING_MSG("Wrong number of arguments on \"real?\"");
-        return NULL;
+object prim_is_real(object o) {
+    EQ_ARGUMENT_NUMBER(1, "real?");
+    if(is_Pair(o) == True && is_Real(car(o)) == True) {
+        return _true;
     }
-    if(is_Pair(o)== True && is_Real(car(o)) == True) return _true;
     return _false;
 }
 
 
-object prim_is_char(object o){
-    if (list_length(o) != 1) {
-        WARNING_MSG("Wrong number of arguments on \"Char\"");
-        return NULL;
+object prim_is_char(object o) {
+    EQ_ARGUMENT_NUMBER(1, "char?");
+    if(is_Pair(o) == True && is_Char(car(o)) == True) {
+        return _true;
     }
-    if(is_Pair(o)== True && is_Char(car(o)) == True) return _true;
     return _false;
 }
 
-object prim_is_symbol(object o){
-    if (list_length(o) != 1) {
-        WARNING_MSG("Wrong number of arguments on \"Symbol\"");
-        return NULL;
+object prim_is_symbol(object o) {
+    EQ_ARGUMENT_NUMBER(1, "symbol?");
+    if(is_Pair(o) == True && is_Symbol(car(o)) == True) {
+        return _true;
     }
-    if(is_Pair(o)== True && is_Symbol(car(o)) == True) return _true;
     return _false;
 }
 
-object prim_is_pair(object o){
-    if (list_length(o) != 1) {
-        WARNING_MSG("Wrong number of arguments on \"Pair\"");
-        return NULL;
+object prim_is_pair(object o) {
+    EQ_ARGUMENT_NUMBER(1, "pair?");
+    if(is_Pair(o) == True && is_Pair(car(o)) == True) {
+        return _true;
     }
-    if(is_Pair(o)== True && is_Pair(car(o)) == True) return _true;
     return _false;
 }
 
-object prim_is_integer(object o){
-    if (list_length(o) != 1) {
-        WARNING_MSG("Wrong number of arguments on \"Integer\"");
-        return NULL;
+object prim_is_integer(object o) {
+    EQ_ARGUMENT_NUMBER(1, "integer?");
+    if(is_Pair(o) == True && is_Integer(car(o)) == True) {
+        return _true;
     }
-    if(is_Pair(o)== True && is_Integer(car(o)) == True) return _true;
     return _false;
 }
 object prim_is_boolean(object o) {
-    if (list_length(o) != 1) {
-        WARNING_MSG("Wrong number of arguments on \"Boolean\"");
-        return NULL;
+    EQ_ARGUMENT_NUMBER(1, "boolean?");
+    if (is_Pair(o) == True && is_Boolean(car(o)) == True) {
+        return _true;
     }
-    if (is_Pair(o) == True && is_Boolean(car(o)) == True) return _true;
     return _false;
 }
 
-object prim_is_null(object o){
-    if(is_Pair(o) == True && is_Nil(car(o))== True) return _true;
+object prim_is_null(object o) {
+    if(is_Pair(o) == True && is_Nil(car(o)) == True) {
+        return _true;
+    }
     return _false;/*faut corrriger*/
 }
 
-object prim_is_string(object o){
+object prim_is_string(object o) {
     if (list_length(o) != 1) {
         WARNING_MSG("Wrong number of arguments on \"String\"");
         return NULL;
-       }
-    if(is_Pair(o)== True && is_String(car(o))== True) return _true;
+    }
+    if(is_Pair(o) == True && is_String(car(o)) == True) {
+        return _true;
+    }
     return _false;
 }
 object prim_arith_plus(object o) {
