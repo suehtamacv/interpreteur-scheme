@@ -19,29 +19,81 @@ void create_basic_primitives() {
     define_symbol(make_symbol("symbol?"), make_primitive(prim_is_symbol), 0);
 
     define_symbol(make_symbol("char?"), make_primitive(prim_is_char), 0);
+
+    define_symbol(make_symbol("real?"), make_primitive(prim_is_real), 0);
+
+    define_symbol(make_symbol(">"), make_primitive(prim_is_plus), 0);
     /* Those are the basic arithmetic primitives */
     define_symbol(make_symbol("+"), make_primitive(prim_arith_plus), 0);
 }
+
+object prim_is_plus(object o){
+restart:
+    if (is_Nil(o) == True) {
+        return _true;
+    }
+    if(is_Pair(o) != True || is_Number(car(o)) != True)
+        WARNING_MSG("Wrong!");
+    else{
+     if(car(o) < cadr(o)) return _false;
+     else{
+         goto restart;
+     }
+    }
+
+
+}
+
+object prim_is_real(object o){
+    if (list_length(o) != 1) {
+        WARNING_MSG("Wrong number of arguments on \"Real\"");
+        return NULL;
+    }
+    if(is_Pair(o)== True && is_Real(car(o)) == True) return _true;
+    return _false;
+}
+
+
 object prim_is_char(object o){
+    if (list_length(o) != 1) {
+        WARNING_MSG("Wrong number of arguments on \"Char\"");
+        return NULL;
+    }
     if(is_Pair(o)== True && is_Char(car(o)) == True) return _true;
     return _false;
 }
 
 object prim_is_symbol(object o){
+    if (list_length(o) != 1) {
+        WARNING_MSG("Wrong number of arguments on \"Symbol\"");
+        return NULL;
+    }
     if(is_Pair(o)== True && is_Symbol(car(o)) == True) return _true;
     return _false;
 }
 
 object prim_is_pair(object o){
+    if (list_length(o) != 1) {
+        WARNING_MSG("Wrong number of arguments on \"Pair\"");
+        return NULL;
+    }
     if(is_Pair(o)== True && is_Pair(car(o)) == True) return _true;
     return _false;
 }
 
 object prim_is_integer(object o){
+    if (list_length(o) != 1) {
+        WARNING_MSG("Wrong number of arguments on \"Integer\"");
+        return NULL;
+    }
     if(is_Pair(o)== True && is_Integer(car(o)) == True) return _true;
     return _false;
 }
 object prim_is_boolean(object o) {
+    if (list_length(o) != 1) {
+        WARNING_MSG("Wrong number of arguments on \"Boolean\"");
+        return NULL;
+    }
     if (is_Pair(o) == True && is_Boolean(car(o)) == True) return _true;
     return _false;
 }
@@ -52,6 +104,10 @@ object prim_is_null(object o){
 }
 
 object prim_is_string(object o){
+    if (list_length(o) != 1) {
+        WARNING_MSG("Wrong number of arguments on \"String\"");
+        return NULL;
+       }
     if(is_Pair(o)== True && is_String(car(o))== True) return _true;
     return _false;
 }

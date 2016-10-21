@@ -140,6 +140,14 @@ Bool is_Integer(object o) {
     return False;
 }
 
+Bool is_Real(object o) {
+    if (o && o->val.number.numtype == NUM_REAL) {
+        return True;
+    }
+    return False;
+}
+
+
 Bool is_Pair(object o) {
     if (o && o->type == SFS_PAIR) {
         return True;
