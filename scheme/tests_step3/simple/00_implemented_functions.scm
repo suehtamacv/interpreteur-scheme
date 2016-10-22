@@ -5,7 +5,7 @@
 
 boolean?
 char?
-nil?
+null?
 string?
 symbol?
 pair?

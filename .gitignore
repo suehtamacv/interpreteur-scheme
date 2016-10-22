@@ -1,5 +1,5 @@
 # Object files
-*.~
+*~
 *.user
 *.o
 *.ko
