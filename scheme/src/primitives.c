@@ -10,6 +10,11 @@
         WARNING_MSG("Wrong number of arguments on \"" nomFunction "\""); \
         return NULL;\
     }
+#define TEST_CONDITION_ARGUMENT_EQ(obj, nomFunction)\
+    if((is_Number(cadr(o)) == False)||cadr(o)->val.number.numtype == NUM_PINFTY || cadr(o)->val.number.numtype == NUM_MINFTY || cadr(o)->val.number.numtype == NUM_COMPLEX){\
+    WARNING_MSG("Wrong type of arguments on \"" nomFunction "\""); \
+    return NULL;\
+}
 
 void create_basic_primitives() {
     /* Those are the basic type comparison functions */
@@ -41,12 +46,162 @@ void create_basic_primitives() {
 
     /* Those are the basic arithmetic primitives */
     //define_symbol(make_symbol("+"), make_primitive(prim_arith_plus), 0);
+    create_primitive(">", prim_larger);
+    create_primitive("<", prim_smaller);
+    create_primitive("=", prim_equal);
 }
 
 void create_primitive(string prim_name, object (*func)(object)) {
     define_symbol(make_symbol(prim_name), make_primitive(func, prim_name), 0);
+
 }
 
+object prim_equal(object o){
+    if (list_length(o) < 2){
+        WARNING_MSG("Wrong number of arguments on \"=\"");
+        return NULL;
+    }
+restart:
+    if (is_Number(car(o)) == False){
+        WARNING_MSG("Wrong type of arguments on \"=\"");
+        return NULL;
+    }
+    switch (car(o)->val.number.numtype) {
+    case NUM_PINFTY:
+        break;
+    case NUM_MINFTY:
+        break;
+    case NUM_COMPLEX:
+        break;
+    case NUM_INTEGER:
+        break;
+    case NUM_UINTEGER:
+         WARNING_MSG("ICI_UNITEGER");
+         TEST_CONDITION_ARGUMENT_EQ(o, "=");
+        if(cadr(o)->val.number.numtype == NUM_UINTEGER){
+            WARNING_MSG("Compare uinteger with uniteger");
+            if(car(o)->val.number.val.integer != cadr(o)->val.number.val.integer) return _false;
+        }
+        if(cadr(o)->val.number.numtype == NUM_REAL){
+            WARNING_MSG("Compare uinteger with real");
+            if(car(o)->val.number.val.integer != cadr(o)->val.number.val.real) return _false;
+        }
+        break;
+    case NUM_REAL:
+        WARNING_MSG("ICI_REAL");
+        TEST_CONDITION_ARGUMENT_EQ(o, "=");
+        if(cadr(o)->val.number.numtype == NUM_UINTEGER){
+            WARNING_MSG("Compare real with uinteger");
+            if(car(o)->val.number.val.real  != cadr(o)->val.number.val.integer) return _false;
+        }
+        if(cadr(o)->val.number.numtype == NUM_REAL){
+            WARNING_MSG("Compare real with real");
+            if(car(o)->val.number.val.real  != cadr(o)->val.number.val.real) return _false;
+        }
+        break;
+    }
+    o = cdr(o);
+    if(list_length(o) == 1) return _true;
+    goto restart;
+}
+
+object prim_smaller(object o){
+    if (list_length(o) < 2){
+        WARNING_MSG("Wrong number of arguments on \"<\"");
+        return NULL;
+    }
+restart:
+    if (is_Number(car(o)) == False){
+        WARNING_MSG("Wrong type of arguments on \"<\"");
+        return NULL;
+    }
+    switch (car(o)->val.number.numtype) {
+    case NUM_PINFTY:
+        break;
+    case NUM_MINFTY:
+        break;
+    case NUM_COMPLEX:
+        break;
+    case NUM_INTEGER:
+        break;
+    case NUM_UINTEGER:
+         WARNING_MSG("ICI_UNITEGER");
+         TEST_CONDITION_ARGUMENT_EQ(o, "<");
+        if(cadr(o)->val.number.numtype == NUM_UINTEGER){
+            WARNING_MSG("Compare uinteger with uniteger");
+            if(car(o)->val.number.val.integer > cadr(o)->val.number.val.integer) return _false;
+        }
+        if(cadr(o)->val.number.numtype == NUM_REAL){
+            WARNING_MSG("Compare uinteger with real");
+            if(car(o)->val.number.val.integer > cadr(o)->val.number.val.real) return _false;
+        }
+        break;
+    case NUM_REAL:
+        WARNING_MSG("ICI_REAL");
+        TEST_CONDITION_ARGUMENT_EQ(o, "<");
+        if(cadr(o)->val.number.numtype == NUM_UINTEGER){
+            WARNING_MSG("Compare real with uinteger");
+            if(car(o)->val.number.val.real  > cadr(o)->val.number.val.integer) return _false;
+        }
+        if(cadr(o)->val.number.numtype == NUM_REAL){
+            WARNING_MSG("Compare real with real");
+            if(car(o)->val.number.val.real  > cadr(o)->val.number.val.real) return _false;
+        }
+        break;
+    }
+    o = cdr(o);
+    if(list_length(o) == 1) return _true;
+    goto restart;
+}
+
+object prim_larger(object o){
+    if (list_length(o) < 2){
+        WARNING_MSG("Wrong type of arguments on \">\"");
+        return NULL;
+    }
+restart:
+    if (is_Number(car(o)) == False){
+        WARNING_MSG("Wrong type of arguments on \">\"");
+        return NULL;
+    }
+    switch (car(o)->val.number.numtype) {
+    case NUM_PINFTY:
+        break;
+    case NUM_MINFTY:
+        break;
+    case NUM_COMPLEX:
+        break;
+    case NUM_INTEGER:
+        break;
+    case NUM_UINTEGER:
+         WARNING_MSG("ICI_UNITEGER");
+         TEST_CONDITION_ARGUMENT_EQ(o, ">");
+        if(cadr(o)->val.number.numtype == NUM_UINTEGER){
+            WARNING_MSG("Compare uinteger with uniteger");
+            if(car(o)->val.number.val.integer < cadr(o)->val.number.val.integer) return _false;
+        }
+        if(cadr(o)->val.number.numtype == NUM_REAL){
+            WARNING_MSG("Compare uinteger with real");
+            if(car(o)->val.number.val.integer < cadr(o)->val.number.val.real) return _false;
+        }
+        break;
+    case NUM_REAL:
+        WARNING_MSG("ICI_REAL");
+        TEST_CONDITION_ARGUMENT_EQ(o, ">");
+        if(cadr(o)->val.number.numtype == NUM_UINTEGER){
+            WARNING_MSG("Compare real with uinteger");
+            if(car(o)->val.number.val.real  < cadr(o)->val.number.val.integer) return _false;
+        }
+        if(cadr(o)->val.number.numtype == NUM_REAL){
+            WARNING_MSG("Compare real with real");
+            if(car(o)->val.number.val.real  < cadr(o)->val.number.val.real) return _false;
+        }
+        break;
+    }
+    o = cdr(o);
+    if(list_length(o) == 1) return _true;
+    goto restart;
+}
 object prim_is_list(object o) {
     TEST_NUMB_ARGUMENT_EQ(1, "list?");
     o = car(o);
