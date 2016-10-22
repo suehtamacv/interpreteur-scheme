@@ -73,13 +73,13 @@ object prim_is_positive(object o) {
         return NULL;
     } else {
         switch (o->val.number.numtype) {
-        case NUM_UINTEGER:
         case NUM_PINFTY:
             return _true;
 
         case NUM_MINFTY:
             return _false;
 
+        case NUM_UINTEGER:
         case NUM_INTEGER:
             return (o->val.number.val.integer > 0 ? _true : _false);
 

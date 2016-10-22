@@ -38,4 +38,3 @@
 (real? compl)
 (complex? compl)
 (zero? compl)
-
