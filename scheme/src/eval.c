@@ -52,6 +52,11 @@ restart:
             object evaluated_list = nil;
             in = cdr(in);
             while (is_Nil(in) == False) {
+                if (is_Define(car(in)) == True) {
+                    WARNING_MSG("Definitions not allowed in expression context");
+                    return NULL;
+                }
+
                 object eval_element = sfs_eval(car(in));
                 if (eval_element) {
                     evaluated_list = cons(sfs_eval(car(in)), evaluated_list);

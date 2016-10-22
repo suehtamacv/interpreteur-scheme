@@ -10,7 +10,12 @@ string?
 symbol?
 pair?
 procedure?
+
+;; Number related primitives
 number?
 integer?
 real?
 complex?
+positive?
+negative?
+zero?

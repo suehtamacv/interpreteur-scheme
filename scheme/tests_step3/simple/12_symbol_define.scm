@@ -1,7 +1,8 @@
 ;;; En tete pour script de test ;;;;;;;;;;
 ; TEST_RETURN_CODE=FAIL
-; TEST_COMMENT=Tests boolean? and define primitive 
+; TEST_COMMENT=Tests symbol? and define primitive 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(boolean? 0)
-(boolean? (define x #t))
+(symbol? 'x)
+(symbol? '(define x 2))
+(symbol? (define x 2))

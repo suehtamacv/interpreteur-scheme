@@ -1,7 +1,8 @@
 ;;; En tete pour script de test ;;;;;;;;;;
 ; TEST_RETURN_CODE=FAIL
-; TEST_COMMENT=Tests boolean? and define primitive 
+; TEST_COMMENT=Tests pair? with more than one argument 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(boolean? 0)
-(boolean? (define x #t))
+(pair? (list 1 2))
+(pair? list)
+(pair? 1 2)
