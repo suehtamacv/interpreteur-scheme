@@ -32,9 +32,57 @@ void create_basic_primitives() {
     define_symbol(make_symbol("list"), make_primitive(prim_list), 0);
 
     /* Those are the basic arithmetic primitives */
-    define_symbol(make_symbol("+"), make_primitive(prim_arith_plus), 0);
+    //define_symbol(make_symbol("+"), make_primitive(prim_arith_plus), 0);
+    define_symbol(make_symbol(">"), make_primitive(prim_larger), 0);
+    define_symbol(make_symbol("<"), make_primitive(prim_smaller), 0);
+    define_symbol(make_symbol("="), make_primitive(prim_equal), 0);
+
+}
+object prim_smaller(object o){
+restart:
+    sfs_print (cadr(o));
+    if(car(o) > cadr(o)){
+        WARNING_MSG("ICI");
+        return _false;
+    }else {
+        object old_list = o;
+        o = cdr(old_list);
+
+    }
+    if (list_length(o) == 0) return _true;
+    goto restart;
 }
 
+object prim_equal(object o){
+restart:
+    sfs_print (cadr(o));
+    if(car(o) != cadr(o)){
+        WARNING_MSG("ICI");
+        return _false;
+    }else {
+        object old_list = o;
+        o = cdr(old_list);
+    }
+    if (list_length(o) == 0) return _true;
+    goto restart;
+}
+
+object prim_larger(object o){
+restart:
+    //sfs_print(car(o));
+
+    sfs_print (cadr(o));
+    if(car(o) < cadr(o)){
+        WARNING_MSG("ICI");
+        return _false;
+    }else {
+        object old_list = o;
+        o = cdr(old_list);
+
+    }
+    if (list_length(o) == 0) return _true;
+    goto restart;
+}
 object prim_list(object o){
     return o;
 }
@@ -164,7 +212,8 @@ object prim_is_string(object o) {
     }
     return _false;
 }
+/*
 object prim_arith_plus(object o) {
     object res = make_object(SFS_NUMBER);
     res->val.number.numtype = NUM_INTEGER;
-}
+}*/
