@@ -13,4 +13,4 @@
 (list? (list 1 2))
 
 (pair? (cons 1 (cons 2 '())))
-(list? (cons 1 (const 2 '())))
+(list? (cons 1 (cons 2 '())))

@@ -14,6 +14,7 @@ object prim_is_pair(object);
 object prim_is_symbol(object);
 object prim_is_char(object);
 object prim_is_procedure(object);
+object prim_is_list(object);
 object prim_is_number(object);
 
 /* Those are number handling functions */

@@ -20,6 +20,7 @@ void create_basic_primitives() {
     create_primitive("symbol?", prim_is_symbol);
     create_primitive("char?", prim_is_char);
     create_primitive("number?", prim_is_number);
+    create_primitive("list?", prim_is_list);
     create_primitive("procedure?", prim_is_procedure);
 
     /* Those are the number related comparison functions */
@@ -44,6 +45,23 @@ void create_basic_primitives() {
 
 void create_primitive(string prim_name, object (*func)(object)) {
     define_symbol(make_symbol(prim_name), make_primitive(func, prim_name), 0);
+}
+
+object prim_is_list(object o) {
+    TEST_NUMB_ARGUMENT_EQ(1, "list?");
+    o = car(o);
+
+restart:
+    if (!o || (is_Pair(o) == False && is_Nil(o) == False)) {
+        return _false;
+    }
+
+    if (is_Nil(o) == True) {
+        return _true;
+    } else {
+        o = cdr(o);
+        goto restart;
+    }
 }
 
 object prim_is_positive(object o) {
