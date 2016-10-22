@@ -9,6 +9,7 @@ null?
 string?
 symbol?
 pair?
+list?
 procedure?
 
 ;; Number related primitives
