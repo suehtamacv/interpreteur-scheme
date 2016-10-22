@@ -4,6 +4,7 @@
 #include <object.h>
 
 void create_basic_primitives(void);
+void create_primitive(string, object (*)(object));
 
 /* Basic type testing function */
 object prim_is_boolean(object);
@@ -24,10 +25,10 @@ object prim_set_cdr(object);
 object prim_cons(object);
 object prim_list(object);
 
-
 /* Those are basic arithmetic functions */
 object prim_arith_plus(object);
 object prim_larger(object);
 object prim_smaller(object);
 object prim_equal(object);
+
 #endif /* PRIMITIVES_H */

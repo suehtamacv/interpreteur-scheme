@@ -54,6 +54,11 @@ restart:
 
             in = cdr(in);
             while (is_Nil(in) == False) {
+                if (is_Define(car(in)) == True) {
+                    WARNING_MSG("Definitions not allowed in expression context");
+                    return NULL;
+                }
+
                 object eval_element = sfs_eval(car(in));
                 if (eval_element) {
                     rev_eval_list = cons(eval_element, rev_eval_list);

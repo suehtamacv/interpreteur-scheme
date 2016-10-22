@@ -185,7 +185,7 @@ void sfs_print_primitive(object o) {
         sfs_print(o);
     }
 
-    printf("<#primitive %p>", o->val.primitive.f);
+    printf("<#procedure %s>", o->val.primitive.func_name);
 }
 
 void sfs_print_form(object o) {
@@ -195,5 +195,5 @@ void sfs_print_form(object o) {
         sfs_print(o);
     }
 
-    printf("<#form %p>", o->val.form.f);
+    printf("<#procedure %s>", o->val.form.func_name);
 }

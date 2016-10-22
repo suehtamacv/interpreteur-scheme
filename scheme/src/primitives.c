@@ -13,80 +13,36 @@
 
 void create_basic_primitives() {
     /* Those are the basic type comparison functions */
-    define_symbol(make_symbol("boolean?"), make_primitive(prim_is_boolean), 0);
-    define_symbol(make_symbol("null?"), make_primitive(prim_is_null), 0);
-    define_symbol(make_symbol("string?"), make_primitive(prim_is_string), 0);
-    define_symbol(make_symbol("integer?"), make_primitive(prim_is_integer), 0);
-    define_symbol(make_symbol("pair?"), make_primitive(prim_is_pair), 0);
-    define_symbol(make_symbol("symbol?"), make_primitive(prim_is_symbol), 0);
-    define_symbol(make_symbol("char?"), make_primitive(prim_is_char), 0);
-    define_symbol(make_symbol("real?"), make_primitive(prim_is_real), 0);
-    define_symbol(make_symbol("procedure?"), make_primitive(prim_is_procedure), 0);
+    create_primitive("boolean?", prim_is_boolean);
+    create_primitive("null?", prim_is_null);
+    create_primitive("string?", prim_is_string);
+    create_primitive("integer?", prim_is_integer);
+    create_primitive("pair?", prim_is_pair);
+    create_primitive("symbol?", prim_is_symbol);
+    create_primitive("char?", prim_is_char);
+    create_primitive("real?", prim_is_real);
+    create_primitive("procedure?", prim_is_procedure);
 
     /* Those are the basic list handling function */
-    define_symbol(make_symbol("car"), make_primitive(prim_car), 0);
-    define_symbol(make_symbol("cdr"), make_primitive(prim_cdr), 0);
-    define_symbol(make_symbol("set-car!"), make_primitive(prim_set_car), 0);
-    define_symbol(make_symbol("set-cdr!"), make_primitive(prim_set_cdr), 0);
-    define_symbol(make_symbol("cons"), make_primitive(prim_cons), 0);
-    define_symbol(make_symbol("list"), make_primitive(prim_list), 0);
+    create_primitive("car", prim_car);
+    create_primitive("cdr", prim_cdr);
+    create_primitive("set-car!", prim_set_car);
+    create_primitive("set-cdr!", prim_set_cdr);
+    create_primitive("cons", prim_cons);
+    create_primitive("list", prim_list);
 
     /* Those are the basic arithmetic primitives */
     //define_symbol(make_symbol("+"), make_primitive(prim_arith_plus), 0);
-    define_symbol(make_symbol(">"), make_primitive(prim_larger), 0);
-    define_symbol(make_symbol("<"), make_primitive(prim_smaller), 0);
-    define_symbol(make_symbol("="), make_primitive(prim_equal), 0);
-
-}
-object prim_smaller(object o){
-restart:
-    sfs_print (cadr(o));
-    if(car(o) > cadr(o)){
-        WARNING_MSG("ICI");
-        return _false;
-    }else {
-        object old_list = o;
-        o = cdr(old_list);
-
-    }
-    if (list_length(o) == 0) return _true;
-    goto restart;
 }
 
-object prim_equal(object o){
-restart:
-    sfs_print (cadr(o));
-    if(car(o) != cadr(o)){
-        WARNING_MSG("ICI");
-        return _false;
-    }else {
-        object old_list = o;
-        o = cdr(old_list);
-    }
-    if (list_length(o) == 0) return _true;
-    goto restart;
+void create_primitive(string prim_name, object (*func)(object)) {
+    define_symbol(make_symbol(prim_name), make_primitive(func, prim_name), 0);
 }
 
-object prim_larger(object o){
-restart:
-    //sfs_print(car(o));
-
-    sfs_print (cadr(o));
-    if(car(o) < cadr(o)){
-        WARNING_MSG("ICI");
-        return _false;
-    }else {
-        object old_list = o;
-        o = cdr(old_list);
-
-    }
-    if (list_length(o) == 0) return _true;
-    goto restart;
-}
-object prim_list(object o){
+object prim_list(object o) {
     return o;
 }
-object prim_cons(object o){
+object prim_cons(object o) {
     TEST_NUMB_ARGUMENT_EQ(2, "cons");
     return cons(car(o), cadr(o));
 }
