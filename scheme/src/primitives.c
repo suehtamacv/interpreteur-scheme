@@ -26,6 +26,9 @@ void create_basic_primitives() {
     create_primitive("real?", prim_is_real);
     create_primitive("complex?", prim_is_complex);
     create_primitive("integer?", prim_is_integer);
+    create_primitive("positive?", prim_is_positive);
+    create_primitive("negative?", prim_is_negative);
+    create_primitive("zero?", prim_is_zero);
 
     /* Those are the basic list handling functions */
     create_primitive("car", prim_car);
@@ -41,6 +44,104 @@ void create_basic_primitives() {
 
 void create_primitive(string prim_name, object (*func)(object)) {
     define_symbol(make_symbol(prim_name), make_primitive(func, prim_name), 0);
+}
+
+object prim_is_positive(object o) {
+    TEST_NUMB_ARGUMENT_EQ(1, "positive?");
+    o = car(o);
+
+    if (is_Number(o) == False) {
+        WARNING_MSG("Cannot apply \"positive?\" to something who is not a number");
+        return NULL;
+    } else {
+        switch (o->val.number.numtype) {
+        case NUM_UINTEGER:
+        case NUM_PINFTY:
+            return _true;
+
+        case NUM_MINFTY:
+            return _false;
+
+        case NUM_INTEGER:
+            return (o->val.number.val.integer > 0 ? _true : _false);
+
+        case NUM_REAL:
+            return (o->val.number.val.real > 0 ? _true : _false);
+
+        case NUM_COMPLEX:
+            WARNING_MSG("There is no ordering relation on the complex numbers");
+            return NULL;
+
+        default:
+            WARNING_MSG("Wrong number type (%d)", o->val.number.numtype);
+            return NULL;
+        }
+    }
+}
+
+object prim_is_negative(object o) {
+    TEST_NUMB_ARGUMENT_EQ(1, "negative?");
+    o = car(o);
+
+    if (is_Number(o) == False) {
+        WARNING_MSG("Cannot apply \"negative?\" to something who is not a number");
+        return NULL;
+    } else {
+        switch (o->val.number.numtype) {
+        case NUM_UINTEGER:
+        case NUM_PINFTY:
+            return _false;
+
+        case NUM_MINFTY:
+            return _true;
+
+        case NUM_INTEGER:
+            return (o->val.number.val.integer < 0 ? _true : _false);
+
+        case NUM_REAL:
+            return (o->val.number.val.real < 0 ? _true : _false);
+
+        case NUM_COMPLEX:
+            WARNING_MSG("There is no ordering relation on the complex numbers");
+            return NULL;
+
+        default:
+            WARNING_MSG("Wrong number type (%d)", o->val.number.numtype);
+            return NULL;
+        }
+    }
+}
+
+object prim_is_zero(object o) {
+    TEST_NUMB_ARGUMENT_EQ(1, "zero?");
+    o = car(o);
+
+    if (is_Number(o) == False) {
+        WARNING_MSG("Cannot apply \"zero?\" to something who is not a number");
+        return NULL;
+    } else {
+        switch (o->val.number.numtype) {
+        case NUM_PINFTY:
+        case NUM_MINFTY:
+            return _false;
+
+        case NUM_INTEGER:
+        case NUM_UINTEGER:
+            return (o->val.number.val.integer == 0 ? _true : _false);
+
+        case NUM_REAL:
+            return (o->val.number.val.real == 0 ? _true : _false);
+
+        case NUM_COMPLEX:
+            return (o->val.number.val.complex.real == 0 &&
+                    o->val.number.val.complex.imag == 0) ?
+                   _true : _false;
+
+        default:
+            WARNING_MSG("Wrong number type (%d)", o->val.number.numtype);
+            return NULL;
+        }
+    }
 }
 
 object prim_list(object o) {
