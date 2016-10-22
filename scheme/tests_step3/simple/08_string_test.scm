@@ -10,4 +10,4 @@
 (string? '(1 2 3))
 (if (string? "Does it work?") ":)" ":(")
 (and #t (string? "I Work") #t)
-(or #f #t (string? CourtCircuit)
+(or #f #t (string? CourtCircuit))

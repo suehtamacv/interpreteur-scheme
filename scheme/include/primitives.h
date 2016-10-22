@@ -16,6 +16,8 @@ object prim_is_symbol(object);
 object prim_is_char(object);
 object prim_is_real(object);
 object prim_is_procedure(object);
+object prim_is_number(object);
+object prim_is_complex(object);
 
 /* Those are the basic list handling functions */
 object prim_car(object);

@@ -429,12 +429,13 @@ object sfs_read_char(char *input, uint *here) {
                 input[*here + p] != '\t' && p < 8;
                 /* Ce sont les chars que peuvent finir le char */
                 p++) {
-            if (input[*here] == ')' && *here != 0 && input[*here - 1] != '\\') {
+            if ((input[*here + p] == ')' || input[*here + p] == '(') &&
+                    p != 0 && input[*here + p - 1] != '\\') {
                 break;
             }
             char_name[p] = input[*here + p];
         }
-        char_name[p] = '\0';
+        *here += p - 1;
 
         /* Certains caracteres ont une representation special */
         if (strcmp(char_name, "space") == 0) {

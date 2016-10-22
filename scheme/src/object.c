@@ -135,16 +135,52 @@ Bool is_Number(object o) {
     return False;
 }
 
+Bool is_Complex(object o) {
+    if (o && o->type == SFS_NUMBER) {
+        switch (o->val.number.numtype) {
+        case NUM_INTEGER:
+        case NUM_UINTEGER:
+        case NUM_REAL:
+        case NUM_COMPLEX:
+            return True;
+
+        default:
+            return False;
+        }
+    }
+    return False;
+}
+
 Bool is_Integer(object o) {
-    if (o && o->val.number.numtype == NUM_UINTEGER) {
-        return True;
+    if (o && o->type == SFS_NUMBER) {
+        switch (o->val.number.numtype) {
+        case NUM_INTEGER:
+        case NUM_UINTEGER:
+            return True;
+
+        default:
+            return False;
+        }
     }
     return False;
 }
 
 Bool is_Real(object o) {
-    if (o && o->val.number.numtype == NUM_REAL) {
-        return True;
+    if (o && o->type == SFS_NUMBER) {
+        switch (o->val.number.numtype) {
+        case NUM_INTEGER:
+        case NUM_UINTEGER:
+        case NUM_REAL:
+            return True;
+            break;
+
+        case NUM_COMPLEX:
+            return (o->val.number.val.complex.imag == 0 ? True : False);
+            break;
+
+        default:
+            return False;
+        }
     }
     return False;
 }

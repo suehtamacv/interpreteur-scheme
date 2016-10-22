@@ -16,14 +16,18 @@ void create_basic_primitives() {
     create_primitive("boolean?", prim_is_boolean);
     create_primitive("null?", prim_is_null);
     create_primitive("string?", prim_is_string);
-    create_primitive("integer?", prim_is_integer);
     create_primitive("pair?", prim_is_pair);
     create_primitive("symbol?", prim_is_symbol);
     create_primitive("char?", prim_is_char);
-    create_primitive("real?", prim_is_real);
+    create_primitive("number?", prim_is_number);
     create_primitive("procedure?", prim_is_procedure);
 
-    /* Those are the basic list handling function */
+    /* Those are the number related comparison functions */
+    create_primitive("real?", prim_is_real);
+    create_primitive("complex?", prim_is_complex);
+    create_primitive("integer?", prim_is_integer);
+
+    /* Those are the basic list handling functions */
     create_primitive("car", prim_car);
     create_primitive("cdr", prim_cdr);
     create_primitive("set-car!", prim_set_car);
@@ -42,10 +46,12 @@ void create_primitive(string prim_name, object (*func)(object)) {
 object prim_list(object o) {
     return o;
 }
+
 object prim_cons(object o) {
     TEST_NUMB_ARGUMENT_EQ(2, "cons");
     return cons(car(o), cadr(o));
 }
+
 object prim_set_car(object o) {
     TEST_NUMB_ARGUMENT_EQ(2, "set-car!");
 
@@ -77,6 +83,7 @@ object prim_set_cdr(object o) {
     WARNING_MSG("Wrong type of arguments on \"set-cdr!\"");
     return NULL;
 }
+
 object prim_car(object o) {
     TEST_NUMB_ARGUMENT_EQ(1, "car");
     if(is_Pair(o) == True && is_Pair(car(o)) == True) {
@@ -95,6 +102,21 @@ object prim_cdr(object o) {
     return NULL;
 }
 
+object prim_is_number(object o) {
+    TEST_NUMB_ARGUMENT_EQ(1, "number?");
+    if (is_Pair(o) == True && is_Number(car(o)) == True) {
+        return _true;
+    }
+    return _false;
+}
+
+object prim_is_complex(object o) {
+    TEST_NUMB_ARGUMENT_EQ(1, "complex?");
+    if (is_Pair(o) == True && is_Complex(car(o)) == True) {
+        return _true;
+    }
+    return _false;
+}
 
 object prim_is_real(object o) {
     TEST_NUMB_ARGUMENT_EQ(1, "real?");

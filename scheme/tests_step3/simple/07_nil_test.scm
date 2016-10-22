@@ -1,14 +1,13 @@
 ;;; En tete pour script de test ;;;;;;;;;;
 ; TEST_RETURN_CODE=PASS
-; TEST_COMMENT=Tests nil? procedure  
+; TEST_COMMENT=Tests null? procedure  
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(nil? #\a)
-(nil? 3)
-(nil? '())
-(nil? '(1 2 3))
-(nil?)
+(null? #\a)
+(null? 3)
+(null? '())
+(null? '(1 2 3))
 
 (define x '())
-(nil? 'x)
-(nil? x)
+(null? 'x)
+(null? x)
