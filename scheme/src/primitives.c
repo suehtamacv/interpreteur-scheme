@@ -57,7 +57,7 @@ void create_primitive(string prim_name, object (*func)(object)) {
 }
 
 object prim_equal(object o){
-    if (list_length(o) < 2){
+    if (list_length(o) < 2){ // (=) ou (= ) ==> #t
         return _true;
     }
 restart:
@@ -69,7 +69,7 @@ restart:
     case NUM_PINFTY:
         WARNING_MSG("ICI_+inf");
         TEST_CONDITION_ARGUMENT_EQ(o, "=");
-        if(cadr(o)->val.number.numtype != NUM_PINFTY) return _false;
+        if(cadr(o)->val.number.numtype != NUM_PINFTY) return _false; // ==> #f si cadr(o) n'est pas +inf
         break;
     case NUM_MINFTY:
         WARNING_MSG("ICI_-inf");
@@ -78,17 +78,21 @@ restart:
         break;
     case NUM_COMPLEX:
         TEST_CONDITION_ARGUMENT_EQ(o, "=");
-        if(car(o)->val.number.val.complex.imag != 0){
+        if(car(o)->val.number.val.complex.imag != 0){// form numero = a + bj avec b!= 0
             if(cadr(o)->val.number.numtype != NUM_COMPLEX) return _false;
-        }else {
+            else{
+                if(car(o)->val.number.val.complex.real != cadr(o)->val.number.val.complex.real ||
+                        car(o)->val.number.val.complex.imag != cadr(o)->val.number.val.complex.imag) return _false;
+            }
+        }else {// form numero avec a + 0j
             if(cadr(o)->val.number.numtype == NUM_MINFTY || cadr(o)->val.number.numtype == NUM_PINFTY) return _false;
-            if(cadr(o)->val.number.numtype == NUM_REAL){
+            if(cadr(o)->val.number.numtype == NUM_REAL){ // comparer a + 0j avec real
                 if( car(o)->val.number.val.complex.real != cadr(o)->val.number.val.real) return _false;
             }
-            if(cadr(o)->val.number.numtype == NUM_UINTEGER){
+            if(cadr(o)->val.number.numtype == NUM_UINTEGER){ // comparer a + 0j avec uinteger
                 if( cadr(o)->val.number.val.integer != car(o)->val.number.val.complex.real) return _false;
             }
-            if(cadr(o)->val.number.numtype == NUM_COMPLEX){
+            if(cadr(o)->val.number.numtype == NUM_COMPLEX){// comparer deux numero complexe
                 if(car(o)->val.number.val.complex.real != cadr(o)->val.number.val.complex.real ||
                         car(o)->val.number.val.complex.imag != cadr(o)->val.number.val.complex.imag) return _false;
             }
@@ -158,11 +162,13 @@ restart:
     switch (car(o)->val.number.numtype) {
     case NUM_PINFTY:
         TEST_CONDITION_ARGUMENT_EQ(o, "<");
-        if(list_length(o) > 1) return _false;
+        if(list_length(o) > 1) return _false; // cas: (< ... +inf element1 ...) est tjs ==> #f
         break;
     case NUM_MINFTY:
         TEST_CONDITION_ARGUMENT_EQ(o, "<");
-        if(list_length(o) > 1) return _false;
+        if(cadr(o)->val.number.numtype == NUM_MINFTY){
+            if(list_length(o) > 1) return _false;// cas: (<... -inf -inf ...) ==> #f
+        }
         break;
     case NUM_COMPLEX:
         TEST_CONDITION_ARGUMENT_EQ(o, "<");
@@ -222,11 +228,14 @@ restart:
     }
     switch (car(o)->val.number.numtype) {
     case NUM_PINFTY:
-        if(list_length(o) > 1) return _false;
+        TEST_CONDITION_ARGUMENT_EQ(o, ">");
+        if(cadr(o)->val.number.numtype == NUM_PINFTY){ // cas: (> ... +inf +inf ...) ==> #f
+            if(list_length(o) > 1) return _false;
+        }
         break;
     case NUM_MINFTY:
         TEST_CONDITION_ARGUMENT_EQ(o, ">");
-        if(list_length(o) > 1) return _false;
+        if(list_length(o) > 1) return _false; //cas: (> ... -inf ....) => f
         break;
     case NUM_COMPLEX:
         TEST_CONDITION_ARGUMENT_EQ(o, ">");
