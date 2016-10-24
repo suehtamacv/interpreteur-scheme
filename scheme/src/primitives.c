@@ -10,11 +10,12 @@
         WARNING_MSG("Wrong number of arguments on \"" nomFunction "\""); \
         return NULL;\
     }
-#define TEST_CONDITION_ARGUMENT_EQ(obj, nomFunction)\
+
+#define TEST_NEXT_IS_NUMBER(obj, nomFunction)\
     if(is_Number(cadr(o)) == False ){\
-    WARNING_MSG("Wrong type of arguments on \"" nomFunction "\""); \
-    return NULL;\
-}
+        WARNING_MSG("Wrong type of arguments on \"" nomFunction "\""); \
+        return NULL;\
+    }
 
 void create_basic_primitives() {
     /* Those are the basic type comparison functions */
@@ -56,233 +57,314 @@ void create_primitive(string prim_name, object (*func)(object)) {
 
 }
 
-object prim_equal(object o){
-    if (list_length(o) < 2){ // (=) ou (= ) ==> #t
+object prim_equal(object o) {
+    if (list_length(o) < 2) { // (=) ou (= ) ==> #t
         return _true;
     }
 restart:
-    if (is_Number(car(o)) == False){
+    if (is_Number(car(o)) == False) {
         WARNING_MSG("Wrong type of arguments on \"=\"");
         return NULL;
     }
     switch (car(o)->val.number.numtype) {
     case NUM_PINFTY:
-        WARNING_MSG("ICI_+inf");
-        TEST_CONDITION_ARGUMENT_EQ(o, "=");
-        if(cadr(o)->val.number.numtype != NUM_PINFTY) return _false; // ==> #f si cadr(o) n'est pas +inf
+        TEST_NEXT_IS_NUMBER(o, "=");
+        if(cadr(o)->val.number.numtype != NUM_PINFTY) {
+            return _false;    /* ==> #f si cadr(o) n'est pas +inf */
+        }
         break;
     case NUM_MINFTY:
         WARNING_MSG("ICI_-inf");
-        TEST_CONDITION_ARGUMENT_EQ(o, "=");
-        if(cadr(o)->val.number.numtype != NUM_MINFTY) return _false;
+        TEST_NEXT_IS_NUMBER(o, "=");
+        if(cadr(o)->val.number.numtype != NUM_MINFTY) {
+            return _false;
+        }
         break;
     case NUM_COMPLEX:
-        TEST_CONDITION_ARGUMENT_EQ(o, "=");
-        if(car(o)->val.number.val.complex.imag != 0){// form numero = a + bj avec b!= 0
-            if(cadr(o)->val.number.numtype != NUM_COMPLEX) return _false;
-            else{
-                if(car(o)->val.number.val.complex.real != cadr(o)->val.number.val.complex.real ||
-                        car(o)->val.number.val.complex.imag != cadr(o)->val.number.val.complex.imag) return _false;
+        TEST_NEXT_IS_NUMBER(o, "=");
+        if(car(o)->val.number.val.complex.imag !=
+                0) { // form z = a + bj avec b!= 0
+            if(cadr(o)->val.number.numtype != NUM_COMPLEX) {
+                return _false;
+            } else {
+                if(car(o)->val.number.val.complex.real != cadr(o)->val.number.val.complex.real
+                        ||
+                        car(o)->val.number.val.complex.imag != cadr(o)->val.number.val.complex.imag) {
+                    return _false;
+                }
             }
-        }else {// form numero avec a + 0j
-            if(cadr(o)->val.number.numtype == NUM_MINFTY || cadr(o)->val.number.numtype == NUM_PINFTY) return _false;
-            if(cadr(o)->val.number.numtype == NUM_REAL){ // comparer a + 0j avec real
-                if( car(o)->val.number.val.complex.real != cadr(o)->val.number.val.real) return _false;
-            }
-            if(cadr(o)->val.number.numtype == NUM_UINTEGER){ // comparer a + 0j avec uinteger
-                if( cadr(o)->val.number.val.integer != car(o)->val.number.val.complex.real) return _false;
-            }
-            if(cadr(o)->val.number.numtype == NUM_COMPLEX){// comparer deux numero complexe
-                if(car(o)->val.number.val.complex.real != cadr(o)->val.number.val.complex.real ||
-                        car(o)->val.number.val.complex.imag != cadr(o)->val.number.val.complex.imag) return _false;
-            }
-        }
-        break;
-    case NUM_INTEGER:
-        break;
-    case NUM_UINTEGER:
-         WARNING_MSG("ICI_UNITEGER");
-         TEST_CONDITION_ARGUMENT_EQ(o, "=");
-        if(cadr(o)->val.number.numtype == NUM_UINTEGER){
-            WARNING_MSG("Compare uinteger with uniteger");
-            if(car(o)->val.number.val.integer != cadr(o)->val.number.val.integer) return _false;
-        }
-        if(cadr(o)->val.number.numtype == NUM_REAL){
-            WARNING_MSG("Compare uinteger with real");
-            if( car(o)->val.number.val.integer != cadr(o)->val.number.val.real) return _false;
-        }
-        if(cadr(o)->val.number.numtype == NUM_COMPLEX){
-            WARNING_MSG("Compare uinteger with complex");
-            if( cadr(o)->val.number.val.complex.imag != 0) return _false;
-            else{
-                if(car(o)->val.number.val.integer != cadr(o)->val.number.val.complex.real) return _false;
-            }
-        }
-        if(cadr(o)->val.number.numtype == NUM_MINFTY || cadr(o)->val.number.numtype == NUM_PINFTY) return _false;
-        break;
-    case NUM_REAL:
-        WARNING_MSG("ICI_REAL");
-        TEST_CONDITION_ARGUMENT_EQ(o, "=");
-        if(cadr(o)->val.number.numtype == NUM_UINTEGER){
-            WARNING_MSG("Compare real with uinteger");
-            if(car(o)->val.number.val.real  != cadr(o)->val.number.val.integer) return _false;
-        }
-        if(cadr(o)->val.number.numtype == NUM_REAL){
-            WARNING_MSG("Compare real with real");
-            if(car(o)->val.number.val.real  != cadr(o)->val.number.val.real) return _false;
-        }
-        if(cadr(o)->val.number.numtype == NUM_COMPLEX){
-            WARNING_MSG("Compare real with complex");
-            if( cadr(o)->val.number.val.complex.imag != 0){
+        } else {// form numero avec a + 0j
+            if(cadr(o)->val.number.numtype == NUM_MINFTY ||
+                    cadr(o)->val.number.numtype == NUM_PINFTY) {
                 return _false;
             }
-            else{
-                if(car(o)->val.number.val.real != cadr(o)->val.number.val.complex.real){
+            if(cadr(o)->val.number.numtype == NUM_REAL) { // comparer a + 0j avec reel
+                if( car(o)->val.number.val.complex.real != cadr(o)->val.number.val.real) {
+                    return _false;
+                }
+            }
+            if(cadr(o)->val.number.numtype ==
+                    NUM_UINTEGER) { // comparer a + 0j avec uinteger
+                if( cadr(o)->val.number.val.integer != car(o)->val.number.val.complex.real) {
+                    return _false;
+                }
+            }
+            if(cadr(o)->val.number.numtype ==
+                    NUM_COMPLEX) { // comparer deux numero complexe
+                if(car(o)->val.number.val.complex.real != cadr(o)->val.number.val.complex.real
+                        ||
+                        car(o)->val.number.val.complex.imag != cadr(o)->val.number.val.complex.imag) {
                     return _false;
                 }
             }
         }
-        if(cadr(o)->val.number.numtype == NUM_MINFTY || cadr(o)->val.number.numtype == NUM_PINFTY) return _false;
+        break;
+    case NUM_INTEGER:
+        break;
+    case NUM_UINTEGER:
+        WARNING_MSG("ICI_UNITEGER");
+        TEST_NEXT_IS_NUMBER(o, "=");
+        if(cadr(o)->val.number.numtype == NUM_UINTEGER) {
+            WARNING_MSG("Compare uinteger with uniteger");
+            if(car(o)->val.number.val.integer != cadr(o)->val.number.val.integer) {
+                return _false;
+            }
+        }
+        if(cadr(o)->val.number.numtype == NUM_REAL) {
+            WARNING_MSG("Compare uinteger with real");
+            if( car(o)->val.number.val.integer != cadr(o)->val.number.val.real) {
+                return _false;
+            }
+        }
+        if(cadr(o)->val.number.numtype == NUM_COMPLEX) {
+            WARNING_MSG("Compare uinteger with complex");
+            if( cadr(o)->val.number.val.complex.imag != 0) {
+                return _false;
+            } else {
+                if(car(o)->val.number.val.integer != cadr(o)->val.number.val.complex.real) {
+                    return _false;
+                }
+            }
+        }
+        if(cadr(o)->val.number.numtype == NUM_MINFTY ||
+                cadr(o)->val.number.numtype == NUM_PINFTY) {
+            return _false;
+        }
+        break;
+    case NUM_REAL:
+        WARNING_MSG("ICI_REAL");
+        TEST_NEXT_IS_NUMBER(o, "=");
+        if(cadr(o)->val.number.numtype == NUM_UINTEGER) {
+            WARNING_MSG("Compare real with uinteger");
+            if(car(o)->val.number.val.real  != cadr(o)->val.number.val.integer) {
+                return _false;    //peut etre (= 4 4.0) vaut #t
+            }
+        }
+        if(cadr(o)->val.number.numtype == NUM_REAL) {
+            WARNING_MSG("Compare real with real");
+            if(car(o)->val.number.val.real  != cadr(o)->val.number.val.real) {
+                return _false;
+            }
+        }
+        if(cadr(o)->val.number.numtype == NUM_COMPLEX) {
+            WARNING_MSG("Compare real with complex");
+            if( cadr(o)->val.number.val.complex.imag != 0) {
+                return _false;
+            } else {
+                if(car(o)->val.number.val.real != cadr(
+                            o)->val.number.val.complex.real) { // peut etre (= 4.0 4.0+0i) vaut #t
+                    return _false;
+                }
+            }
+        }
+        if(cadr(o)->val.number.numtype == NUM_MINFTY ||
+                cadr(o)->val.number.numtype == NUM_PINFTY) {
+            return _false;    // tjs ==> #f
+        }
         break;
     }
     o = cdr(o);
-    if(list_length(o) == 1) return _true;
+    if(list_length(o) == 1) {
+        return _true;
+    }
     goto restart;
 }
 
-object prim_smaller(object o){
-    if (list_length(o) < 2){
+object prim_smaller(object o) {
+    if (list_length(o) < 2) {
         return _true;
     }
 restart:
-    if (is_Number(car(o)) == False){
+    if (is_Number(car(o)) == False) {
         WARNING_MSG("Wrong type of arguments on \"<\"");
         return NULL;
     }
     switch (car(o)->val.number.numtype) {
     case NUM_PINFTY:
-        TEST_CONDITION_ARGUMENT_EQ(o, "<");
-        if(list_length(o) > 1) return _false; // cas: (< ... +inf element1 ...) est tjs ==> #f
+        TEST_NEXT_IS_NUMBER(o, "<");
+        if(list_length(o) > 1) {
+            return _false;    // cas: (< ... +inf element1 ...) est tjs ==> #f
+        }
         break;
     case NUM_MINFTY:
-        TEST_CONDITION_ARGUMENT_EQ(o, "<");
-        if(cadr(o)->val.number.numtype == NUM_MINFTY){
-            if(list_length(o) > 1) return _false;// cas: (<... -inf -inf ...) ==> #f
+        TEST_NEXT_IS_NUMBER(o, "<");
+        if(cadr(o)->val.number.numtype == NUM_MINFTY) {
+            if(list_length(o) > 1) {
+                return _false;    // cas: (<... -inf -inf ...) ==> #f
+            }
         }
         break;
     case NUM_COMPLEX:
-        TEST_CONDITION_ARGUMENT_EQ(o, "<");
-        WARNING_MSG("Wrong type of arguments on \"<\"");
+        TEST_NEXT_IS_NUMBER(o, "<");
+        WARNING_MSG("Wrong type of arguments on \"<\"");  // il n'y a pas la comparaison entre deux numeros complexes
         return NULL;
         break;
     case NUM_INTEGER:
         break;
     case NUM_UINTEGER:
-         WARNING_MSG("ICI_UNITEGER");
-         TEST_CONDITION_ARGUMENT_EQ(o, "<");
-        if(cadr(o)->val.number.numtype == NUM_UINTEGER){
+        WARNING_MSG("ICI_UNITEGER");
+        TEST_NEXT_IS_NUMBER(o, "<");
+        if(cadr(o)->val.number.numtype == NUM_UINTEGER) {
             WARNING_MSG("Compare uinteger with uniteger");
-            if(car(o)->val.number.val.integer >= cadr(o)->val.number.val.integer) return _false;
+            if(car(o)->val.number.val.integer >= cadr(o)->val.number.val.integer) {
+                return _false;
+            }
         }
-        if(cadr(o)->val.number.numtype == NUM_REAL){
+        if(cadr(o)->val.number.numtype == NUM_REAL) {
             WARNING_MSG("Compare uinteger with real");
-            if(car(o)->val.number.val.integer >= cadr(o)->val.number.val.real) return _false;
+            if(car(o)->val.number.val.integer >= cadr(o)->val.number.val.real) {
+                return _false;
+            }
         }
-        if(cadr(o)->val.number.numtype == NUM_MINFTY) return _false;
-        if(cadr(o)->val.number.numtype == NUM_COMPLEX){
+        if(cadr(o)->val.number.numtype == NUM_MINFTY) {
+            return _false;    // le prochain element est -inf ==> #f
+        }
+        if(cadr(o)->val.number.numtype ==
+                NUM_COMPLEX) { // il n'y a pas la comparaison ">" entre integer et complexe
             WARNING_MSG("Wrong type of arguments on \"<\"");
             return NULL;
         }
         break;
     case NUM_REAL:
         WARNING_MSG("ICI_REAL");
-        TEST_CONDITION_ARGUMENT_EQ(o, "<");
-        if(cadr(o)->val.number.numtype == NUM_UINTEGER){
+        TEST_NEXT_IS_NUMBER(o, "<");
+        if(cadr(o)->val.number.numtype == NUM_UINTEGER) {
             WARNING_MSG("Compare real with uinteger");
-            if(car(o)->val.number.val.real  >= cadr(o)->val.number.val.integer) return _false;
+            if(car(o)->val.number.val.real  >= cadr(o)->val.number.val.integer) {
+                return _false;
+            }
         }
-        if(cadr(o)->val.number.numtype == NUM_REAL){
+        if(cadr(o)->val.number.numtype == NUM_REAL) {
             WARNING_MSG("Compare real with real");
-            if(car(o)->val.number.val.real  >= cadr(o)->val.number.val.real) return _false;
+            if(car(o)->val.number.val.real  >= cadr(o)->val.number.val.real) {
+                return _false;
+            }
         }
-        if(cadr(o)->val.number.numtype == NUM_MINFTY) return _false;
-        if(cadr(o)->val.number.numtype == NUM_COMPLEX){
+        if(cadr(o)->val.number.numtype == NUM_MINFTY) {
+            return _false;    // le prochain element est -inf ==> #f
+        }
+        if(cadr(o)->val.number.numtype ==
+                NUM_COMPLEX) { // il n'y a pas la comparaison ">" entre integer et complexe
             WARNING_MSG("Wrong type of arguments on \"<\"");
             return NULL;
         }
         break;
     }
     o = cdr(o);
-    if(list_length(o) == 1) return _true;
+    if(list_length(o) == 1) {
+        return _true;
+    }
     goto restart;
 }
 
-object prim_larger(object o){
-    if (list_length(o) < 2){
+object prim_larger(object o) {
+    if (list_length(o) < 2) { // (<) et (< element1) ==> #t
         return _true;
     }
 restart:
-    if (is_Number(car(o)) == False){
+    if (is_Number(car(o)) == False) {
         WARNING_MSG("Wrong type of arguments on \">\"");
         return NULL;
     }
     switch (car(o)->val.number.numtype) {
     case NUM_PINFTY:
-        TEST_CONDITION_ARGUMENT_EQ(o, ">");
-        if(cadr(o)->val.number.numtype == NUM_PINFTY){ // cas: (> ... +inf +inf ...) ==> #f
-            if(list_length(o) > 1) return _false;
+        TEST_NEXT_IS_NUMBER(o, ">");
+        if(cadr(o)->val.number.numtype ==
+                NUM_PINFTY) { // cas: (> ... +inf +inf ...) ==> #f
+            if(list_length(o) > 1) {
+                return _false;
+            }
         }
         break;
     case NUM_MINFTY:
-        TEST_CONDITION_ARGUMENT_EQ(o, ">");
-        if(list_length(o) > 1) return _false; //cas: (> ... -inf ....) => f
+        TEST_NEXT_IS_NUMBER(o, ">");
+        if(list_length(o) > 1) {
+            return _false;    //cas: (> ... -inf ....) => f
+        }
         break;
     case NUM_COMPLEX:
-        TEST_CONDITION_ARGUMENT_EQ(o, ">");
-        WARNING_MSG("Wrong type of arguments on \">\"");
+        TEST_NEXT_IS_NUMBER(o, ">");
+        WARNING_MSG("Wrong type of arguments on \">\""); // il n'y a pas la comparaison entre deux numeros complexes
         return NULL;
         break;
     case NUM_INTEGER:
         break;
     case NUM_UINTEGER:
-         WARNING_MSG("ICI_UNITEGER");
-         TEST_CONDITION_ARGUMENT_EQ(o, ">");
-        if(cadr(o)->val.number.numtype == NUM_UINTEGER){
+        WARNING_MSG("ICI_UNITEGER");
+        TEST_NEXT_IS_NUMBER(o, ">");
+        if(cadr(o)->val.number.numtype == NUM_UINTEGER) {
             WARNING_MSG("Compare uinteger with uniteger");
-            if(car(o)->val.number.val.integer <= cadr(o)->val.number.val.integer) return _false;
+            if(car(o)->val.number.val.integer <= cadr(o)->val.number.val.integer) {
+                return _false;
+            }
         }
-        if(cadr(o)->val.number.numtype == NUM_REAL){
+        if(cadr(o)->val.number.numtype == NUM_REAL) {
             WARNING_MSG("Compare uinteger with real");
-            if(car(o)->val.number.val.integer <= cadr(o)->val.number.val.real) return _false;
+            if(car(o)->val.number.val.integer <= cadr(o)->val.number.val.real) {
+                return _false;
+            }
         }
-        if(cadr(o)->val.number.numtype == NUM_PINFTY) return _false;
-        if(cadr(o)->val.number.numtype == NUM_COMPLEX){
+        if(cadr(o)->val.number.numtype == NUM_PINFTY) {
+            return _false;    // le prochain element est +inf ==> #f
+        }
+        if(cadr(o)->val.number.numtype ==
+                NUM_COMPLEX) { // il n'y a pas la comparaison ">" entre integer et complexe
             WARNING_MSG("Wrong type of arguments on \">\"");
             return NULL;
         }
         break;
     case NUM_REAL:
         WARNING_MSG("ICI_REAL");
-        TEST_CONDITION_ARGUMENT_EQ(o, ">");
-        if(cadr(o)->val.number.numtype == NUM_UINTEGER){
+        TEST_NEXT_IS_NUMBER(o, ">");
+        if(cadr(o)->val.number.numtype == NUM_UINTEGER) {
             WARNING_MSG("Compare real with uinteger");
-            if(car(o)->val.number.val.real  <= cadr(o)->val.number.val.integer) return _false;
+            if(car(o)->val.number.val.real  <= cadr(o)->val.number.val.integer) {
+                return _false;
+            }
         }
-        if(cadr(o)->val.number.numtype == NUM_REAL){
+        if(cadr(o)->val.number.numtype == NUM_REAL) {
             WARNING_MSG("Compare real with real");
-            if(car(o)->val.number.val.real  <= cadr(o)->val.number.val.real) return _false;
+            if(car(o)->val.number.val.real  <= cadr(o)->val.number.val.real) {
+                return _false;
+            }
         }
-        if(cadr(o)->val.number.numtype == NUM_PINFTY) return _false;
-        if(cadr(o)->val.number.numtype == NUM_COMPLEX){
+        if(cadr(o)->val.number.numtype == NUM_PINFTY) {
+            return _false;    // le prochain element est +inf ==> #f
+        }
+        if(cadr(o)->val.number.numtype ==
+                NUM_COMPLEX) { // il n'y a pas la comparaison ">" entre real et complexe
             WARNING_MSG("Wrong type of arguments on \">\"");
             return NULL;
         }
         break;
     }
     o = cdr(o);
-    if(list_length(o) == 1) return _true;
+    if(list_length(o) == 1) {
+        return _true;
+    }
     goto restart;
 }
+
 object prim_is_list(object o) {
     TEST_NUMB_ARGUMENT_EQ(1, "list?");
     o = car(o);
