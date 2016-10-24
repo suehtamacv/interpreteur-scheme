@@ -3,6 +3,7 @@
 #include "eval.h"
 #include "lists.h"
 #include <limits.h>
+#include <strings.h>
 
 void create_basic_forms() {
     /* Create associations in the symbol table */

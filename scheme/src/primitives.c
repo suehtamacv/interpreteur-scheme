@@ -243,47 +243,47 @@ restart:
         WARNING_MSG("Wrong type of arguments on \"<\"");
         return NULL;
     }
+
+    TEST_NEXT_IS_NUMBER(o, "<");
+
     switch (car(o)->val.number.numtype) {
     case NUM_PINFTY:
-        TEST_NEXT_IS_NUMBER(o, "<");
         if(list_length(o) > 1) {
-            return _false;    /* case: (< ... +inf element1 ...) always ==> #f */
+            /* (< [numbers] +inf [numbers]) is always #t */
+            return _true;
         }
         break;
+
     case NUM_MINFTY:
-        TEST_NEXT_IS_NUMBER(o, "<");
         if(cadr(o)->val.number.numtype == NUM_MINFTY) {
             if(list_length(o) > 1) {
+                /* (< [numbers] +inf [numbers]) is always #f */
                 return _false;    /* case: (<... -inf -inf ...) ==> #f */
             }
         }
         break;
+
     case NUM_COMPLEX:
-        TEST_NEXT_IS_NUMBER(o, "<");
         if(car(o)->val.number.val.complex.imag != 0) {
-            WARNING_MSG("Wrong type of arguments on \"<\"");  /* there isn't a comparison with complexe number having imag != 0 */
+            /* There isn't a comparison with complex numbers having imaginary part not zero */
+            WARNING_MSG("Wrong type of arguments on \"<\"");
             return NULL;
         } else {
             switch (cadr(o)->val.number.numtype) {
             case NUM_REAL:
-                if( car(o)->val.number.val.complex.real != cadr(
-                            o)->val.number.val.real) {/* compare a + 0j with real */
+                if (car(o)->val.number.val.complex.real != cadr(o)->val.number.val.real) {
+                    /* Comparing a + 0j with real */
                     return _false;
                 }
                 break;
+
             case NUM_UINTEGER:
-                /* compare z = a + 0j with uinteger */
+            case NUM_INTEGER:
+                /* Comparing z = a + 0j with uinteger */
                 if( cadr(o)->val.number.val.integer >= car(o)->val.number.val.complex.real) {
                     return _false;
                 }
 
-                break;
-            case NUM_INTEGER:
-                /* compare z= a + 0j with integer  */
-                if( cadr(o)->val.number.val.integer >= car(o)->val.number.val.complex.real) {
-                    return _false;
-                }
-                break;
             default:
                 WARNING_MSG("Wrong type of arguments on \"<\"");
                 return NULL;
@@ -291,105 +291,75 @@ restart:
             }
         }
         break;
+
     case NUM_INTEGER:
+    case NUM_UINTEGER:
         switch (cadr(o)->val.number.numtype) {
         case NUM_INTEGER:
-            if(car(o)->val.number.val.integer >= cadr(o)->val.number.val.integer) {
-                return _false;
-            }
-            break;
-        case NUM_PINFTY:
-
-            break;
-        case NUM_MINFTY:
-            return _false; /* case: (< ... -inf ...) always ==> #f  */
-            break;
-        case NUM_REAL:
-            if(car(o)->val.number.val.integer >= cadr(o)->val.number.val.real) {
-                return _false;
-            }
-            break;
         case NUM_UINTEGER:
             if(car(o)->val.number.val.integer >= cadr(o)->val.number.val.integer) {
                 return _false;
             }
             break;
+
+        case NUM_PINFTY:
+            break;
+
+        case NUM_MINFTY:
+            return _false; /* case: (< [number] -inf [number]) is always #f  */
+            break;
+
+        case NUM_REAL:
+            if(car(o)->val.number.val.integer >= cadr(o)->val.number.val.real) {
+                return _false;
+            }
+            break;
+
         case NUM_COMPLEX:
             if(car(o)->val.number.val.integer >= cadr(o)->val.number.val.complex.real) {
                 return _false;
             }
             break;
+
         default:
             WARNING_MSG("Wrong type of arguments on \"<\"");
             return NULL;
         }
         break;
-    case NUM_UINTEGER:
-        TEST_NEXT_IS_NUMBER(o, "<");
-        switch (cadr(o)->val.number.numtype) {
-        case NUM_INTEGER:
-            if(car(o)->val.number.val.integer >= cadr(o)->val.number.val.integer) {
-                return _false;
-            }
-            break;
-        case NUM_PINFTY:
-            break;
-        case NUM_MINFTY:
-            return _false;
-            break;
-        case NUM_REAL:
-            if(car(o)->val.number.val.integer >= cadr(o)->val.number.val.real) {
-                return _false;
-            }
-            break;
-        case NUM_UINTEGER:
-            if(car(o)->val.number.val.integer >= cadr(o)->val.number.val.integer) {
-                return _false;
-            }
-            break;
-        case NUM_COMPLEX: {
-            /* there isn't comparison "<" between integer and complexe */
-            WARNING_MSG("Wrong type of arguments on \"<\"");
-            return NULL;
-        }
-        default:
-            WARNING_MSG("Wrong type of arguments on \"<\"");
-            return NULL;
-        }
+
     case NUM_REAL:
-        TEST_NEXT_IS_NUMBER(o, "<");
         switch (cadr(o)->val.number.numtype) {
         case NUM_INTEGER:
+        case NUM_UINTEGER:
             if(car(o)->val.number.val.real  >= cadr(o)->val.number.val.integer) {
                 return _false;
             }
             break;
+
         case NUM_PINFTY:
             break;
+
         case NUM_MINFTY:
-            return _false; /* Case: (< ... -inf ...) always ==> #f */
+            return _false; /* case: (< [number] -inf [number]) is always #f  */
             break;
+
         case NUM_REAL:
             if(car(o)->val.number.val.real  >= cadr(o)->val.number.val.real) {
                 return _false;
             }
             break;
-        case NUM_UINTEGER:
-            if(car(o)->val.number.val.real  >= cadr(o)->val.number.val.integer) {
-                return _false;
-            }
-            break;
-        case NUM_COMPLEX: {
-            /* there isn't comparison "<" between real and complexe */
+
+        case NUM_COMPLEX:
+            /* There isn't a comparison between real and complex numbers */
             WARNING_MSG("Wrong type of arguments on \"<\"");
             return NULL;
-        }
-        break;
+
         default:
             WARNING_MSG("Wrong number type (%d)", o->val.number.numtype);
             return NULL;
         }
     }
+
     o = cdr(o);
     if(list_length(o) == 1) {
         return _true;
@@ -398,17 +368,15 @@ restart:
 }
 
 object prim_larger(object o) {
-    if (prim_equal(o) == NULL || prim_smaller(o) == NULL) {/*  */
-        INFO_MSG("ICI NULL");
+    object is_equal = prim_equal(o);
+    object is_smaller = prim_smaller(o);
+
+    if (!is_equal || !is_smaller) {
         WARNING_MSG("Wrong type of arguments on \">\"");
         return NULL;
-    } else if(prim_equal(o) == _false &&
-              prim_smaller(o) == _false) { /* neither "<" nor "=" */
-        INFO_MSG("ICI True");
-        return _true;
-    } else {
-        return _false;
     }
+
+    return (is_True(is_equal) == False && is_True(is_smaller) == False) ? _true : _false;
 }
 
 /*
