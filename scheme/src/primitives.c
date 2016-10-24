@@ -46,7 +46,6 @@ void create_basic_primitives() {
     create_primitive("list", prim_list);
 
     /* Those are the basic arithmetic primitives */
-    //define_symbol(make_symbol("+"), make_primitive(prim_arith_plus), 0);
     create_primitive(">", prim_larger);
     create_primitive("<", prim_smaller);
     create_primitive("=", prim_equal);
@@ -58,183 +57,175 @@ void create_primitive(string prim_name, object (*func)(object)) {
 }
 
 object prim_equal(object o) {
-    if (list_length(o) < 2) { /* (=) or (= ) ==> #t */
+    if (list_length(o) < 2) { /* (=) or (= _) ==> #t */
         return _true;
     }
+
 restart:
+
     if (is_Number(car(o)) == False) {
         WARNING_MSG("Wrong type of arguments on \"=\"");
         return NULL;
     }
+
+    TEST_NEXT_IS_NUMBER(o, "=");
+
     switch (car(o)->val.number.numtype) {
     case NUM_PINFTY:
-        TEST_NEXT_IS_NUMBER(o, "=");
         if(cadr(o)->val.number.numtype != NUM_PINFTY) {
             return _false;    /* ==> #f if cadr(o) isn't +inf */
         }
         break;
+
     case NUM_MINFTY:
-        TEST_NEXT_IS_NUMBER(o, "=");
         if(cadr(o)->val.number.numtype != NUM_MINFTY) {
             return _false;
         }
         break;
+
     case NUM_COMPLEX:
-        TEST_NEXT_IS_NUMBER(o, "=");
-        if(car(o)->val.number.val.complex.imag !=
-                0) { // form z = a + bj with b!= 0
+        if (car(o)->val.number.val.complex.imag != 0) {
+            /* z = a + bj with b != 0 */
             if(cadr(o)->val.number.numtype != NUM_COMPLEX) {
                 WARNING_MSG("Wrong type of arguments on \"=\"");
                 return NULL;
             } else {
-                if(car(o)->val.number.val.complex.real != cadr(o)->val.number.val.complex.real
-                        ||
-                        car(o)->val.number.val.complex.imag != cadr(o)->val.number.val.complex.imag) {
+                if (
+                    car(o)->val.number.val.complex.real != cadr(o)->val.number.val.complex.real ||
+                    car(o)->val.number.val.complex.imag != cadr(o)->val.number.val.complex.imag) {
                     return _false;
                 }
             }
-        } else {// Form number z= a + 0j
+        } else {
+            /* z = a + 0j */
             switch (cadr(o)->val.number.numtype) {
             case NUM_PINFTY:
-                return _false;
-                break;
             case NUM_MINFTY:
                 return _false;
                 break;
-            case NUM_REAL:
-                if( car(o)->val.number.val.complex.real != cadr(
-                            o)->val.number.val.real) {/* compare a + 0j with real */
-                    return _false;
-                }
-                break;
-            case NUM_UINTEGER:
-                /* compare z = a + 0j with uinteger */
-                if( cadr(o)->val.number.val.integer != car(o)->val.number.val.complex.real) {
-                    return _false;
-                }
 
-                break;
-            case NUM_INTEGER:
-                /* compare z= a + 0j with integer  */
-                if( cadr(o)->val.number.val.integer != car(o)->val.number.val.complex.real) {
+            case NUM_REAL:
+                if (
+                    car(o)->val.number.val.complex.real !=
+                    cadr(o)->val.number.val.real) {/* compare a + 0j with real */
                     return _false;
                 }
                 break;
+
+            case NUM_UINTEGER:
+            case NUM_INTEGER:
+                /* compare z = a + 0j with integer  */
+                if (cadr(o)->val.number.val.integer != car(o)->val.number.val.complex.real) {
+                    return _false;
+                }
+                break;
+
             default:
                 WARNING_MSG("Wrong type of arguments on \"=\"");
                 return NULL;
-                break;
             }
         }
         break;
+
     case NUM_INTEGER:
         switch (cadr(o)->val.number.numtype) {
         case NUM_INTEGER:
-            if( cadr(o)->val.number.val.integer != car(o)->val.number.val.integer) {
+        case NUM_UINTEGER:
+            if (cadr(o)->val.number.val.integer != car(o)->val.number.val.integer) {
                 return _false;
             }
             break;
+
         case NUM_PINFTY:
-            return _false;
-            break;
         case NUM_MINFTY:
             return _false;
             break;
+
         case NUM_REAL:
-            if( cadr(o)->val.number.val.real != car(o)->val.number.val.integer) {
+            if (cadr(o)->val.number.val.real != car(o)->val.number.val.integer) {
                 return _false;
             }
             break;
-        case NUM_UINTEGER:
-            if( cadr(o)->val.number.val.integer != car(o)->val.number.val.integer) {
-                return _false;
-            }
-            break;
+
         case NUM_COMPLEX:
-            if( cadr(o)->val.number.val.complex.real != car(o)->val.number.val.integer) {
+            if (cadr(o)->val.number.val.complex.real != car(o)->val.number.val.integer) {
                 return _false;
             }
             break;
+
         default:
             WARNING_MSG("Wrong type of arguments on \"=\"");
             return NULL;
-            break;
         }
         break;
+
     case NUM_UINTEGER:
-        TEST_NEXT_IS_NUMBER(o, "=");
         switch (cadr(o)->val.number.numtype) {
         case NUM_INTEGER:
-            if( cadr(o)->val.number.val.integer != car(o)->val.number.val.integer) {
+        case NUM_UINTEGER:
+            if (cadr(o)->val.number.val.integer != car(o)->val.number.val.integer) {
                 return _false;
             }
             break;
+
         case NUM_PINFTY:
-            return _false;
-            break;
         case NUM_MINFTY:
             return _false;
             break;
+
         case NUM_REAL:
-            if( cadr(o)->val.number.val.real != car(o)->val.number.val.integer) {
+            if (cadr(o)->val.number.val.real != car(o)->val.number.val.integer) {
                 return _false;
             }
             break;
-        case NUM_UINTEGER:
-            if( cadr(o)->val.number.val.integer != car(o)->val.number.val.integer) {
-                return _false;
-            }
-            break;
+
         case NUM_COMPLEX:
-            if( cadr(o)->val.number.val.complex.real != car(o)->val.number.val.integer) {
+            if (cadr(o)->val.number.val.complex.real != car(o)->val.number.val.integer) {
                 return _false;
             }
             break;
+
         default:
             WARNING_MSG("Wrong type of arguments on \"=\"");
             return NULL;
-            break;
         }
+
     case NUM_REAL:
-        TEST_NEXT_IS_NUMBER(o, "=");
         switch (cadr(o)->val.number.numtype) {
+        case NUM_UINTEGER:
         case NUM_INTEGER:
-            if(car(o)->val.number.val.real  != cadr(o)->val.number.val.integer) {
-                return _false;    //May be (= 4 4.0) vaut #t
+            if (car(o)->val.number.val.real != cadr(o)->val.number.val.integer) {
+                return _false;    /* (= 4 4.0) evaluates to #t */
             }
             break;
+
         case NUM_PINFTY:
-            return _false;
-            break;
         case NUM_MINFTY:
             return _false;
             break;
+
         case NUM_REAL:
             if(car(o)->val.number.val.real  != cadr(o)->val.number.val.real) {
                 return _false;
             }
             break;
-        case NUM_UINTEGER:
-            if(car(o)->val.number.val.real  != cadr(o)->val.number.val.integer) {
-                return _false;    //peut etre (= 4 4.0) vaut #t
-            }
-            break;
+
         case NUM_COMPLEX:
-            if( cadr(o)->val.number.val.complex.imag != 0) {
+            if (cadr(o)->val.number.val.complex.imag != 0) {
                 return _false;
             } else {
-                if(car(o)->val.number.val.real != cadr(
-                            o)->val.number.val.complex.real) { // peut etre (= 4.0 4.0+0i) vaut #t
+                if (car(o)->val.number.val.real != cadr(o)->val.number.val.complex.real) {
                     return _false;
                 }
             }
             break;
+
         default:
             WARNING_MSG("Wrong type of arguments on \"=\"");
             return NULL;
-            break;
         }
     }
+
     o = cdr(o);
     if(list_length(o) == 1) {
         return _true;
@@ -242,11 +233,11 @@ restart:
     goto restart;
 }
 
-
 object prim_smaller(object o) {
     if (list_length(o) < 2) {
         return _true;
     }
+
 restart:
     if (is_Number(car(o)) == False) {
         WARNING_MSG("Wrong type of arguments on \"<\"");

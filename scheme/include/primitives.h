@@ -34,7 +34,6 @@ object prim_cons(object);
 object prim_list(object);
 
 /* Those are basic arithmetic functions */
-object prim_arith_plus(object);
 object prim_larger(object);
 object prim_smaller(object);
 object prim_equal(object);
