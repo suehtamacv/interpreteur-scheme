@@ -128,37 +128,6 @@ restart:
         break;
 
     case NUM_INTEGER:
-        switch (cadr(o)->val.number.numtype) {
-        case NUM_INTEGER:
-        case NUM_UINTEGER:
-            if (cadr(o)->val.number.val.integer != car(o)->val.number.val.integer) {
-                return _false;
-            }
-            break;
-
-        case NUM_PINFTY:
-        case NUM_MINFTY:
-            return _false;
-            break;
-
-        case NUM_REAL:
-            if (cadr(o)->val.number.val.real != car(o)->val.number.val.integer) {
-                return _false;
-            }
-            break;
-
-        case NUM_COMPLEX:
-            if (cadr(o)->val.number.val.complex.real != car(o)->val.number.val.integer) {
-                return _false;
-            }
-            break;
-
-        default:
-            WARNING_MSG("Wrong type of arguments on \"=\"");
-            return NULL;
-        }
-        break;
-
     case NUM_UINTEGER:
         switch (cadr(o)->val.number.numtype) {
         case NUM_INTEGER:
@@ -189,6 +158,7 @@ restart:
             WARNING_MSG("Wrong type of arguments on \"=\"");
             return NULL;
         }
+        break;
 
     case NUM_REAL:
         switch (cadr(o)->val.number.numtype) {
@@ -224,6 +194,11 @@ restart:
             WARNING_MSG("Wrong type of arguments on \"=\"");
             return NULL;
         }
+        break;
+
+    default:
+        WARNING_MSG("Wrong type of arguments on \"=\"");
+        return NULL;
     }
 
     o = cdr(o);
@@ -283,11 +258,11 @@ restart:
                 if( cadr(o)->val.number.val.integer >= car(o)->val.number.val.complex.real) {
                     return _false;
                 }
+                break;
 
             default:
                 WARNING_MSG("Wrong type of arguments on \"<\"");
                 return NULL;
-                break;
             }
         }
         break;
