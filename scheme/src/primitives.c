@@ -149,6 +149,10 @@ restart:
             break;
 
         case NUM_COMPLEX:
+            if (cadr(o)->val.number.val.complex.imag != 0) {
+                WARNING_MSG("Wrong type of arguments on \"=\"");
+                return NULL;
+            }
             if (cadr(o)->val.number.val.complex.real != car(o)->val.number.val.integer) {
                 return _false;
             }
@@ -182,7 +186,9 @@ restart:
 
         case NUM_COMPLEX:
             if (cadr(o)->val.number.val.complex.imag != 0) {
-                return _false;
+                WARNING_MSG("Wrong type of arguments on \"=\"");
+                return NULL;
+
             } else {
                 if (car(o)->val.number.val.real != cadr(o)->val.number.val.complex.real) {
                     return _false;
@@ -224,8 +230,8 @@ restart:
     switch (car(o)->val.number.numtype) {
     case NUM_PINFTY:
         if(list_length(o) > 1) {
-            /* (< [numbers] +inf [numbers]) is always #t */
-            return _true;
+            /* (< [numbers] +inf [numbers]) is always # */
+            return _false;
         }
         break;
 
