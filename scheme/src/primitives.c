@@ -49,6 +49,7 @@ void create_basic_primitives() {
     create_primitive(">", prim_larger);
     create_primitive("<", prim_smaller);
     create_primitive("=", prim_equal);
+    create_primitive("+", prim_arith_plus);
 }
 
 void create_primitive(string prim_name, object (*func)(object)) {
@@ -740,7 +741,7 @@ object prim_is_null(object o) {
     if(is_Pair(o) == True && is_Nil(car(o)) == True) {
         return _true;
     }
-    return _false;/*faut corrriger*/
+    return _false;
 }
 
 object prim_is_string(object o) {
@@ -750,8 +751,82 @@ object prim_is_string(object o) {
     }
     return _false;
 }
-/*
+
 object prim_arith_plus(object o) {
-    object res = make_object(SFS_NUMBER);
-    res->val.number.numtype = NUM_INTEGER;
-}*/
+    if (list_length(o) == 0) {
+        return make_integer(0);
+    } else if (list_length(o) == 1) {
+        return car(o);
+    }
+
+    object result = make_integer(0);
+    object next_number = NULL;
+
+restart:
+    next_number = car(o);
+    if (is_Number(next_number) == False) {
+        WARNING_MSG("Invalid type of argument in function \"+\"");
+        return NULL;
+    }
+
+    switch (result->val.number.numtype) {
+    case NUM_UNDEF:
+        return NaN;
+
+    case NUM_PINFTY:
+        switch (next_number->val.number.numtype) {
+        case NUM_MINFTY:
+            return NaN; /* (+ +inf -inf) = NaN */
+
+        default:
+            break;
+        }
+
+    case NUM_MINFTY:
+        switch (next_number->val.number.numtype) {
+        case NUM_PINFTY:
+            return NaN; /* (+ -inf +inf) = NaN */
+
+        default:
+            break;
+        }
+
+    case NUM_UINTEGER:
+    case NUM_INTEGER:
+        switch (next_number->val.number.numtype) {
+        case NUM_PINFTY:
+            result = plus_inf;
+            break;
+
+        case NUM_MINFTY:
+            result = minus_inf;
+            break;
+
+        case NUM_UNDEF:
+            return NaN;
+
+        case NUM_INTEGER:
+        case NUM_UINTEGER:
+            result->val.number.val.integer += next_number->val.number.val.integer;
+            break;
+
+        case NUM_REAL:
+            result = to_real(result);
+            result->val.number.val.real += next_number->val.number.val.real;
+            break;
+
+        case NUM_COMPLEX:
+            result = to_complex(result);
+            result->val.number.val.complex.real += next_number->val.number.val.complex.real;
+            result->val.number.val.complex.imag += next_number->val.number.val.complex.imag;
+            break;
+        }
+    }
+
+    o = cdr(o);
+    if (is_Nil(o) == True) {
+        return result;
+    } else {
+        goto restart;
+    }
+}

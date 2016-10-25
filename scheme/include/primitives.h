@@ -37,5 +37,7 @@ object prim_list(object);
 object prim_larger(object);
 object prim_smaller(object);
 object prim_equal(object);
+object prim_arith_plus(object);
+
 
 #endif /* PRIMITIVES_H */

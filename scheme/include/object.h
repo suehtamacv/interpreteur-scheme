@@ -85,6 +85,9 @@ extern object nil;
 extern object _true;
 extern object _false;
 extern object symbol_table;
+extern object plus_inf;
+extern object minus_inf;
+extern object NaN;
 
 #ifdef __cplusplus
 }
