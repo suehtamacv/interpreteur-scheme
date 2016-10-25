@@ -223,6 +223,10 @@ restart:
     TEST_NEXT_IS_NUMBER(o, "<");
 
     switch (car(o)->val.number.numtype) {
+    case NUM_UNDEF:
+        WARNING_MSG("Can't compare with NaN");
+        return NULL;
+
     case NUM_PINFTY:
         if(list_length(o) > 1) {
             /* (< [numbers] +inf [numbers]) is always #t */
@@ -821,6 +825,66 @@ restart:
             result->val.number.val.complex.imag += next_number->val.number.val.complex.imag;
             break;
         }
+        break;
+
+    case NUM_REAL:
+        switch (next_number->val.number.numtype) {
+        case NUM_PINFTY:
+            result = plus_inf;
+            break;
+
+        case NUM_MINFTY:
+            result = minus_inf;
+            break;
+
+        case NUM_UNDEF:
+            return NaN;
+
+        case NUM_INTEGER:
+        case NUM_UINTEGER:
+            result->val.number.val.real += next_number->val.number.val.integer;
+            break;
+
+        case NUM_REAL:
+            result->val.number.val.real += next_number->val.number.val.real;
+            break;
+
+        case NUM_COMPLEX:
+            result = to_complex(result);
+            result->val.number.val.complex.real += next_number->val.number.val.complex.real;
+            result->val.number.val.complex.imag += next_number->val.number.val.complex.imag;
+            break;
+        }
+        break;
+
+    case NUM_COMPLEX:
+        switch (next_number->val.number.numtype) {
+        case NUM_PINFTY:
+            result = plus_inf;
+            break;
+
+        case NUM_MINFTY:
+            result = minus_inf;
+            break;
+
+        case NUM_UNDEF:
+            return NaN;
+
+        case NUM_INTEGER:
+        case NUM_UINTEGER:
+            result->val.number.val.complex.real += next_number->val.number.val.integer;
+            break;
+
+        case NUM_REAL:
+            result->val.number.val.complex.real += next_number->val.number.val.real;
+            break;
+
+        case NUM_COMPLEX:
+            result->val.number.val.complex.real += next_number->val.number.val.complex.real;
+            result->val.number.val.complex.imag += next_number->val.number.val.complex.imag;
+            break;
+        }
+        break;
     }
 
     o = cdr(o);
