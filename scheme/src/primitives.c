@@ -87,8 +87,7 @@ restart:
         if (car(o)->val.number.val.complex.imag != 0) {
             /* z = a + bj with b != 0 */
             if(cadr(o)->val.number.numtype != NUM_COMPLEX) {
-                WARNING_MSG("Wrong type of arguments on \"=\"");
-                return NULL;
+                return _false;
             } else {
                 if (
                     car(o)->val.number.val.complex.real != cadr(o)->val.number.val.complex.real ||
@@ -149,11 +148,8 @@ restart:
             break;
 
         case NUM_COMPLEX:
-            if (cadr(o)->val.number.val.complex.imag != 0) {
-                WARNING_MSG("Wrong type of arguments on \"=\"");
-                return NULL;
-            }
-            if (cadr(o)->val.number.val.complex.real != car(o)->val.number.val.integer) {
+
+            if (cadr(o)->val.number.val.complex.real != car(o)->val.number.val.integer || cadr(o)->val.number.val.complex.imag != 0 ) {
                 return _false;
             }
             break;
@@ -186,8 +182,7 @@ restart:
 
         case NUM_COMPLEX:
             if (cadr(o)->val.number.val.complex.imag != 0) {
-                WARNING_MSG("Wrong type of arguments on \"=\"");
-                return NULL;
+                return _false;
 
             } else {
                 if (car(o)->val.number.val.real != cadr(o)->val.number.val.complex.real) {
