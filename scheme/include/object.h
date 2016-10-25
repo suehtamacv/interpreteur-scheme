@@ -17,9 +17,13 @@ extern "C" {
 #include "boolean.h"
 #include "number.h"
 
+typedef enum object_type_t {
+    SFS_NUMBER, SFS_CHARACTER, SFS_STRING, SFS_PAIR, SFS_NIL, SFS_BOOLEAN, SFS_SYMBOL, SFS_PRIMITIVE, SFS_FORM
+} object_type;
+
 typedef struct object_t {
 
-    uint type;
+    object_type type;
     union {
         num              number;
         Bool             boolean;
@@ -75,16 +79,6 @@ Bool is_Real(object o);
 Bool is_Complex(object o);
 
 Bool is_AutoEvaluable(object o);
-
-#define SFS_NUMBER       0x00
-#define SFS_CHARACTER    0x01
-#define SFS_STRING       0x02
-#define SFS_PAIR         0x03
-#define SFS_NIL          0x04
-#define SFS_BOOLEAN      0x05
-#define SFS_SYMBOL       0x06
-#define SFS_PRIMITIVE    0x07
-#define SFS_FORM         0x08
 
 extern object nil;
 extern object _true;

@@ -16,13 +16,9 @@ extern "C" {
 
 #include "basic.h"
 
-#define NUM_REAL     0x00
-#define NUM_INTEGER  0x01
-#define NUM_UINTEGER 0x02
-#define NUM_COMPLEX  0x03
-#define NUM_UNDEF    0x04
-#define NUM_PINFTY   0x05
-#define NUM_MINFTY   0x06
+typedef enum number_type_t {
+    NUM_REAL, NUM_INTEGER, NUM_UINTEGER, NUM_COMPLEX, NUM_UNDEF, NUM_PINFTY, NUM_MINFTY
+} number_type;
 
 /**
  * @brief The complex_t struct is used to create the structure of a
@@ -42,7 +38,7 @@ typedef struct complex_t {
 
 typedef struct num_t {
 
-    uint numtype;
+    number_type numtype;
     union {
         double       real;
         int          integer;
