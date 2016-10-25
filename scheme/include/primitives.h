@@ -41,6 +41,7 @@ object prim_equal(object);
 /* Those are basic arithmetic functions */
 object prim_arith_plus(object);
 object prim_arith_minus(object);
+object prim_arith_times(object);
 
 
 #endif /* PRIMITIVES_H */
