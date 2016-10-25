@@ -50,7 +50,6 @@ restart:
         if ((*symb)->type == SFS_PRIMITIVE) {
             /* Must evaluate the arguments */
             object rev_eval_list = nil;
-            object eval_list = nil;
 
             in = cdr(in);
             while (is_Nil(in) == False) {
@@ -68,14 +67,8 @@ restart:
                 in = cdr(in);
             }
 
-            /* Reverses the list */
-            while (is_Nil(rev_eval_list) == False) {
-                eval_list = cons(car(rev_eval_list), eval_list);
-                rev_eval_list = cdr(rev_eval_list);
-            }
-
             /* Calls the function */
-            return (*symb)->val.primitive.f(eval_list);
+            return (*symb)->val.primitive.f(reverse(rev_eval_list));
         } else if (((*symb)->type == SFS_FORM)) {
             /* Calls the function */
             return (*symb)->val.form.f(cdr(in));

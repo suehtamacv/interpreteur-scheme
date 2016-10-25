@@ -47,5 +47,7 @@ object caddr(object o);
  * @return the list (a list).
  */
 object cons(object o, object list);
+/* Function reverse list*/
+object reverse(object o);
 
 #endif /* LISTS_H */

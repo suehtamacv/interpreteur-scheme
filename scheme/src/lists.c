@@ -1,5 +1,21 @@
 #include "lists.h"
 
+object reverse(object o) {
+    if (is_Pair(o) == True || is_Nil(o) == True) {
+        object eval_list = nil;
+
+        /* Reverses the list */
+        while (is_Nil(o) == False) {
+            eval_list = cons(car(o), eval_list);
+            o = cdr(o);
+        }
+        return eval_list;
+    } else {
+        WARNING_MSG("Can't reverse something that is neither a list nor nil");
+        return NULL;
+    }
+}
+
 object car(object o) {
     if (is_Pair(o) == False) {
         ERROR_MSG("Trying to get car of a object who is not a pair (actually it is %d)",
