@@ -4,6 +4,7 @@
 #include <symbols.h>
 #include <lists.h>
 #include <print.h>
+#include <math.h>
 
 #define TEST_NUMB_ARGUMENT_EQ(n_Arg, nomFunction) \
     if (list_length(o) != n_Arg) { \
@@ -45,10 +46,16 @@ void create_basic_primitives() {
     create_primitive("cons", prim_cons);
     create_primitive("list", prim_list);
 
-    /* Those are the basic arithmetic primitives */
+    /* Those are ordering primitives */
     create_primitive(">", prim_larger);
     create_primitive("<", prim_smaller);
     create_primitive("=", prim_equal);
+
+    /* Those are the basic arithmetic primitives */
+    create_primitive("+", prim_arith_plus);
+    create_primitive("-", prim_arith_minus);
+    create_primitive("*", prim_arith_times);
+    create_primitive("/", prim_arith_division);
 }
 
 void create_primitive(string prim_name, object (*func)(object)) {
@@ -197,9 +204,9 @@ restart:
         }
         break;
 
-    default:
-        WARNING_MSG("Wrong type of arguments on \"=\"");
-        return NULL;
+    case NUM_UNDEF:
+        return _false;
+        break;
     }
 
     o = cdr(o);
@@ -223,6 +230,9 @@ restart:
     TEST_NEXT_IS_NUMBER(o, "<");
 
     switch (car(o)->val.number.numtype) {
+    case NUM_UNDEF:
+        return _false;
+
     case NUM_PINFTY:
         if(list_length(o) > 1) {
             /* (< [numbers] +inf [numbers]) is always # */
@@ -254,11 +264,6 @@ restart:
                 break;
 
             case NUM_UINTEGER:
-                /* Comparing z = a + 0j with uinteger */
-                if( cadr(o)->val.number.val.integer >= car(o)->val.number.val.complex.real) {
-                    return _false;
-                }
-                break;
             case NUM_INTEGER:
                 /* Comparing z = a + 0j with integer */
                 if( cadr(o)->val.number.val.integer >= car(o)->val.number.val.complex.real) {
@@ -266,20 +271,23 @@ restart:
                 }
                 break;
 
-            default:
-                WARNING_MSG("Wrong type of arguments on \"<\"");
+            case NUM_UNDEF:
+                return _false;
+                break;
+
+            case NUM_COMPLEX:
+            case NUM_PINFTY:
+            case NUM_MINFTY:
+                WARNING_MSG("Wrong type of arguments on \"=\"");
                 return NULL;
             }
         }
         break;
 
+    case NUM_UINTEGER:
     case NUM_INTEGER:
         switch (cadr(o)->val.number.numtype) {
         case NUM_INTEGER:
-            if(car(o)->val.number.val.integer >= cadr(o)->val.number.val.integer) {
-                return _false;
-            }
-            break;
         case NUM_UINTEGER:
             if(car(o)->val.number.val.integer >= cadr(o)->val.number.val.integer) {
                 return _false;
@@ -309,50 +317,8 @@ restart:
             }
             break;
 
-        default:
-            WARNING_MSG("Wrong type of arguments on \"<\"");
-            return NULL;
-        }
-        break;
-    case NUM_UINTEGER:
-        switch (cadr(o)->val.number.numtype) {
-        case NUM_INTEGER:
-            if(car(o)->val.number.val.integer >= cadr(o)->val.number.val.integer) {
-                return _false;
-            }
-            break;
-        case NUM_UINTEGER:
-            if(car(o)->val.number.val.integer >= cadr(o)->val.number.val.integer) {
-                return _false;
-            }
-            break;
-
-        case NUM_PINFTY:
-            break;
-
-        case NUM_MINFTY:
-            return _false; /* case: (< [number] -inf [number]) is always #f  */
-            break;
-
-        case NUM_REAL:
-            if(car(o)->val.number.val.integer >= cadr(o)->val.number.val.real) {
-                return _false;
-            }
-            break;
-
-        case NUM_COMPLEX:
-            if (cadr(o)->val.number.val.complex.imag != 0) {
-                WARNING_MSG("Wrong type of arguments on \"<\"");
-                return NULL;
-            }
-            if(car(o)->val.number.val.integer >= cadr(o)->val.number.val.complex.real) {
-                return _false;
-            }
-            break;
-
-        default:
-            WARNING_MSG("Wrong type of arguments on \"<\"");
-            return NULL;
+        case NUM_UNDEF:
+            return _false;
         }
         break;
 
@@ -383,9 +349,8 @@ restart:
             WARNING_MSG("Wrong type of arguments on \"<\"");
             return NULL;
 
-        default:
-            WARNING_MSG("Wrong number type (%d)", o->val.number.numtype);
-            return NULL;
+        case NUM_UNDEF:
+            return _false;
         }
     }
 
@@ -400,95 +365,6 @@ object prim_larger(object o) {
     return prim_smaller(reverse(o));
 }
 
-/*
-object prim_larger(object o) {
-    if (list_length(o) < 2) { // (<) et (< element1) ==> #t
-        return _true;
-    }
-restart:
-    if (is_Number(car(o)) == False) {
-        WARNING_MSG("Wrong type of arguments on \">\"");
-        return NULL;
-    }
-    switch (car(o)->val.number.numtype) {
-    case NUM_PINFTY:
-        TEST_NEXT_IS_NUMBER(o, ">");
-        if(cadr(o)->val.number.numtype ==
-                NUM_PINFTY) { // cas: (> ... +inf +inf ...) ==> #f
-            if(list_length(o) > 1) {
-                return _false;
-            }
-        }
-        break;
-    case NUM_MINFTY:
-        TEST_NEXT_IS_NUMBER(o, ">");
-        if(list_length(o) > 1) {
-            return _false;    //cas: (> ... -inf ....) => f
-        }
-        break;
-    case NUM_COMPLEX:
-        TEST_NEXT_IS_NUMBER(o, ">");
-        WARNING_MSG("Wrong type of arguments on \">\""); // il n'y a pas la comparaison entre deux numeros complexes
-        return NULL;
-        break;
-    case NUM_INTEGER:
-        break;
-    case NUM_UINTEGER:
-        WARNING_MSG("ICI_UNITEGER");
-        TEST_NEXT_IS_NUMBER(o, ">");
-        if(cadr(o)->val.number.numtype == NUM_UINTEGER) {
-            WARNING_MSG("Compare uinteger with uniteger");
-            if(car(o)->val.number.val.integer <= cadr(o)->val.number.val.integer) {
-                return _false;
-            }
-        }
-        if(cadr(o)->val.number.numtype == NUM_REAL) {
-            WARNING_MSG("Compare uinteger with real");
-            if(car(o)->val.number.val.integer <= cadr(o)->val.number.val.real) {
-                return _false;
-            }
-        }
-        if(cadr(o)->val.number.numtype == NUM_PINFTY) {
-            return _false;    // le prochain element est +inf ==> #f
-        }
-        if(cadr(o)->val.number.numtype ==
-                NUM_COMPLEX) { // il n'y a pas la comparaison ">" entre integer et complexe
-            WARNING_MSG("Wrong type of arguments on \">\"");
-            return NULL;
-        }
-        break;
-    case NUM_REAL:
-        WARNING_MSG("ICI_REAL");
-        TEST_NEXT_IS_NUMBER(o, ">");
-        if(cadr(o)->val.number.numtype == NUM_UINTEGER) {
-            WARNING_MSG("Compare real with uinteger");
-            if(car(o)->val.number.val.real  <= cadr(o)->val.number.val.integer) {
-                return _false;
-            }
-        }
-        if(cadr(o)->val.number.numtype == NUM_REAL) {
-            WARNING_MSG("Compare real with real");
-            if(car(o)->val.number.val.real  <= cadr(o)->val.number.val.real) {
-                return _false;
-            }
-        }
-        if(cadr(o)->val.number.numtype == NUM_PINFTY) {
-            return _false;    // le prochain element est +inf ==> #f
-        }
-        if(cadr(o)->val.number.numtype ==
-                NUM_COMPLEX) { // il n'y a pas la comparaison ">" entre real et complexe
-            WARNING_MSG("Wrong type of arguments on \">\"");
-            return NULL;
-        }
-        break;
-    }
-    o = cdr(o);
-    if(list_length(o) == 1) {
-        return _true;
-    }
-    goto restart;
-}
-*/
 object prim_is_list(object o) {
     TEST_NUMB_ARGUMENT_EQ(1, "list?");
     o = car(o);
@@ -581,6 +457,7 @@ object prim_is_zero(object o) {
         return NULL;
     } else {
         switch (o->val.number.numtype) {
+        case NUM_UNDEF:
         case NUM_PINFTY:
         case NUM_MINFTY:
             return _false;
@@ -596,12 +473,9 @@ object prim_is_zero(object o) {
             return (o->val.number.val.complex.real == 0 &&
                     o->val.number.val.complex.imag == 0) ?
                    _true : _false;
-
-        default:
-            WARNING_MSG("Wrong number type (%d)", o->val.number.numtype);
-            return NULL;
         }
     }
+    return _false;
 }
 
 object prim_list(object o) {
@@ -741,7 +615,7 @@ object prim_is_null(object o) {
     if(is_Pair(o) == True && is_Nil(car(o)) == True) {
         return _true;
     }
-    return _false;/*faut corrriger*/
+    return _false;
 }
 
 object prim_is_string(object o) {
@@ -751,8 +625,448 @@ object prim_is_string(object o) {
     }
     return _false;
 }
-/*
+
 object prim_arith_plus(object o) {
-    object res = make_object(SFS_NUMBER);
-    res->val.number.numtype = NUM_INTEGER;
-}*/
+    if (list_length(o) == 0) {
+        return make_integer(0);
+    } else if (list_length(o) == 1) {
+        return car(o);
+    }
+
+    object result = make_integer(0);
+    object next_number = NULL;
+
+restart:
+    next_number = car(o);
+    if (is_Number(next_number) == False) {
+        WARNING_MSG("Invalid type of argument in function \"+\"");
+        return NULL;
+    }
+
+    switch (result->val.number.numtype) {
+    case NUM_UNDEF:
+        return NaN;
+
+    case NUM_PINFTY:
+        switch (next_number->val.number.numtype) {
+        case NUM_MINFTY:
+            return NaN; /* (+ +inf -inf) = NaN */
+
+        default:
+            break;
+        }
+
+    case NUM_MINFTY:
+        switch (next_number->val.number.numtype) {
+        case NUM_PINFTY:
+            return NaN; /* (+ -inf +inf) = NaN */
+
+        default:
+            break;
+        }
+
+    case NUM_UINTEGER:
+    case NUM_INTEGER:
+        switch (next_number->val.number.numtype) {
+        case NUM_PINFTY:
+            result = plus_inf;
+            break;
+
+        case NUM_MINFTY:
+            result = minus_inf;
+            break;
+
+        case NUM_UNDEF:
+            return NaN;
+
+        case NUM_INTEGER:
+        case NUM_UINTEGER:
+            result->val.number.val.integer += next_number->val.number.val.integer;
+            break;
+
+        case NUM_REAL:
+            result = to_real(result);
+            result->val.number.val.real += next_number->val.number.val.real;
+            break;
+
+        case NUM_COMPLEX:
+            result = to_complex(result);
+            result->val.number.val.complex.real += next_number->val.number.val.complex.real;
+            result->val.number.val.complex.imag += next_number->val.number.val.complex.imag;
+            break;
+        }
+        break;
+
+    case NUM_REAL:
+        switch (next_number->val.number.numtype) {
+        case NUM_PINFTY:
+            result = plus_inf;
+            break;
+
+        case NUM_MINFTY:
+            result = minus_inf;
+            break;
+
+        case NUM_UNDEF:
+            return NaN;
+
+        case NUM_INTEGER:
+        case NUM_UINTEGER:
+            result->val.number.val.real += next_number->val.number.val.integer;
+            break;
+
+        case NUM_REAL:
+            result->val.number.val.real += next_number->val.number.val.real;
+            break;
+
+        case NUM_COMPLEX:
+            result = to_complex(result);
+            result->val.number.val.complex.real += next_number->val.number.val.complex.real;
+            result->val.number.val.complex.imag += next_number->val.number.val.complex.imag;
+            break;
+        }
+        break;
+
+    case NUM_COMPLEX:
+        switch (next_number->val.number.numtype) {
+        case NUM_PINFTY:
+            result = plus_inf;
+            break;
+
+        case NUM_MINFTY:
+            result = minus_inf;
+            break;
+
+        case NUM_UNDEF:
+            return NaN;
+
+        case NUM_INTEGER:
+        case NUM_UINTEGER:
+            result->val.number.val.complex.real += next_number->val.number.val.integer;
+            break;
+
+        case NUM_REAL:
+            result->val.number.val.complex.real += next_number->val.number.val.real;
+            break;
+
+        case NUM_COMPLEX:
+            result->val.number.val.complex.real += next_number->val.number.val.complex.real;
+            result->val.number.val.complex.imag += next_number->val.number.val.complex.imag;
+            break;
+        }
+        break;
+    }
+
+    o = cdr(o);
+    if (is_Nil(o) == True) {
+        return result;
+    } else {
+        goto restart;
+    }
+}
+
+object prim_arith_minus(object o) {
+    if (list_length(o) == 0) {
+        return make_integer(0);
+    } else if (list_length(o) == 1) {
+        return prim_arith_minus(cons(make_integer(0), cons(car(o),
+                                     nil))); /* (- a) = (- 0 a) */
+    }
+
+    object result = car(o);
+
+    object negative_part = prim_arith_plus(cdr(o));
+    switch (negative_part->val.number.numtype) {
+    case NUM_PINFTY:
+        negative_part = minus_inf;
+        break;
+
+    case NUM_MINFTY:
+        negative_part = plus_inf;
+        break;
+
+    case NUM_UNDEF:
+        negative_part = NaN;
+        break;
+
+    case NUM_INTEGER:
+    case NUM_UINTEGER:
+        negative_part = make_integer(-negative_part->val.number.val.integer);
+        break;
+
+    case NUM_REAL:
+        negative_part = make_real(-negative_part->val.number.val.real);
+        break;
+
+    case NUM_COMPLEX:
+        negative_part = make_complex(-negative_part->val.number.val.complex.real,
+                                     -negative_part->val.number.val.complex.imag);
+        break;
+    }
+
+    return prim_arith_plus(cons(result, cons(negative_part, nil)));
+}
+
+object prim_arith_times(object o) {
+    if (list_length(o) == 0) {
+        return make_integer(1);
+    } else if (list_length(o) == 1) {
+        return car(o);
+    }
+
+    object result = make_integer(1);
+    object next_number = NULL;
+
+restart:
+    next_number = car(o);
+    if (is_Number(next_number) == False) {
+        WARNING_MSG("Invalid type of argument in function \"*\"");
+        return NULL;
+    }
+
+    switch (result->val.number.numtype) {
+    case NUM_UNDEF:
+        return NaN;
+
+    case NUM_PINFTY:
+        switch (next_number->val.number.numtype) {
+        case NUM_UNDEF:
+            return NaN;
+
+        case NUM_PINFTY:
+            result = plus_inf;
+            break;
+
+        case NUM_MINFTY:
+            result = minus_inf;
+            break;
+
+        case NUM_UINTEGER:
+        case NUM_INTEGER:
+            if (next_number->val.number.val.integer == 0) {
+                return NaN;
+            }
+            result = (next_number->val.number.val.integer > 0) ? plus_inf : minus_inf;
+            break;
+
+        case NUM_REAL:
+            if (next_number->val.number.val.real == 0) {
+                return NaN;
+            }
+            result = (next_number->val.number.val.real > 0) ? plus_inf : minus_inf;
+            break;
+
+        case NUM_COMPLEX:
+            WARNING_MSG("Can't multiply a complex number by infinity: phase not well defined");
+            return NULL;
+        }
+        break;
+
+    case NUM_MINFTY:
+        switch (next_number->val.number.numtype) {
+        case NUM_UNDEF:
+            return NaN;
+
+        case NUM_PINFTY:
+            result = minus_inf;
+            break;
+
+        case NUM_MINFTY:
+            result = plus_inf;
+            break;
+
+        case NUM_UINTEGER:
+        case NUM_INTEGER:
+            if (next_number->val.number.val.integer == 0) {
+                return NaN;
+            }
+            result = (next_number->val.number.val.integer < 0) ? plus_inf : minus_inf;
+            break;
+
+        case NUM_REAL:
+            if (next_number->val.number.val.real == 0) {
+                return NaN;
+            }
+            result = (next_number->val.number.val.real < 0) ? plus_inf : minus_inf;
+            break;
+
+        case NUM_COMPLEX:
+            WARNING_MSG("Can't multiply a complex number by infinity: phase not well defined");
+            return NULL;
+        }
+        break;
+
+    case NUM_INTEGER:
+    case NUM_UINTEGER:
+        switch (next_number->val.number.numtype) {
+        case NUM_UNDEF:
+            return NaN;
+
+        case NUM_PINFTY:
+            if (result->val.number.val.integer == 0) {
+                return NaN;
+            }
+            result = (result->val.number.val.integer > 0) ? plus_inf : minus_inf;
+            break;
+
+        case NUM_MINFTY:
+            if (result->val.number.val.integer == 0) {
+                return NaN;
+            }
+            result = (result->val.number.val.integer > 0) ? minus_inf : plus_inf;
+            break;
+
+        case NUM_UINTEGER:
+        case NUM_INTEGER:
+            result->val.number.val.integer *= next_number->val.number.val.integer;
+            break;
+
+        case NUM_REAL:
+            result = to_real(result);
+            result->val.number.val.real *= next_number->val.number.val.real;
+            break;
+
+        case NUM_COMPLEX:
+            result = to_complex(result);
+            result = make_complex(
+                         /* Real part */
+                         next_number->val.number.val.complex.real *
+                         result->val.number.val.complex.real,
+                         /* Imaginary part */
+                         next_number->val.number.val.complex.imag *
+                         result->val.number.val.complex.real);
+            break;
+        }
+        break;
+
+    case NUM_REAL:
+        switch (next_number->val.number.numtype) {
+        case NUM_UNDEF:
+            return NaN;
+
+        case NUM_PINFTY:
+            if (result->val.number.val.real == 0) {
+                return NaN;
+            }
+            result = (result->val.number.val.real > 0) ? plus_inf : minus_inf;
+            break;
+
+        case NUM_MINFTY:
+            if (result->val.number.val.real == 0) {
+                return NaN;
+            }
+            result = (result->val.number.val.real > 0) ? minus_inf : plus_inf;
+            break;
+
+        case NUM_UINTEGER:
+        case NUM_INTEGER:
+            result->val.number.val.real *= next_number->val.number.val.integer;
+            break;
+
+        case NUM_REAL:
+            result->val.number.val.real *= next_number->val.number.val.real;
+            break;
+
+        case NUM_COMPLEX:
+            result = to_complex(result);
+            result->val.number.val.complex.real = next_number->val.number.val.complex.real *
+                                                  result->val.number.val.complex.real;
+            result->val.number.val.complex.imag = next_number->val.number.val.complex.imag *
+                                                  result->val.number.val.complex.real;
+            break;
+        }
+        break;
+
+    case NUM_COMPLEX:
+        switch (next_number->val.number.numtype) {
+        case NUM_UNDEF:
+            return NaN;
+
+        case NUM_MINFTY:
+        case NUM_PINFTY:
+            WARNING_MSG("Can't multiply a complex number by infinity: phase not well defined");
+            return NULL;
+
+        case NUM_UINTEGER:
+        case NUM_INTEGER:
+            result->val.number.val.complex.real *= next_number->val.number.val.integer;
+            result->val.number.val.complex.imag *= next_number->val.number.val.integer;
+            break;
+
+        case NUM_REAL:
+            result->val.number.val.complex.real *= next_number->val.number.val.real;
+            result->val.number.val.complex.imag *= next_number->val.number.val.real;
+            break;
+
+        case NUM_COMPLEX:
+            result = make_complex(
+                         /* Real part */
+                         next_number->val.number.val.complex.real *
+                         result->val.number.val.complex.real -
+                         next_number->val.number.val.complex.imag *
+                         result->val.number.val.complex.imag,
+                         /* Imaginary part */
+                         next_number->val.number.val.complex.real *
+                         result->val.number.val.complex.imag +
+                         next_number->val.number.val.complex.imag *
+                         result->val.number.val.complex.real);
+            break;
+        }
+        break;
+    }
+
+    o = cdr(o);
+    if (is_Nil(o) == True) {
+        return result;
+    } else {
+        goto restart;
+    }
+}
+
+object prim_arith_division(object o) {
+    if (list_length(o) == 0) {
+        return make_integer(1);
+    } else if (list_length(o) == 1) {
+        return prim_arith_division(cons(make_integer(1), cons(car(o), nil)));
+        /* (/ a) = (/ 1 a) */
+    }
+
+    object result = car(o);
+
+    object denominator = prim_arith_times(cdr(o));
+    if (is_True(prim_is_zero(make_pair(denominator, nil))) == True) {
+        WARNING_MSG("Can't divide by zero");
+        return NULL;
+    }
+
+    double abs = 0;
+    switch (denominator->val.number.numtype) {
+    case NUM_PINFTY:
+    case NUM_MINFTY:
+        denominator = make_integer(0);
+        break;
+
+    case NUM_UNDEF:
+        denominator = NaN;
+        break;
+
+    case NUM_INTEGER:
+    case NUM_UINTEGER:
+        denominator = make_real(1.0L / denominator->val.number.val.integer);
+        break;
+
+    case NUM_REAL:
+        denominator = make_real(1.0L / denominator->val.number.val.real);
+        break;
+
+    case NUM_COMPLEX:
+        abs = pow(denominator->val.number.val.complex.real, 2) +
+              pow(denominator->val.number.val.complex.imag, 2);
+        sfs_print(denominator);
+        denominator = make_complex(denominator->val.number.val.complex.real / abs,
+                                   -denominator->val.number.val.complex.imag / abs);
+        break;
+    }
+
+    return prim_arith_times(cons(result, cons(denominator, nil)));
+}

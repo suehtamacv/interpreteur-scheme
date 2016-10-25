@@ -13,7 +13,7 @@
 #include "number.h"
 
 
-object make_object(uint type) {
+object make_object(object_type type) {
     object t = sfs_malloc(sizeof(*t));
     t->type = type;
     return t;

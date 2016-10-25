@@ -50,7 +50,7 @@ typedef struct object_t {
 
 } *object;
 
-object make_object(uint type);
+object make_object(object_type type);
 object make_pair(object car, object cdr);
 object make_nil(void);
 object make_true(void);
@@ -85,6 +85,9 @@ extern object nil;
 extern object _true;
 extern object _false;
 extern object symbol_table;
+extern object plus_inf;
+extern object minus_inf;
+extern object NaN;
 
 #ifdef __cplusplus
 }

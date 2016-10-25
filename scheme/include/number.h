@@ -47,6 +47,17 @@ typedef struct num_t {
 
 } num;
 
+typedef struct object_t *object;
+
+object make_integer(int);
+object make_uinteger(int);
+object make_real(double);
+object make_complex(double, double);
+
+object to_integer(object);
+object to_real(object);
+object to_complex(object);
+
 #ifdef __cplusplus
 }
 #endif

@@ -35,12 +35,18 @@ object nil;
 object _true;
 object _false;
 object symbol_table;
+object plus_inf;
+object minus_inf;
+object NaN;
 
 void init_interpreter (void) {
     /* Crée les singletons */
     nil = make_nil();
     _true = make_true();
     _false = make_false();
+    plus_inf = make_number(NUM_PINFTY);
+    minus_inf = make_number(NUM_MINFTY);
+    NaN = make_number(NUM_UNDEF);
 
     /* Crée l'environment top-level */
     symbol_table = make_symbol_table();
@@ -51,6 +57,8 @@ void init_interpreter (void) {
 
     /* Crée les primitives */
     create_basic_primitives();
+
+    define_symbol(make_symbol("NaN"), NaN, 0);
 }
 
 int main (int argc, char *argv[]) {
