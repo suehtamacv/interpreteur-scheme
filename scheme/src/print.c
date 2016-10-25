@@ -14,7 +14,7 @@
 
 void sfs_print(object o) {
     /* Le premier paranthèse ouvrante des listes */
-    if (is_List(o) == True) {
+    if (is_List(o) == True && is_Nil(o) == False) {
         printf("(");
     }
 

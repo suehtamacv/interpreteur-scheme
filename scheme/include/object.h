@@ -50,7 +50,7 @@ typedef struct object_t {
 
 } *object;
 
-object make_object(uint type);
+object make_object(object_type type);
 object make_pair(object car, object cdr);
 object make_nil(void);
 object make_true(void);

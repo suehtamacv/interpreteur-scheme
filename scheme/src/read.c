@@ -379,7 +379,7 @@ object sfs_read_bool(char *input, uint *h) {
             /* Ce sont les chars que peuvent finir le bool */
             input[*h + p] != ' ' && input[*h + p] != '\n' &&
             input[*h + p] != '\t' && input[*h + p] != '"' &&
-            input[*h + p] != ')' && input[*h + p] != '('
+            input[*h + p] != ')' && input[*h + p] != '(' && input[*h + p] != '\0'
             /* Apres la diese, on a dans un boolean maximale d'un caractere. Donc si
              * on compte deux caracteres apres la diese (p < 3), on sait ou non s'il s'agit
              * d'un boolean correcte */
@@ -410,33 +410,34 @@ object sfs_read_bool(char *input, uint *h) {
     }
 }
 
-object sfs_read_char(char *input, uint *here) {
-    if (input[*here] != '\\') {
+object sfs_read_char(char *input, uint *h) {
+    if (input[*h] != '\\') {
         WARNING_MSG("Invalid call to %s", __func__);
         return NULL;
     }
 
     object atom = make_object(SFS_CHARACTER);
 
-    (*here)++;
-    if (input[*here] == ' ' || input[*here] == '\n' || input[*here] == '\0') {
+    (*h)++;
+    if (input[*h] == ' ' || input[*h] == '\n' || input[*h] == '\0') {
         WARNING_MSG("Invalid character found");
         return NULL;
     } else {
         string char_name;
         size_t p;
         for (p = 0;
-                input[*here + p] != ' ' && input[*here + p] != '\n' &&
-                input[*here + p] != '\t' && input[*here + p] != '\0' && p < 8;
+                input[*h] != ' ' && input[*h] != '\n' &&
+                input[*h] != '\t' && input[*h] != '\0' && p < 8;
                 /* Ce sont les chars que peuvent finir le char */
                 p++) {
-            if ((input[*here + p] == ')' || input[*here + p] == '(') &&
-                    p != 0 && input[*here + p - 1] != '\\') {
+            if ((input[*h] == ')' || input[*h] == '(') &&
+                    p != 0 && input[*h - 1] != '\\') {
                 break;
             }
-            char_name[p] = input[*here + p];
+            char_name[p] = input[*h];
+            (*h)++;
         }
-        *here += p - 1;
+        char_name[p] = '\0';
 
         /* Certains caracteres ont une representation special */
         if (strcmp(char_name, "space") == 0) {
@@ -446,15 +447,13 @@ object sfs_read_char(char *input, uint *here) {
             DEBUG_MSG("Reading a SFS_CHARACTER: newline");
             atom->val.character = '\n';
         } else if (strlen(char_name) == 1) {
-            DEBUG_MSG("Reading a SFS_CHARACTER: %c", input[*here]);
-            atom->val.character = input[*here];
+            DEBUG_MSG("Reading a SFS_CHARACTER: %c", char_name[0]);
+            atom->val.character = char_name[0];
         } else {
             WARNING_MSG("%s is not a valid character", char_name);
             return NULL;
         }
     }
-
-    (*here)++;
 
     return atom;
 }
