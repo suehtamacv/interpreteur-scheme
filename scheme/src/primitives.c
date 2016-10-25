@@ -900,17 +900,17 @@ restart:
             return NaN;
 
         case NUM_PINFTY:
-            if (next_number->val.number.val.integer == 0) {
+            if (result->val.number.val.integer == 0) {
                 return NaN;
             }
-            result = (next_number->val.number.val.integer > 0) ? plus_inf : minus_inf;
+            result = (result->val.number.val.integer > 0) ? plus_inf : minus_inf;
             break;
 
         case NUM_MINFTY:
-            if (next_number->val.number.val.integer == 0) {
+            if (result->val.number.val.integer == 0) {
                 return NaN;
             }
-            result = (next_number->val.number.val.integer > 0) ? minus_inf : plus_inf;
+            result = (result->val.number.val.integer > 0) ? minus_inf : plus_inf;
             break;
 
         case NUM_UINTEGER:
@@ -928,6 +928,76 @@ restart:
             result->val.number.val.complex.real = next_number->val.number.val.complex.real *
                                                   result->val.number.val.complex.real;
             result->val.number.val.complex.imag = next_number->val.number.val.complex.imag *
+                                                  result->val.number.val.complex.real;
+            break;
+        }
+
+    case NUM_REAL:
+        switch (next_number->val.number.numtype) {
+        case NUM_UNDEF:
+            return NaN;
+
+        case NUM_PINFTY:
+            if (result->val.number.val.real == 0) {
+                return NaN;
+            }
+            result = (result->val.number.val.real > 0) ? plus_inf : minus_inf;
+            break;
+
+        case NUM_MINFTY:
+            if (result->val.number.val.real == 0) {
+                return NaN;
+            }
+            result = (result->val.number.val.real > 0) ? minus_inf : plus_inf;
+            break;
+
+        case NUM_UINTEGER:
+        case NUM_INTEGER:
+            result->val.number.val.real *= next_number->val.number.val.integer;
+            break;
+
+        case NUM_REAL:
+            result->val.number.val.real *= next_number->val.number.val.real;
+            break;
+
+        case NUM_COMPLEX:
+            result = to_complex(result);
+            result->val.number.val.complex.real = next_number->val.number.val.complex.real *
+                                                  result->val.number.val.complex.real;
+            result->val.number.val.complex.imag = next_number->val.number.val.complex.imag *
+                                                  result->val.number.val.complex.real;
+            break;
+        }
+
+    case NUM_COMPLEX:
+        switch (next_number->val.number.numtype) {
+        case NUM_UNDEF:
+            return NaN;
+
+        case NUM_MINFTY:
+        case NUM_PINFTY:
+            WARNING_MSG("Can't multiply a complex number by infinity: phase not well defined");
+            return NULL;
+
+        case NUM_UINTEGER:
+        case NUM_INTEGER:
+            result->val.number.val.complex.real *= next_number->val.number.val.integer;
+            result->val.number.val.complex.imag *= next_number->val.number.val.integer;
+            break;
+
+        case NUM_REAL:
+            result->val.number.val.complex.real *= next_number->val.number.val.real;
+            result->val.number.val.complex.imag *= next_number->val.number.val.real;
+            break;
+
+        case NUM_COMPLEX:
+            result->val.number.val.complex.real = next_number->val.number.val.complex.real *
+                                                  result->val.number.val.complex.real -
+                                                  next_number->val.number.val.complex.imag *
+                                                  result->val.number.val.complex.imag;
+            result->val.number.val.complex.imag = next_number->val.number.val.complex.real *
+                                                  result->val.number.val.complex.imag +
+                                                  next_number->val.number.val.complex.imag *
                                                   result->val.number.val.complex.real;
             break;
         }
