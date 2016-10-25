@@ -54,6 +54,10 @@ void sfs_print_primitive(object);
  * @brief sfs_print_form prints the definition of a form.
  */
 void sfs_print_form(object);
+/**
+ * @brief sfs_print_pair prints a pair.
+ */
+void sfs_print_pair(object);
 
 #ifdef __cplusplus
 }

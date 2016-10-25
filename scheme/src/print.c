@@ -14,14 +14,12 @@
 
 void sfs_print(object o) {
     /* Le premier paranthèse ouvrante des listes */
-    if (is_Pair(o) == True) {
+    if (is_List(o) == True) {
         printf("(");
     }
 
 restart:
-
-    if (is_Pair(o) == True) {
-
+    if (is_List(o) == True && is_Nil(o) == False) {
         sfs_print(car(o));
         o = cdr(o); /* On part au prochain element de la liste */
 
@@ -68,6 +66,10 @@ restart:
         case SFS_FORM:
             sfs_print_form(o);
             break;
+
+        case SFS_PAIR:
+            sfs_print_pair(o);
+            break;
         }
     }
 }
@@ -89,6 +91,21 @@ void sfs_print_char(object o) {
         printf("#\\%c", o->val.character);
     }
 }
+
+void sfs_print_pair(object o) {
+    if (o->type != SFS_PAIR) {
+        WARNING_MSG("Trying to print object of type %d as character (%d).", o->type,
+                    SFS_PAIR);
+        return sfs_print(o);
+    }
+
+    printf("(");
+    sfs_print(o->val.pair.car);
+    printf(" . ");
+    sfs_print(o->val.pair.cdr);
+    printf(")");
+}
+
 
 void sfs_print_nil(object o) {
     if (o->type != SFS_NIL) {

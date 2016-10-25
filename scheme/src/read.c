@@ -371,6 +371,7 @@ object sfs_read_pair(char *input, uint *h) {
     return pair;
 }
 
+/* TODO Corriger problème avec (#t #\u) */
 object sfs_read_bool(char *input, uint *h) {
     string bool_name;
     size_t p;
@@ -426,7 +427,7 @@ object sfs_read_char(char *input, uint *here) {
         size_t p;
         for (p = 0;
                 input[*here + p] != ' ' && input[*here + p] != '\n' &&
-                input[*here + p] != '\t' && p < 8;
+                input[*here + p] != '\t' && input[*here + p] != '\0' && p < 8;
                 /* Ce sont les chars que peuvent finir le char */
                 p++) {
             if ((input[*here + p] == ')' || input[*here + p] == '(') &&

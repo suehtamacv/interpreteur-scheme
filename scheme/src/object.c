@@ -185,6 +185,23 @@ Bool is_Real(object o) {
     return False;
 }
 
+Bool is_List(object o) {
+    if (!o && (is_Pair(o) == False && is_Nil(o) == False)) {
+        return False;
+    }
+
+restart:
+    if (!o || (is_Pair(o) == False && is_Nil(o) == False)) {
+        return False;
+    }
+
+    if (is_Nil(o) == True) {
+        return True;
+    } else {
+        o = o->val.pair.cdr;
+        goto restart;
+    }
+}
 
 Bool is_Pair(object o) {
     if (o && o->type == SFS_PAIR) {
