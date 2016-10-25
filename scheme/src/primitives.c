@@ -4,6 +4,7 @@
 #include <symbols.h>
 #include <lists.h>
 #include <print.h>
+#include <math.h>
 
 #define TEST_NUMB_ARGUMENT_EQ(n_Arg, nomFunction) \
     if (list_length(o) != n_Arg) { \
@@ -54,6 +55,7 @@ void create_basic_primitives() {
     create_primitive("+", prim_arith_plus);
     create_primitive("-", prim_arith_minus);
     create_primitive("*", prim_arith_times);
+    create_primitive("/", prim_arith_division);
 }
 
 void create_primitive(string prim_name, object (*func)(object)) {
@@ -454,6 +456,7 @@ object prim_is_zero(object o) {
         return NULL;
     } else {
         switch (o->val.number.numtype) {
+        case NUM_UNDEF:
         case NUM_PINFTY:
         case NUM_MINFTY:
             return _false;
@@ -469,12 +472,9 @@ object prim_is_zero(object o) {
             return (o->val.number.val.complex.real == 0 &&
                     o->val.number.val.complex.imag == 0) ?
                    _true : _false;
-
-        default:
-            WARNING_MSG("Wrong number type (%d)", o->val.number.numtype);
-            return NULL;
         }
     }
+    return _false;
 }
 
 object prim_list(object o) {
@@ -859,6 +859,7 @@ restart:
             WARNING_MSG("Can't multiply a complex number by infinity: phase not well defined");
             return NULL;
         }
+        break;
 
     case NUM_MINFTY:
         switch (next_number->val.number.numtype) {
@@ -892,6 +893,7 @@ restart:
             WARNING_MSG("Can't multiply a complex number by infinity: phase not well defined");
             return NULL;
         }
+        break;
 
     case NUM_INTEGER:
     case NUM_UINTEGER:
@@ -925,12 +927,16 @@ restart:
 
         case NUM_COMPLEX:
             result = to_complex(result);
-            result->val.number.val.complex.real = next_number->val.number.val.complex.real *
-                                                  result->val.number.val.complex.real;
-            result->val.number.val.complex.imag = next_number->val.number.val.complex.imag *
-                                                  result->val.number.val.complex.real;
+            result = make_complex(
+                         /* Real part */
+                         next_number->val.number.val.complex.real *
+                         result->val.number.val.complex.real,
+                         /* Imaginary part */
+                         next_number->val.number.val.complex.imag *
+                         result->val.number.val.complex.real);
             break;
         }
+        break;
 
     case NUM_REAL:
         switch (next_number->val.number.numtype) {
@@ -968,6 +974,7 @@ restart:
                                                   result->val.number.val.complex.real;
             break;
         }
+        break;
 
     case NUM_COMPLEX:
         switch (next_number->val.number.numtype) {
@@ -991,16 +998,20 @@ restart:
             break;
 
         case NUM_COMPLEX:
-            result->val.number.val.complex.real = next_number->val.number.val.complex.real *
-                                                  result->val.number.val.complex.real -
-                                                  next_number->val.number.val.complex.imag *
-                                                  result->val.number.val.complex.imag;
-            result->val.number.val.complex.imag = next_number->val.number.val.complex.real *
-                                                  result->val.number.val.complex.imag +
-                                                  next_number->val.number.val.complex.imag *
-                                                  result->val.number.val.complex.real;
+            result = make_complex(
+                         /* Real part */
+                         next_number->val.number.val.complex.real *
+                         result->val.number.val.complex.real -
+                         next_number->val.number.val.complex.imag *
+                         result->val.number.val.complex.imag,
+                         /* Imaginary part */
+                         next_number->val.number.val.complex.real *
+                         result->val.number.val.complex.imag +
+                         next_number->val.number.val.complex.imag *
+                         result->val.number.val.complex.real);
             break;
         }
+        break;
     }
 
     o = cdr(o);
@@ -1009,4 +1020,52 @@ restart:
     } else {
         goto restart;
     }
+}
+
+object prim_arith_division(object o) {
+    if (list_length(o) == 0) {
+        return make_integer(1);
+    } else if (list_length(o) == 1) {
+        return prim_arith_division(cons(make_integer(1), cons(car(o), nil)));
+        /* (/ a) = (/ 1 a) */
+    }
+
+    object result = car(o);
+
+    object denominator = prim_arith_times(cdr(o));
+    if (is_True(prim_is_zero(make_pair(denominator, nil))) == True) {
+        WARNING_MSG("Can't divide by zero");
+        return NULL;
+    }
+
+    double abs = 0;
+    switch (denominator->val.number.numtype) {
+    case NUM_PINFTY:
+    case NUM_MINFTY:
+        denominator = make_integer(0);
+        break;
+
+    case NUM_UNDEF:
+        denominator = NaN;
+        break;
+
+    case NUM_INTEGER:
+    case NUM_UINTEGER:
+        denominator = make_real(1.0L / denominator->val.number.val.integer);
+        break;
+
+    case NUM_REAL:
+        denominator = make_real(1.0L / denominator->val.number.val.real);
+        break;
+
+    case NUM_COMPLEX:
+        abs = pow(denominator->val.number.val.complex.real, 2) +
+              pow(denominator->val.number.val.complex.imag, 2);
+        sfs_print(denominator);
+        denominator = make_complex(denominator->val.number.val.complex.real / abs,
+                                   -denominator->val.number.val.complex.imag / abs);
+        break;
+    }
+
+    return prim_arith_times(cons(result, cons(denominator, nil)));
 }
