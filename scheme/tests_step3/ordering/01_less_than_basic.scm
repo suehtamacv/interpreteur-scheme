@@ -1,6 +1,6 @@
 ;;; En tete pour script de test ;;;;;;;;;;
 ; TEST_RETURN_CODE=PASS
-; TEST_COMMENT=Tests basically the less than function 
+; TEST_COMMENT=Tests the less than function 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (< 1 2)
