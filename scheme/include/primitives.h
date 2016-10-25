@@ -33,11 +33,14 @@ object prim_set_cdr(object);
 object prim_cons(object);
 object prim_list(object);
 
-/* Those are basic arithmetic functions */
+/* Those are ordering primitives */
 object prim_larger(object);
 object prim_smaller(object);
 object prim_equal(object);
+
+/* Those are basic arithmetic functions */
 object prim_arith_plus(object);
+object prim_arith_minus(object);
 
 
 #endif /* PRIMITIVES_H */

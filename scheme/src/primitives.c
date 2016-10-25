@@ -45,11 +45,14 @@ void create_basic_primitives() {
     create_primitive("cons", prim_cons);
     create_primitive("list", prim_list);
 
-    /* Those are the basic arithmetic primitives */
+    /* Those are ordering primitives */
     create_primitive(">", prim_larger);
     create_primitive("<", prim_smaller);
     create_primitive("=", prim_equal);
+
+    /* Those are the basic arithmetic primitives */
     create_primitive("+", prim_arith_plus);
+    create_primitive("-", prim_arith_minus);
 }
 
 void create_primitive(string prim_name, object (*func)(object)) {
@@ -893,4 +896,45 @@ restart:
     } else {
         goto restart;
     }
+}
+
+object prim_arith_minus(object o) {
+    if (list_length(o) == 0) {
+        return make_integer(0);
+    } else if (list_length(o) == 1) {
+        return prim_arith_minus(cons(make_integer(0), cons(car(o), nil)));
+    }
+
+    object result = car(o);
+
+    object negative_part = prim_arith_plus(cdr(o));
+    switch (negative_part->val.number.numtype) {
+    case NUM_PINFTY:
+        negative_part = minus_inf;
+        break;
+
+    case NUM_MINFTY:
+        negative_part = plus_inf;
+        break;
+
+    case NUM_UNDEF:
+        negative_part = NaN;
+        break;
+
+    case NUM_INTEGER:
+    case NUM_UINTEGER:
+        negative_part = make_integer(-negative_part->val.number.val.integer);
+        break;
+
+    case NUM_REAL:
+        negative_part = make_real(-negative_part->val.number.val.real);
+        break;
+
+    case NUM_COMPLEX:
+        negative_part = make_complex(-negative_part->val.number.val.complex.real,
+                                     -negative_part->val.number.val.complex.imag);
+        break;
+    }
+
+    return prim_arith_plus(cons(result, cons(negative_part, nil)));
 }
