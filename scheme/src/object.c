@@ -122,7 +122,7 @@ Bool is_Char(object o) {
 }
 
 Bool is_Nil(object o) {
-    if (o && o->type == SFS_NIL) {
+    if (o && o == nil) {
         return True;
     }
     return False;

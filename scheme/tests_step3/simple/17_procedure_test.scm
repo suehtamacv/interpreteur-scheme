@@ -6,9 +6,9 @@
 (procedure? procedure?)
 (procedure? (procedure? procedure?))
 
-(define quote +)
-(procedure? quote)
-(quote 1 2 3)
+(define and +)
+(procedure? and)
+(and 1 2 3)
 
 (procedure? boolean?)
 (define boolean? "No longer a procedure")

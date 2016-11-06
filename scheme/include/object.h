@@ -83,6 +83,7 @@ Bool is_Zero(object o);
 Bool is_AutoEvaluable(object o);
 
 extern object nil;
+extern object _void;
 extern object _true;
 extern object _false;
 extern object symbol_table;
