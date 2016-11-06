@@ -56,6 +56,7 @@ void create_basic_primitives() {
     create_primitive("-", prim_arith_minus);
     create_primitive("*", prim_arith_times);
     create_primitive("/", prim_arith_division);
+
 }
 
 void create_primitive(string prim_name, object (*func)(object)) {
@@ -156,7 +157,8 @@ restart:
 
         case NUM_COMPLEX:
 
-            if (cadr(o)->val.number.val.complex.real != car(o)->val.number.val.integer || cadr(o)->val.number.val.complex.imag != 0 ) {
+            if (cadr(o)->val.number.val.complex.real != car(o)->val.number.val.integer ||
+                    cadr(o)->val.number.val.complex.imag != 0 ) {
                 return _false;
             }
             break;
@@ -655,6 +657,7 @@ restart:
         default:
             break;
         }
+        break;
 
     case NUM_MINFTY:
         switch (next_number->val.number.numtype) {
@@ -664,6 +667,7 @@ restart:
         default:
             break;
         }
+        break;
 
     case NUM_UINTEGER:
     case NUM_INTEGER:
@@ -827,6 +831,7 @@ restart:
     switch (result->val.number.numtype) {
     case NUM_UNDEF:
         return NaN;
+        break;
 
     case NUM_PINFTY:
         switch (next_number->val.number.numtype) {
@@ -969,10 +974,10 @@ restart:
 
         case NUM_COMPLEX:
             result = to_complex(result);
-            result->val.number.val.complex.real = next_number->val.number.val.complex.real *
-                                                  result->val.number.val.complex.real;
-            result->val.number.val.complex.imag = next_number->val.number.val.complex.imag *
-                                                  result->val.number.val.complex.real;
+            result = make_complex(next_number->val.number.val.complex.real *
+                                  result->val.number.val.complex.real,
+                                  next_number->val.number.val.complex.imag *
+                                  result->val.number.val.complex.real);
             break;
         }
         break;

@@ -20,6 +20,8 @@ typedef enum number_type_t {
     NUM_REAL, NUM_INTEGER, NUM_UINTEGER, NUM_COMPLEX, NUM_UNDEF, NUM_PINFTY, NUM_MINFTY
 } number_type;
 
+struct num_t;
+
 /**
  * @brief The complex_t struct is used to create the structure of a
  * complex number. A complex number is a pair of two values, its real

@@ -1,8 +1,7 @@
 ;;; En tete pour script de test ;;;;;;;;;;
 ; TEST_RETURN_CODE=PASS
-; TEST_COMMENT=Tests "+" which has 2 arguments (basic)
+; TEST_COMMENT=Tests + which has 2 arguments
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (+ 1 2)
 (+ 1 +1)
 (+ 1 -1)
@@ -65,3 +64,4 @@
 (+ +inf +inf)
 (+ -inf -inf)
 (+ NaN NaN)
+

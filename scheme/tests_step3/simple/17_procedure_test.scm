@@ -6,12 +6,6 @@
 (procedure? procedure?)
 (procedure? (procedure? procedure?))
 
-(procedure? if)
-(procedure? and)
-(procedure? or)
-(procedure? define)
-
-(procedure? quote)
 (define quote +)
 (procedure? quote)
 (quote 1 2 3)
