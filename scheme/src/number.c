@@ -1,5 +1,6 @@
 #include "number.h"
 #include "object.h"
+#include <math.h>
 
 object make_integer(int i) {
     object o = make_number(NUM_INTEGER);
@@ -47,12 +48,21 @@ object to_integer(object o) {
         return NULL;
 
     case NUM_REAL:
-        WARNING_MSG("Cannot convert a real number to integer");
-        return NULL;
+        if (fmod(o->val.number.val.real, 1.0) != 0) {
+            WARNING_MSG("Cannot convert a real number to integer");
+            return NULL;
+        } else {
+            return make_integer((long) o->val.number.val.real);
+        }
 
     case NUM_COMPLEX:
-        WARNING_MSG("Cannot convert a complex number to integer");
-        return NULL;
+        if (o->val.number.val.complex.imag != 0 ||
+                fmod(o->val.number.val.complex.real, 1.0) != 0) {
+            WARNING_MSG("Cannot convert a complex number to integer");
+            return NULL;
+        } else {
+            return make_integer((long) o->val.number.val.complex.real);
+        }
 
     case NUM_UNDEF:
         WARNING_MSG("Cannot convert NaN to integer");

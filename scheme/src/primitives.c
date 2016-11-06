@@ -56,12 +56,44 @@ void create_basic_primitives() {
     create_primitive("-", prim_arith_minus);
     create_primitive("*", prim_arith_times);
     create_primitive("/", prim_arith_division);
-
+    create_primitive("remainder", prim_arith_remainder);
+    create_primitive("quotient", prim_arith_quotient);
 }
 
 void create_primitive(string prim_name, object (*func)(object)) {
     define_symbol(make_symbol(prim_name), make_primitive(func, prim_name), 0);
+}
 
+object prim_arith_quotient(object o) {
+    TEST_NUMB_ARGUMENT_EQ(2, "quotient");
+
+    if (is_Integer(car(o)) == False || is_Integer(cadr(o)) == False) {
+        WARNING_MSG("\"quotient\" can only be applied to numbers");
+        return NULL;
+    } else if (is_Zero(cadr(o)) == True) {
+        WARNING_MSG("Can't divide by zero");
+        return NULL;
+    }
+
+    object num = to_integer(car(o));
+    object den = to_integer(cadr(o));
+    return make_integer(num->val.number.val.integer / den->val.number.val.integer);
+}
+
+object prim_arith_remainder(object o) {
+    TEST_NUMB_ARGUMENT_EQ(2, "remainder");
+
+    if (is_Integer(car(o)) == False || is_Integer(cadr(o)) == False) {
+        WARNING_MSG("\"remainder\" can only be applied to numbers");
+        return NULL;
+    } else if (is_Zero(cadr(o)) == True) {
+        WARNING_MSG("Can't divide by zero");
+        return NULL;
+    }
+
+    object num = to_integer(car(o));
+    object den = to_integer(cadr(o));
+    return make_integer(num->val.number.val.integer % den->val.number.val.integer);
 }
 
 object prim_equal(object o) {
@@ -458,24 +490,7 @@ object prim_is_zero(object o) {
         WARNING_MSG("Cannot apply \"zero?\" to something who is not a number");
         return NULL;
     } else {
-        switch (o->val.number.numtype) {
-        case NUM_UNDEF:
-        case NUM_PINFTY:
-        case NUM_MINFTY:
-            return _false;
-
-        case NUM_INTEGER:
-        case NUM_UINTEGER:
-            return (o->val.number.val.integer == 0 ? _true : _false);
-
-        case NUM_REAL:
-            return (o->val.number.val.real == 0 ? _true : _false);
-
-        case NUM_COMPLEX:
-            return (o->val.number.val.complex.real == 0 &&
-                    o->val.number.val.complex.imag == 0) ?
-                   _true : _false;
-        }
+        return (is_Zero(o) == True ? _true : _false);
     }
     return _false;
 }
@@ -1039,7 +1054,7 @@ object prim_arith_division(object o) {
     object result = car(o);
 
     object denominator = prim_arith_times(cdr(o));
-    if (is_True(prim_is_zero(make_pair(denominator, nil))) == True) {
+    if (is_Zero(denominator) == True) {
         WARNING_MSG("Can't divide by zero");
         return NULL;
     }

@@ -11,7 +11,7 @@
 #include "forms.h"
 #include "mem.h"
 #include "number.h"
-
+#include <math.h>
 
 object make_object(object_type type) {
     object t = sfs_malloc(sizeof(*t));
@@ -151,12 +151,46 @@ Bool is_Complex(object o) {
     return False;
 }
 
+Bool is_Zero(object o) {
+    if (o && is_Number(o) == True) {
+        switch (o->val.number.numtype) {
+        case NUM_UNDEF:
+        case NUM_PINFTY:
+        case NUM_MINFTY:
+            return False;
+
+        case NUM_INTEGER:
+        case NUM_UINTEGER:
+            return (o->val.number.val.integer == 0 ? True : False);
+
+        case NUM_REAL:
+            return (o->val.number.val.real == 0 ? True : False);
+
+        case NUM_COMPLEX:
+            return (o->val.number.val.complex.real == 0 &&
+                    o->val.number.val.complex.imag == 0) ?
+                   True : False;
+        }
+    }
+    return False;
+}
+
 Bool is_Integer(object o) {
     if (o && o->type == SFS_NUMBER) {
         switch (o->val.number.numtype) {
         case NUM_INTEGER:
         case NUM_UINTEGER:
             return True;
+
+        case NUM_REAL:
+            return (fmod(o->val.number.val.real, 1.0) == 0 ? True : False);
+
+        case NUM_COMPLEX:
+            if (o->val.number.val.complex.imag != 0) {
+                return False;
+            } else {
+                return (fmod(o->val.number.val.complex.real, 1.0) == 0 ? True : False);
+            }
 
         default:
             return False;
