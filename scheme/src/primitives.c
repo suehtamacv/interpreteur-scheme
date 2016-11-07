@@ -77,7 +77,7 @@ object prim_arith_quotient(object o) {
 
     object num = to_integer(car(o));
     object den = to_integer(cadr(o));
-    return make_integer(num->val.number.val.integer / den->val.number.val.integer);
+    return make_integer(num->val.number->val.integer / den->val.number->val.integer);
 }
 
 object prim_arith_remainder(object o) {
@@ -93,7 +93,7 @@ object prim_arith_remainder(object o) {
 
     object num = to_integer(car(o));
     object den = to_integer(cadr(o));
-    return make_integer(num->val.number.val.integer % den->val.number.val.integer);
+    return make_integer(num->val.number->val.integer % den->val.number->val.integer);
 }
 
 object prim_equal(object o) {
@@ -110,34 +110,34 @@ restart:
 
     TEST_NEXT_IS_NUMBER(o, "=");
 
-    switch (car(o)->val.number.numtype) {
+    switch (car(o)->val.number->numtype) {
     case NUM_PINFTY:
-        if(cadr(o)->val.number.numtype != NUM_PINFTY) {
+        if(cadr(o)->val.number->numtype != NUM_PINFTY) {
             return _false;    /* ==> #f if cadr(o) isn't +inf */
         }
         break;
 
     case NUM_MINFTY:
-        if(cadr(o)->val.number.numtype != NUM_MINFTY) {
+        if(cadr(o)->val.number->numtype != NUM_MINFTY) {
             return _false;
         }
         break;
 
     case NUM_COMPLEX:
-        if (car(o)->val.number.val.complex.imag != 0) {
+        if (car(o)->val.number->val.complex->imag != 0) {
             /* z = a + bj with b != 0 */
-            if(cadr(o)->val.number.numtype != NUM_COMPLEX) {
+            if(cadr(o)->val.number->numtype != NUM_COMPLEX) {
                 return _false;
             } else {
                 if (
-                    car(o)->val.number.val.complex.real != cadr(o)->val.number.val.complex.real ||
-                    car(o)->val.number.val.complex.imag != cadr(o)->val.number.val.complex.imag) {
+                    car(o)->val.number->val.complex->real != cadr(o)->val.number->val.complex->real ||
+                    car(o)->val.number->val.complex->imag != cadr(o)->val.number->val.complex->imag) {
                     return _false;
                 }
             }
         } else {
             /* z = a + 0j */
-            switch (cadr(o)->val.number.numtype) {
+            switch (cadr(o)->val.number->numtype) {
             case NUM_PINFTY:
             case NUM_MINFTY:
                 return _false;
@@ -145,8 +145,8 @@ restart:
 
             case NUM_REAL:
                 if (
-                    car(o)->val.number.val.complex.real !=
-                    cadr(o)->val.number.val.real) {/* compare a + 0j with real */
+                    car(o)->val.number->val.complex->real !=
+                    cadr(o)->val.number->val.real) {/* compare a + 0j with real */
                     return _false;
                 }
                 break;
@@ -154,7 +154,7 @@ restart:
             case NUM_UINTEGER:
             case NUM_INTEGER:
                 /* compare z = a + 0j with integer  */
-                if (cadr(o)->val.number.val.integer != car(o)->val.number.val.complex.real) {
+                if (cadr(o)->val.number->val.integer != car(o)->val.number->val.complex->real) {
                     return _false;
                 }
                 break;
@@ -168,10 +168,10 @@ restart:
 
     case NUM_INTEGER:
     case NUM_UINTEGER:
-        switch (cadr(o)->val.number.numtype) {
+        switch (cadr(o)->val.number->numtype) {
         case NUM_INTEGER:
         case NUM_UINTEGER:
-            if (cadr(o)->val.number.val.integer != car(o)->val.number.val.integer) {
+            if (cadr(o)->val.number->val.integer != car(o)->val.number->val.integer) {
                 return _false;
             }
             break;
@@ -182,15 +182,15 @@ restart:
             break;
 
         case NUM_REAL:
-            if (cadr(o)->val.number.val.real != car(o)->val.number.val.integer) {
+            if (cadr(o)->val.number->val.real != car(o)->val.number->val.integer) {
                 return _false;
             }
             break;
 
         case NUM_COMPLEX:
 
-            if (cadr(o)->val.number.val.complex.real != car(o)->val.number.val.integer ||
-                    cadr(o)->val.number.val.complex.imag != 0 ) {
+            if (cadr(o)->val.number->val.complex->real != car(o)->val.number->val.integer ||
+                    cadr(o)->val.number->val.complex->imag != 0 ) {
                 return _false;
             }
             break;
@@ -202,10 +202,10 @@ restart:
         break;
 
     case NUM_REAL:
-        switch (cadr(o)->val.number.numtype) {
+        switch (cadr(o)->val.number->numtype) {
         case NUM_UINTEGER:
         case NUM_INTEGER:
-            if (car(o)->val.number.val.real != cadr(o)->val.number.val.integer) {
+            if (car(o)->val.number->val.real != cadr(o)->val.number->val.integer) {
                 return _false;    /* (= 4 4.0) evaluates to #t */
             }
             break;
@@ -216,17 +216,17 @@ restart:
             break;
 
         case NUM_REAL:
-            if(car(o)->val.number.val.real  != cadr(o)->val.number.val.real) {
+            if(car(o)->val.number->val.real  != cadr(o)->val.number->val.real) {
                 return _false;
             }
             break;
 
         case NUM_COMPLEX:
-            if (cadr(o)->val.number.val.complex.imag != 0) {
+            if (cadr(o)->val.number->val.complex->imag != 0) {
                 return _false;
 
             } else {
-                if (car(o)->val.number.val.real != cadr(o)->val.number.val.complex.real) {
+                if (car(o)->val.number->val.real != cadr(o)->val.number->val.complex->real) {
                     return _false;
                 }
             }
@@ -263,7 +263,7 @@ restart:
 
     TEST_NEXT_IS_NUMBER(o, "<");
 
-    switch (car(o)->val.number.numtype) {
+    switch (car(o)->val.number->numtype) {
     case NUM_UNDEF:
         return _false;
 
@@ -275,7 +275,7 @@ restart:
         break;
 
     case NUM_MINFTY:
-        if(cadr(o)->val.number.numtype == NUM_MINFTY) {
+        if(cadr(o)->val.number->numtype == NUM_MINFTY) {
             if(list_length(o) > 1) {
                 /* (< [numbers] +inf [numbers]) is always #f */
                 return _false;    /* case: (<... -inf -inf ...) ==> #f */
@@ -284,14 +284,14 @@ restart:
         break;
 
     case NUM_COMPLEX:
-        if(car(o)->val.number.val.complex.imag != 0) {
+        if(car(o)->val.number->val.complex->imag != 0) {
             /* There isn't a comparison with complex numbers having imaginary part not zero */
             WARNING_MSG("Wrong type of arguments on \"<\"");
             return NULL;
         } else {
-            switch (cadr(o)->val.number.numtype) {
+            switch (cadr(o)->val.number->numtype) {
             case NUM_REAL:
-                if (car(o)->val.number.val.complex.real != cadr(o)->val.number.val.real) {
+                if (car(o)->val.number->val.complex->real != cadr(o)->val.number->val.real) {
                     /* Comparing a + 0j with real */
                     return _false;
                 }
@@ -300,7 +300,7 @@ restart:
             case NUM_UINTEGER:
             case NUM_INTEGER:
                 /* Comparing z = a + 0j with integer */
-                if( cadr(o)->val.number.val.integer >= car(o)->val.number.val.complex.real) {
+                if( cadr(o)->val.number->val.integer >= car(o)->val.number->val.complex->real) {
                     return _false;
                 }
                 break;
@@ -320,10 +320,10 @@ restart:
 
     case NUM_UINTEGER:
     case NUM_INTEGER:
-        switch (cadr(o)->val.number.numtype) {
+        switch (cadr(o)->val.number->numtype) {
         case NUM_INTEGER:
         case NUM_UINTEGER:
-            if(car(o)->val.number.val.integer >= cadr(o)->val.number.val.integer) {
+            if(car(o)->val.number->val.integer >= cadr(o)->val.number->val.integer) {
                 return _false;
             }
             break;
@@ -336,17 +336,17 @@ restart:
             break;
 
         case NUM_REAL:
-            if(car(o)->val.number.val.integer >= cadr(o)->val.number.val.real) {
+            if(car(o)->val.number->val.integer >= cadr(o)->val.number->val.real) {
                 return _false;
             }
             break;
 
         case NUM_COMPLEX:
-            if (cadr(o)->val.number.val.complex.imag != 0) {
+            if (cadr(o)->val.number->val.complex->imag != 0) {
                 WARNING_MSG("Wrong type of arguments on \"<\"");
                 return NULL;
             }
-            if(car(o)->val.number.val.integer >= cadr(o)->val.number.val.complex.real) {
+            if(car(o)->val.number->val.integer >= cadr(o)->val.number->val.complex->real) {
                 return _false;
             }
             break;
@@ -357,10 +357,10 @@ restart:
         break;
 
     case NUM_REAL:
-        switch (cadr(o)->val.number.numtype) {
+        switch (cadr(o)->val.number->numtype) {
         case NUM_INTEGER:
         case NUM_UINTEGER:
-            if(car(o)->val.number.val.real  >= cadr(o)->val.number.val.integer) {
+            if(car(o)->val.number->val.real  >= cadr(o)->val.number->val.integer) {
                 return _false;
             }
             break;
@@ -373,7 +373,7 @@ restart:
             break;
 
         case NUM_REAL:
-            if(car(o)->val.number.val.real  >= cadr(o)->val.number.val.real) {
+            if(car(o)->val.number->val.real  >= cadr(o)->val.number->val.real) {
                 return _false;
             }
             break;
@@ -424,7 +424,7 @@ object prim_is_positive(object o) {
         WARNING_MSG("Cannot apply \"positive?\" to something who is not a number");
         return NULL;
     } else {
-        switch (o->val.number.numtype) {
+        switch (o->val.number->numtype) {
         case NUM_PINFTY:
             return _true;
 
@@ -433,17 +433,17 @@ object prim_is_positive(object o) {
 
         case NUM_UINTEGER:
         case NUM_INTEGER:
-            return (o->val.number.val.integer > 0 ? _true : _false);
+            return (o->val.number->val.integer > 0 ? _true : _false);
 
         case NUM_REAL:
-            return (o->val.number.val.real > 0 ? _true : _false);
+            return (o->val.number->val.real > 0 ? _true : _false);
 
         case NUM_COMPLEX:
             WARNING_MSG("There is no ordering relation on the complex numbers");
             return NULL;
 
         default:
-            WARNING_MSG("Wrong number type (%d)", o->val.number.numtype);
+            WARNING_MSG("Wrong number type (%d)", o->val.number->numtype);
             return NULL;
         }
     }
@@ -457,7 +457,7 @@ object prim_is_negative(object o) {
         WARNING_MSG("Cannot apply \"negative?\" to something who is not a number");
         return NULL;
     } else {
-        switch (o->val.number.numtype) {
+        switch (o->val.number->numtype) {
         case NUM_UINTEGER:
         case NUM_PINFTY:
             return _false;
@@ -466,17 +466,17 @@ object prim_is_negative(object o) {
             return _true;
 
         case NUM_INTEGER:
-            return (o->val.number.val.integer < 0 ? _true : _false);
+            return (o->val.number->val.integer < 0 ? _true : _false);
 
         case NUM_REAL:
-            return (o->val.number.val.real < 0 ? _true : _false);
+            return (o->val.number->val.real < 0 ? _true : _false);
 
         case NUM_COMPLEX:
             WARNING_MSG("There is no ordering relation on the complex numbers");
             return NULL;
 
         default:
-            WARNING_MSG("Wrong number type (%d)", o->val.number.numtype);
+            WARNING_MSG("Wrong number type (%d)", o->val.number->numtype);
             return NULL;
         }
     }
@@ -660,12 +660,12 @@ restart:
         return NULL;
     }
 
-    switch (result->val.number.numtype) {
+    switch (result->val.number->numtype) {
     case NUM_UNDEF:
         return NaN;
 
     case NUM_PINFTY:
-        switch (next_number->val.number.numtype) {
+        switch (next_number->val.number->numtype) {
         case NUM_MINFTY:
             return NaN; /* (+ +inf -inf) = NaN */
 
@@ -675,7 +675,7 @@ restart:
         break;
 
     case NUM_MINFTY:
-        switch (next_number->val.number.numtype) {
+        switch (next_number->val.number->numtype) {
         case NUM_PINFTY:
             return NaN; /* (+ -inf +inf) = NaN */
 
@@ -686,7 +686,7 @@ restart:
 
     case NUM_UINTEGER:
     case NUM_INTEGER:
-        switch (next_number->val.number.numtype) {
+        switch (next_number->val.number->numtype) {
         case NUM_PINFTY:
             result = plus_inf;
             break;
@@ -700,24 +700,24 @@ restart:
 
         case NUM_INTEGER:
         case NUM_UINTEGER:
-            result->val.number.val.integer += next_number->val.number.val.integer;
+            result->val.number->val.integer += next_number->val.number->val.integer;
             break;
 
         case NUM_REAL:
             result = to_real(result);
-            result->val.number.val.real += next_number->val.number.val.real;
+            result->val.number->val.real += next_number->val.number->val.real;
             break;
 
         case NUM_COMPLEX:
             result = to_complex(result);
-            result->val.number.val.complex.real += next_number->val.number.val.complex.real;
-            result->val.number.val.complex.imag += next_number->val.number.val.complex.imag;
+            result->val.number->val.complex->real += next_number->val.number->val.complex->real;
+            result->val.number->val.complex->imag += next_number->val.number->val.complex->imag;
             break;
         }
         break;
 
     case NUM_REAL:
-        switch (next_number->val.number.numtype) {
+        switch (next_number->val.number->numtype) {
         case NUM_PINFTY:
             result = plus_inf;
             break;
@@ -731,23 +731,23 @@ restart:
 
         case NUM_INTEGER:
         case NUM_UINTEGER:
-            result->val.number.val.real += next_number->val.number.val.integer;
+            result->val.number->val.real += next_number->val.number->val.integer;
             break;
 
         case NUM_REAL:
-            result->val.number.val.real += next_number->val.number.val.real;
+            result->val.number->val.real += next_number->val.number->val.real;
             break;
 
         case NUM_COMPLEX:
             result = to_complex(result);
-            result->val.number.val.complex.real += next_number->val.number.val.complex.real;
-            result->val.number.val.complex.imag += next_number->val.number.val.complex.imag;
+            result->val.number->val.complex->real += next_number->val.number->val.complex->real;
+            result->val.number->val.complex->imag += next_number->val.number->val.complex->imag;
             break;
         }
         break;
 
     case NUM_COMPLEX:
-        switch (next_number->val.number.numtype) {
+        switch (next_number->val.number->numtype) {
         case NUM_PINFTY:
             result = plus_inf;
             break;
@@ -761,16 +761,16 @@ restart:
 
         case NUM_INTEGER:
         case NUM_UINTEGER:
-            result->val.number.val.complex.real += next_number->val.number.val.integer;
+            result->val.number->val.complex->real += next_number->val.number->val.integer;
             break;
 
         case NUM_REAL:
-            result->val.number.val.complex.real += next_number->val.number.val.real;
+            result->val.number->val.complex->real += next_number->val.number->val.real;
             break;
 
         case NUM_COMPLEX:
-            result->val.number.val.complex.real += next_number->val.number.val.complex.real;
-            result->val.number.val.complex.imag += next_number->val.number.val.complex.imag;
+            result->val.number->val.complex->real += next_number->val.number->val.complex->real;
+            result->val.number->val.complex->imag += next_number->val.number->val.complex->imag;
             break;
         }
         break;
@@ -795,7 +795,7 @@ object prim_arith_minus(object o) {
     object result = car(o);
 
     object negative_part = prim_arith_plus(cdr(o));
-    switch (negative_part->val.number.numtype) {
+    switch (negative_part->val.number->numtype) {
     case NUM_PINFTY:
         negative_part = minus_inf;
         break;
@@ -810,16 +810,16 @@ object prim_arith_minus(object o) {
 
     case NUM_INTEGER:
     case NUM_UINTEGER:
-        negative_part = make_integer(-negative_part->val.number.val.integer);
+        negative_part = make_integer(-negative_part->val.number->val.integer);
         break;
 
     case NUM_REAL:
-        negative_part = make_real(-negative_part->val.number.val.real);
+        negative_part = make_real(-negative_part->val.number->val.real);
         break;
 
     case NUM_COMPLEX:
-        negative_part = make_complex(-negative_part->val.number.val.complex.real,
-                                     -negative_part->val.number.val.complex.imag);
+        negative_part = make_complex(-negative_part->val.number->val.complex->real,
+                                     -negative_part->val.number->val.complex->imag);
         break;
     }
 
@@ -843,13 +843,13 @@ restart:
         return NULL;
     }
 
-    switch (result->val.number.numtype) {
+    switch (result->val.number->numtype) {
     case NUM_UNDEF:
         return NaN;
         break;
 
     case NUM_PINFTY:
-        switch (next_number->val.number.numtype) {
+        switch (next_number->val.number->numtype) {
         case NUM_UNDEF:
             return NaN;
 
@@ -863,17 +863,17 @@ restart:
 
         case NUM_UINTEGER:
         case NUM_INTEGER:
-            if (next_number->val.number.val.integer == 0) {
+            if (next_number->val.number->val.integer == 0) {
                 return NaN;
             }
-            result = (next_number->val.number.val.integer > 0) ? plus_inf : minus_inf;
+            result = (next_number->val.number->val.integer > 0) ? plus_inf : minus_inf;
             break;
 
         case NUM_REAL:
-            if (next_number->val.number.val.real == 0) {
+            if (next_number->val.number->val.real == 0) {
                 return NaN;
             }
-            result = (next_number->val.number.val.real > 0) ? plus_inf : minus_inf;
+            result = (next_number->val.number->val.real > 0) ? plus_inf : minus_inf;
             break;
 
         case NUM_COMPLEX:
@@ -883,7 +883,7 @@ restart:
         break;
 
     case NUM_MINFTY:
-        switch (next_number->val.number.numtype) {
+        switch (next_number->val.number->numtype) {
         case NUM_UNDEF:
             return NaN;
 
@@ -897,17 +897,17 @@ restart:
 
         case NUM_UINTEGER:
         case NUM_INTEGER:
-            if (next_number->val.number.val.integer == 0) {
+            if (next_number->val.number->val.integer == 0) {
                 return NaN;
             }
-            result = (next_number->val.number.val.integer < 0) ? plus_inf : minus_inf;
+            result = (next_number->val.number->val.integer < 0) ? plus_inf : minus_inf;
             break;
 
         case NUM_REAL:
-            if (next_number->val.number.val.real == 0) {
+            if (next_number->val.number->val.real == 0) {
                 return NaN;
             }
-            result = (next_number->val.number.val.real < 0) ? plus_inf : minus_inf;
+            result = (next_number->val.number->val.real < 0) ? plus_inf : minus_inf;
             break;
 
         case NUM_COMPLEX:
@@ -918,87 +918,87 @@ restart:
 
     case NUM_INTEGER:
     case NUM_UINTEGER:
-        switch (next_number->val.number.numtype) {
+        switch (next_number->val.number->numtype) {
         case NUM_UNDEF:
             return NaN;
 
         case NUM_PINFTY:
-            if (result->val.number.val.integer == 0) {
+            if (result->val.number->val.integer == 0) {
                 return NaN;
             }
-            result = (result->val.number.val.integer > 0) ? plus_inf : minus_inf;
+            result = (result->val.number->val.integer > 0) ? plus_inf : minus_inf;
             break;
 
         case NUM_MINFTY:
-            if (result->val.number.val.integer == 0) {
+            if (result->val.number->val.integer == 0) {
                 return NaN;
             }
-            result = (result->val.number.val.integer > 0) ? minus_inf : plus_inf;
+            result = (result->val.number->val.integer > 0) ? minus_inf : plus_inf;
             break;
 
         case NUM_UINTEGER:
         case NUM_INTEGER:
-            result->val.number.val.integer *= next_number->val.number.val.integer;
+            result->val.number->val.integer *= next_number->val.number->val.integer;
             break;
 
         case NUM_REAL:
             result = to_real(result);
-            result->val.number.val.real *= next_number->val.number.val.real;
+            result->val.number->val.real *= next_number->val.number->val.real;
             break;
 
         case NUM_COMPLEX:
             result = to_complex(result);
             result = make_complex(
                          /* Real part */
-                         next_number->val.number.val.complex.real *
-                         result->val.number.val.complex.real,
+                         next_number->val.number->val.complex->real *
+                         result->val.number->val.complex->real,
                          /* Imaginary part */
-                         next_number->val.number.val.complex.imag *
-                         result->val.number.val.complex.real);
+                         next_number->val.number->val.complex->imag *
+                         result->val.number->val.complex->real);
             break;
         }
         break;
 
     case NUM_REAL:
-        switch (next_number->val.number.numtype) {
+        switch (next_number->val.number->numtype) {
         case NUM_UNDEF:
             return NaN;
 
         case NUM_PINFTY:
-            if (result->val.number.val.real == 0) {
+            if (result->val.number->val.real == 0) {
                 return NaN;
             }
-            result = (result->val.number.val.real > 0) ? plus_inf : minus_inf;
+            result = (result->val.number->val.real > 0) ? plus_inf : minus_inf;
             break;
 
         case NUM_MINFTY:
-            if (result->val.number.val.real == 0) {
+            if (result->val.number->val.real == 0) {
                 return NaN;
             }
-            result = (result->val.number.val.real > 0) ? minus_inf : plus_inf;
+            result = (result->val.number->val.real > 0) ? minus_inf : plus_inf;
             break;
 
         case NUM_UINTEGER:
         case NUM_INTEGER:
-            result->val.number.val.real *= next_number->val.number.val.integer;
+            result->val.number->val.real *= next_number->val.number->val.integer;
             break;
 
         case NUM_REAL:
-            result->val.number.val.real *= next_number->val.number.val.real;
+            result->val.number->val.real *= next_number->val.number->val.real;
             break;
 
         case NUM_COMPLEX:
             result = to_complex(result);
-            result = make_complex(next_number->val.number.val.complex.real *
-                                  result->val.number.val.complex.real,
-                                  next_number->val.number.val.complex.imag *
-                                  result->val.number.val.complex.real);
+            result = make_complex(next_number->val.number->val.complex->real *
+                                  result->val.number->val.complex->real,
+                                  next_number->val.number->val.complex->imag *
+                                  result->val.number->val.complex->real);
             break;
         }
         break;
 
     case NUM_COMPLEX:
-        switch (next_number->val.number.numtype) {
+        switch (next_number->val.number->numtype) {
         case NUM_UNDEF:
             return NaN;
 
@@ -1009,27 +1009,27 @@ restart:
 
         case NUM_UINTEGER:
         case NUM_INTEGER:
-            result->val.number.val.complex.real *= next_number->val.number.val.integer;
-            result->val.number.val.complex.imag *= next_number->val.number.val.integer;
+            result->val.number->val.complex->real *= next_number->val.number->val.integer;
+            result->val.number->val.complex->imag *= next_number->val.number->val.integer;
             break;
 
         case NUM_REAL:
-            result->val.number.val.complex.real *= next_number->val.number.val.real;
-            result->val.number.val.complex.imag *= next_number->val.number.val.real;
+            result->val.number->val.complex->real *= next_number->val.number->val.real;
+            result->val.number->val.complex->imag *= next_number->val.number->val.real;
             break;
 
         case NUM_COMPLEX:
             result = make_complex(
                          /* Real part */
-                         next_number->val.number.val.complex.real *
-                         result->val.number.val.complex.real -
-                         next_number->val.number.val.complex.imag *
-                         result->val.number.val.complex.imag,
+                         next_number->val.number->val.complex->real *
+                         result->val.number->val.complex->real -
+                         next_number->val.number->val.complex->imag *
+                         result->val.number->val.complex->imag,
                          /* Imaginary part */
-                         next_number->val.number.val.complex.real *
-                         result->val.number.val.complex.imag +
-                         next_number->val.number.val.complex.imag *
-                         result->val.number.val.complex.real);
+                         next_number->val.number->val.complex->real *
+                         result->val.number->val.complex->imag +
+                         next_number->val.number->val.complex->imag *
+                         result->val.number->val.complex->real);
             break;
         }
         break;
@@ -1060,7 +1060,7 @@ object prim_arith_division(object o) {
     }
 
     double abs = 0;
-    switch (denominator->val.number.numtype) {
+    switch (denominator->val.number->numtype) {
     case NUM_PINFTY:
     case NUM_MINFTY:
         denominator = make_integer(0);
@@ -1072,19 +1072,19 @@ object prim_arith_division(object o) {
 
     case NUM_INTEGER:
     case NUM_UINTEGER:
-        denominator = make_real(1.0L / denominator->val.number.val.integer);
+        denominator = make_real(1.0L / denominator->val.number->val.integer);
         break;
 
     case NUM_REAL:
-        denominator = make_real(1.0L / denominator->val.number.val.real);
+        denominator = make_real(1.0L / denominator->val.number->val.real);
         break;
 
     case NUM_COMPLEX:
-        abs = pow(denominator->val.number.val.complex.real, 2) +
-              pow(denominator->val.number.val.complex.imag, 2);
+        abs = pow(denominator->val.number->val.complex->real, 2) +
+              pow(denominator->val.number->val.complex->imag, 2);
         sfs_print(denominator);
-        denominator = make_complex(denominator->val.number.val.complex.real / abs,
-                                   -denominator->val.number.val.complex.imag / abs);
+        denominator = make_complex(denominator->val.number->val.complex->real / abs,
+                                   -denominator->val.number->val.complex->imag / abs);
         break;
     }
 

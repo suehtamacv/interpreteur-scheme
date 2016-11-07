@@ -614,14 +614,14 @@ object sfs_read_integer_number(char *input, uint *h) {
     object atom = make_object(SFS_NUMBER);
 
     if (input[*h] == '+') {
-        atom->val.number.numtype = NUM_INTEGER;
+        atom->val.number->numtype = NUM_INTEGER;
         (*h)++;
     } else if (input[*h] == '-') {
-        atom->val.number.numtype = NUM_INTEGER;
+        atom->val.number->numtype = NUM_INTEGER;
         (*h)++;
         k = -1;
     } else {
-        atom->val.number.numtype = NUM_UINTEGER;
+        atom->val.number->numtype = NUM_UINTEGER;
     }
 
     long int cur_num = 0;
@@ -636,9 +636,9 @@ object sfs_read_integer_number(char *input, uint *h) {
 
         if (cur_num > INT_MAX) { /* Test si un overflow a eu lieu. */
             if (k == 1) {
-                atom->val.number.numtype = NUM_PINFTY;
+                atom->val.number->numtype = NUM_PINFTY;
             } else {
-                atom->val.number.numtype = NUM_MINFTY;
+                atom->val.number->numtype = NUM_MINFTY;
             }
         }
     } while (input[*h] != ' ' &&
@@ -650,12 +650,12 @@ object sfs_read_integer_number(char *input, uint *h) {
              input[*h] != EOF);
 
     /* Considere que le nombre peut etre negatif */
-    atom->val.number.val.integer = cur_num * k;
+    atom->val.number->val.integer = cur_num * k;
 
-    if (atom->val.number.numtype == NUM_INTEGER) {
-        DEBUG_MSG("Reading a NUM_INTEGER: %d", atom->val.number.val.integer);
-    } else if (atom->val.number.numtype == NUM_UINTEGER) {
-        DEBUG_MSG("Reading a NUM_UINTEGER: %d", atom->val.number.val.integer);
+    if (atom->val.number->numtype == NUM_INTEGER) {
+        DEBUG_MSG("Reading a NUM_INTEGER: %d", atom->val.number->val.integer);
+    } else if (atom->val.number->numtype == NUM_UINTEGER) {
+        DEBUG_MSG("Reading a NUM_UINTEGER: %d", atom->val.number->val.integer);
     }
     return atom;
 }
@@ -663,7 +663,7 @@ object sfs_read_integer_number(char *input, uint *h) {
 object sfs_read_complex_number(char *input, uint *h) {
     object atom = make_object(SFS_NUMBER);
     short k = 1;
-    atom->val.number.numtype = NUM_COMPLEX;
+    atom->val.number->numtype = NUM_COMPLEX;
     double real = 0, imag = 0;
 
     if (input[*h] == '-') {
@@ -740,8 +740,9 @@ object sfs_read_complex_number(char *input, uint *h) {
 
     imag *= k;
 
-    atom->val.number.val.complex.real = real;
-    atom->val.number.val.complex.imag = imag;
+    // TODO correct this
+    //atom->val.number->val.complex->real = real;
+    //atom->val.number->val.complex->imag = imag;
 
     DEBUG_MSG("Reading a NUM_COMPLEX: (%f) + j (%f)", real, imag);
     return atom;
@@ -750,7 +751,7 @@ object sfs_read_complex_number(char *input, uint *h) {
 object sfs_read_real_number(char *input, uint *h) {
     object atom = make_object(SFS_NUMBER);
     short k = 1;
-    atom->val.number.numtype = NUM_REAL;
+    atom->val.number->numtype = NUM_REAL;
 
     if (input[*h] == '-') {
         k = -1; /* Une constante pour considerer les nombres negatifs */
@@ -789,8 +790,8 @@ object sfs_read_real_number(char *input, uint *h) {
              input[*h] != EOF);
 
     /* Considere que le nombre peut etre negatif */
-    atom->val.number.val.real = cur_number * k;
+    atom->val.number->val.real = cur_number * k;
 
-    DEBUG_MSG("Reading a NUM_REAL: %f", atom->val.number.val.real);
+    DEBUG_MSG("Reading a NUM_REAL: %f", atom->val.number->val.real);
     return atom;
 }
