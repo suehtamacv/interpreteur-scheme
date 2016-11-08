@@ -683,6 +683,8 @@ object sfs_read_complex_number(char *input, uint *h) {
                 atom->val.number->val.complex->real, nil));
     }
 
+    *h += real_p + imag_p + 1;
+
     DEBUG_MSG("Reading a NUM_COMPLEX");
     return atom;
 }

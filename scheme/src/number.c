@@ -134,16 +134,10 @@ object to_complex(object o) {
     case NUM_REAL:
     case NUM_INTEGER:
     case NUM_UINTEGER:
-        return make_complex(o, make_number(0));
-
     case NUM_PINFTY:
     case NUM_MINFTY:
-        WARNING_MSG("Cannot convert +inf or -inf to complex");
-        return NULL;
-
     case NUM_UNDEF:
-        WARNING_MSG("Cannot convert NaN to complex");
-        return NULL;
+        return make_complex(o, make_number(0));
     }
 
     return NULL;

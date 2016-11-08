@@ -5,6 +5,7 @@
 #include <lists.h>
 #include <print.h>
 #include <math.h>
+#include <mem.h>
 
 #define TEST_NUMB_ARGUMENT_EQ(n_Arg, nomFunction) \
     if (list_length(o) != n_Arg) { \
@@ -649,12 +650,32 @@ restart:
 
     switch (result->val.number->numtype) {
     case NUM_UNDEF:
-        return NaN;
+        switch (next_number->val.number->numtype) {
+        case NUM_COMPLEX:
+            result = to_complex(result);
+            result->val.number->val.complex->imag = imag_part(next_number->val.number);
+            break;
+
+        default:
+            break;
+        }
+        break;
 
     case NUM_PINFTY:
         switch (next_number->val.number->numtype) {
+        case NUM_UNDEF:
+            result = NaN;
+            break;
+
         case NUM_MINFTY:
             return NaN; /* (+ +inf -inf) = NaN */
+
+        case NUM_COMPLEX:
+            result = to_complex(result);
+            result->val.number->val.complex->imag =
+                prim_arith_plus(list(imag_part(result->val.number),
+                                     imag_part(next_number->val.number)));
+            break;
 
         default:
             break;
@@ -663,8 +684,17 @@ restart:
 
     case NUM_MINFTY:
         switch (next_number->val.number->numtype) {
+        case NUM_UNDEF:
         case NUM_PINFTY:
-            return NaN; /* (+ -inf +inf) = NaN */
+            result = NaN; /* (+ -inf +inf) = NaN */
+            break;
+
+        case NUM_COMPLEX:
+            result = to_complex(result);
+            result->val.number->val.complex->imag =
+                prim_arith_plus(list(imag_part(result->val.number),
+                                     imag_part(next_number->val.number)));
+            break;
 
         default:
             break;
@@ -683,7 +713,8 @@ restart:
             break;
 
         case NUM_UNDEF:
-            return NaN;
+            result = NaN;
+            break;
 
         case NUM_INTEGER:
         case NUM_UINTEGER:
@@ -700,7 +731,7 @@ restart:
             result->val.number->val.complex->real = prim_arith_plus(list(
                     real_part(result->val.number),
                     real_part(next_number->val.number)));
-            result->val.number->val.complex->real = prim_arith_plus(list(
+            result->val.number->val.complex->imag = prim_arith_plus(list(
                     imag_part(result->val.number),
                     imag_part(next_number->val.number)));
             break;
@@ -718,7 +749,8 @@ restart:
             break;
 
         case NUM_UNDEF:
-            return NaN;
+            result = NaN;
+            break;
 
         case NUM_INTEGER:
         case NUM_UINTEGER:
@@ -734,7 +766,7 @@ restart:
             result->val.number->val.complex->real = prim_arith_plus(list(
                     real_part(result->val.number),
                     real_part(next_number->val.number)));
-            result->val.number->val.complex->real = prim_arith_plus(list(
+            result->val.number->val.complex->imag = prim_arith_plus(list(
                     imag_part(result->val.number),
                     imag_part(next_number->val.number)));
             break;
@@ -744,15 +776,12 @@ restart:
     case NUM_COMPLEX:
         switch (next_number->val.number->numtype) {
         case NUM_PINFTY:
-            result = plus_inf;
-            break;
-
         case NUM_MINFTY:
-            result = minus_inf;
-            break;
-
         case NUM_UNDEF:
-            return NaN;
+            result->val.number->val.complex->real =
+                prim_arith_plus(list(real_part(result->val.number),
+                                     real_part(next_number->val.number)));
+            break;
 
         case NUM_INTEGER:
         case NUM_UINTEGER:
@@ -766,7 +795,7 @@ restart:
             result->val.number->val.complex->real = prim_arith_plus(list(
                     real_part(result->val.number),
                     real_part(next_number->val.number)));
-            result->val.number->val.complex->real = prim_arith_plus(list(
+            result->val.number->val.complex->imag = prim_arith_plus(list(
                     imag_part(result->val.number),
                     imag_part(next_number->val.number)));
             break;
@@ -816,8 +845,8 @@ object prim_arith_minus(object o) {
 
     case NUM_COMPLEX:
         negative_part = make_complex(
-                            prim_arith_minus(real_part(negative_part->val.number)),
-                            prim_arith_minus(imag_part(negative_part->val.number)));
+                            prim_arith_minus(cons(real_part(negative_part->val.number), nil)),
+                            prim_arith_minus(cons(imag_part(negative_part->val.number), nil)));
         break;
     }
 
@@ -841,15 +870,29 @@ restart:
         return NULL;
     }
 
+    object rescpy = make_number(NUM_COMPLEX);
+
     switch (result->val.number->numtype) {
     case NUM_UNDEF:
-        return NaN;
+        switch (next_number->val.number->numtype) {
+        case NUM_COMPLEX:
+            result = to_complex(result);
+            result->val.number->val.complex->real = prim_arith_times(list(NaN,
+                                                    real_part(result->val.number)));
+            result->val.number->val.complex->imag = prim_arith_times(list(NaN,
+                                                    imag_part(result->val.number)));
+            break;
+
+        default:
+            break;
+        }
         break;
 
     case NUM_PINFTY:
         switch (next_number->val.number->numtype) {
         case NUM_UNDEF:
-            return NaN;
+            result = NaN;
+            break;
 
         case NUM_PINFTY:
             result = plus_inf;
@@ -875,15 +918,19 @@ restart:
             break;
 
         case NUM_COMPLEX:
-            WARNING_MSG("Can't multiply a complex number by infinity: phase not well defined");
-            return NULL;
+            result->val.number->val.complex->real = prim_arith_times(list(plus_inf,
+                                                    real_part(result->val.number)));
+            result->val.number->val.complex->imag = prim_arith_times(list(plus_inf,
+                                                    imag_part(result->val.number)));
+            break;
         }
         break;
 
     case NUM_MINFTY:
         switch (next_number->val.number->numtype) {
         case NUM_UNDEF:
-            return NaN;
+            result = NaN;
+            break;
 
         case NUM_PINFTY:
             result = minus_inf;
@@ -909,8 +956,11 @@ restart:
             break;
 
         case NUM_COMPLEX:
-            WARNING_MSG("Can't multiply a complex number by infinity: phase not well defined");
-            return NULL;
+            result->val.number->val.complex->real = prim_arith_times(list(minus_inf,
+                                                    real_part(result->val.number)));
+            result->val.number->val.complex->imag = prim_arith_times(list(minus_inf,
+                                                    imag_part(result->val.number)));
+            break;
         }
         break;
 
@@ -918,20 +968,23 @@ restart:
     case NUM_UINTEGER:
         switch (next_number->val.number->numtype) {
         case NUM_UNDEF:
-            return NaN;
+            result = NaN;
+            break;
 
         case NUM_PINFTY:
             if (result->val.number->val.integer == 0) {
-                return NaN;
+                result = NaN;
+            } else {
+                result = (result->val.number->val.integer > 0) ? plus_inf : minus_inf;
             }
-            result = (result->val.number->val.integer > 0) ? plus_inf : minus_inf;
             break;
 
         case NUM_MINFTY:
             if (result->val.number->val.integer == 0) {
-                return NaN;
+                result = NaN;
+            } else {
+                result = (result->val.number->val.integer > 0) ? minus_inf : plus_inf;
             }
-            result = (result->val.number->val.integer > 0) ? minus_inf : plus_inf;
             break;
 
         case NUM_UINTEGER:
@@ -946,13 +999,20 @@ restart:
 
         case NUM_COMPLEX:
             result = to_complex(result);
-            object rescpy = result;
-            result->val.number->val.complex->real =
-                prim_arith_times(list(real_part(rescpy->val.number),
-                                      real_part(next_number->val.number)));
-            result->val.number->val.complex->real =
-                prim_arith_times(list(imag_part(rescpy->val.number),
-                                      imag_part(next_number->val.number)));
+            rescpy->val.number->val.complex->real = sfs_malloc(sizeof(*
+                                                    (result->val.number->val.complex->real)));
+            rescpy->val.number->val.complex->imag = sfs_malloc(sizeof(*
+                                                    (result->val.number->val.complex->imag)));
+            memcpy(rescpy->val.number->val.complex->real,
+                   result->val.number->val.complex->real,
+                   sizeof(*(result->val.number->val.complex->real)));
+            memcpy(rescpy->val.number->val.complex->imag,
+                   result->val.number->val.complex->imag,
+                   sizeof(*(result->val.number->val.complex->imag)));
+            result->val.number->val.complex->real = prim_arith_times(list(real_part(
+                    rescpy->val.number), real_part(next_number->val.number)));
+            result->val.number->val.complex->imag = prim_arith_times(list(real_part(
+                    rescpy->val.number), imag_part(next_number->val.number)));
             break;
         }
         break;
@@ -960,7 +1020,8 @@ restart:
     case NUM_REAL:
         switch (next_number->val.number->numtype) {
         case NUM_UNDEF:
-            return NaN;
+            result = NaN;
+            break;
 
         case NUM_PINFTY:
             if (result->val.number->val.real == 0) {
@@ -987,13 +1048,20 @@ restart:
 
         case NUM_COMPLEX:
             result = to_complex(result);
-            object rescpy = result;
-            result->val.number->val.complex->real =
-                prim_arith_times(list(real_part(rescpy->val.number),
-                                      real_part(next_number->val.number)));
-            result->val.number->val.complex->real =
-                prim_arith_times(list(imag_part(rescpy->val.number),
-                                      imag_part(next_number->val.number)));
+            rescpy->val.number->val.complex->real = sfs_malloc(sizeof(*
+                                                    (result->val.number->val.complex->real)));
+            rescpy->val.number->val.complex->imag = sfs_malloc(sizeof(*
+                                                    (result->val.number->val.complex->imag)));
+            memcpy(rescpy->val.number->val.complex->real,
+                   result->val.number->val.complex->real,
+                   sizeof(*(result->val.number->val.complex->real)));
+            memcpy(rescpy->val.number->val.complex->imag,
+                   result->val.number->val.complex->imag,
+                   sizeof(*(result->val.number->val.complex->imag)));
+            result->val.number->val.complex->real = prim_arith_times(list(real_part(
+                    rescpy->val.number), real_part(next_number->val.number)));
+            result->val.number->val.complex->imag = prim_arith_times(list(real_part(
+                    rescpy->val.number), imag_part(next_number->val.number)));
             break;
         }
         break;
@@ -1001,12 +1069,13 @@ restart:
     case NUM_COMPLEX:
         switch (next_number->val.number->numtype) {
         case NUM_UNDEF:
-            return NaN;
-
         case NUM_MINFTY:
         case NUM_PINFTY:
-            WARNING_MSG("Can't multiply a complex number by infinity: phase not well defined");
-            return NULL;
+            result->val.number->val.complex->real = prim_arith_times(list(next_number,
+                                                    real_part(result->val.number)));
+            result->val.number->val.complex->imag = prim_arith_times(list(next_number,
+                                                    imag_part(result->val.number)));
+            break;
 
         case NUM_UINTEGER:
         case NUM_INTEGER:
@@ -1019,7 +1088,16 @@ restart:
 
         case NUM_COMPLEX:
             result = to_complex(result);
-            object rescpy = result;
+            rescpy->val.number->val.complex->real = sfs_malloc(sizeof(*
+                                                    (result->val.number->val.complex->real)));
+            rescpy->val.number->val.complex->imag = sfs_malloc(sizeof(*
+                                                    (result->val.number->val.complex->imag)));
+            memcpy(rescpy->val.number->val.complex->real,
+                   result->val.number->val.complex->real,
+                   sizeof(*(result->val.number->val.complex->real)));
+            memcpy(rescpy->val.number->val.complex->imag,
+                   result->val.number->val.complex->imag,
+                   sizeof(*(result->val.number->val.complex->imag)));
             result->val.number->val.complex->real = prim_arith_minus(list(
                     prim_arith_times(list(real_part(next_number->val.number),
                                           real_part(rescpy->val.number))),
@@ -1079,7 +1157,8 @@ object prim_arith_division(object o) {
         break;
 
     case NUM_COMPLEX:
-        denominator = prim_arith_division(list(num_conj(denominator), num_abs(denominator)));
+        denominator = prim_arith_division(list(num_conj(denominator),
+                                               num_abs(denominator)));
         break;
     }
 

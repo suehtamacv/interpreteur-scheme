@@ -153,7 +153,7 @@ void sfs_print_number(object o) {
 
     case NUM_COMPLEX:
         sfs_print_number(real_part(o->val.number));
-        if (is_Negative(imag_part(o->val.number)) == False) {
+        if (imag_part(o->val.number) == NaN || is_Negative(imag_part(o->val.number)) == False) {
             printf("+");
         }
         sfs_print_number(imag_part(o->val.number));
