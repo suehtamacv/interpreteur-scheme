@@ -210,7 +210,9 @@ object prim_is_eq(object o) {
         return _true;
     }
 restart:
-    if (car(o) != cadr(o)) {
+    if (is_Symbol(car(o)) == True && is_Symbol(cadr(o)) == True) {
+        return (strcmp(car(o)->val.string, cadr(o)->val.string) == 0 ? _true : _false);
+    } else if (car(o) != cadr(o)) {
         return _false;
     } else {
         o = cdr(o);
