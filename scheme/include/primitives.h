@@ -35,6 +35,13 @@ object prim_set_cdr(object);
 object prim_cons(object);
 object prim_list(object);
 
+/* Those are the conversation primitives */
+object prim_integer_to_char(object);
+object prim_char_to_integer(object);
+object prim_number_to_string(object);
+object prim_string_to_number(object);
+object prim_symbol_to_string(object);
+object prim_string_to_symbol(object);
 
 /* Those are ordering primitives */
 object prim_larger(object);

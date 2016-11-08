@@ -5,6 +5,7 @@
 #include <lists.h>
 #include <print.h>
 #include <math.h>
+#include <stdio.h>
 
 #define TEST_NUMB_ARGUMENT_EQ(n_Arg, nomFunction) \
     if (list_length(o) != n_Arg) { \
@@ -53,6 +54,14 @@ void create_basic_primitives() {
     create_primitive("<", prim_smaller);
     create_primitive("=", prim_equal);
 
+    /* Those are conversation primitives */
+    create_primitive("integer->char", prim_integer_to_char);
+    create_primitive("char->integer", prim_char_to_integer);
+    create_primitive("number->string", prim_number_to_string);
+    create_primitive("string->number", prim_string_to_number);
+    create_primitive("symbol->string", prim_symbol_to_string);
+    create_primitive("string->symbol", prim_string_to_symbol);
+
 
     /* Those are the basic arithmetic primitives */
     create_primitive("+", prim_arith_plus);
@@ -66,6 +75,101 @@ void create_primitive(string prim_name, object (*func)(object)) {
     define_symbol(make_symbol(prim_name), make_primitive(func, prim_name), 0);
 
 }
+
+object prim_string_to_number(object o) {
+    TEST_NUMB_ARGUMENT_EQ(1, "string->number");
+    if(is_String(car(o)) != True) {
+        WARNING_MSG("Wrong type of arguments on \"string->number\"");
+        return NULL;
+    } else {
+        /*if(is_Number(o->val.string) != True) {
+            WARNING_MSG("Can't convert string which isn't number");
+            return NULL;
+        } else {
+             if(is_Complex(o->val.string) == T)
+        }*/
+    }
+}
+
+object prim_string_to_symbol(object o) {
+    // TODO Faut corriger
+    TEST_NUMB_ARGUMENT_EQ(1, "string->symbol");
+    if(is_String(car(o)) != True) {
+        WARNING_MSG("Wrong type of arguments on \"string->symbol\"");
+        return NULL;
+    } else {
+        return make_symbol(car(o)->val.string);
+    }
+}
+object prim_symbol_to_string(object o) {
+    TEST_NUMB_ARGUMENT_EQ(1, "symbol->string");
+    if(is_Symbol(car(o)) != True) {
+        WARNING_MSG("Wrong type of arguments on \"symbol->string\"");
+        return NULL;
+    } else {
+        return make_string(car(o)->val.string);
+    }
+}
+
+object prim_number_to_string(object o) {
+    TEST_NUMB_ARGUMENT_EQ(1, "number->string");
+    if(is_Number(car(o)) != True) {
+        WARNING_MSG("Wrong type of arguments on \"number->string\"");
+        return NULL;
+    } else {
+        object str = make_string("");
+        switch (car(o)->val.number.numtype) {
+        case NUM_INTEGER:
+        case NUM_UINTEGER:
+            sprintf(str->val.string, "%d", car(o)->val.number.val.integer);
+            break;
+
+        case NUM_REAL:
+            sprintf(str->val.string, "%f", car(o)->val.number.val.real);
+            break;
+
+        case NUM_UNDEF:
+            sprintf(str->val.string, "NaN");
+            break;
+
+        case NUM_PINFTY:
+            sprintf(str->val.string, "+inf");
+            break;
+
+        case NUM_MINFTY:
+            sprintf(str->val.string, "-inf");
+            break;
+
+        }
+        return str;
+    }
+    return NULL;
+}
+
+object prim_char_to_integer(object o) {
+    TEST_NUMB_ARGUMENT_EQ(1, "char->integer");
+    if(is_Char(car(o)) != True) {
+        WARNING_MSG("Wrong type of arguments on \"char->integer\"");
+        return NULL;
+    } else {
+        return make_integer((int) car(o)->val.character);
+    }
+}
+
+object prim_integer_to_char(object o) {
+    TEST_NUMB_ARGUMENT_EQ(1, "integer->char");
+    if (car(o)->val.number.numtype != NUM_UINTEGER &&
+            car(o)->val.number.numtype != NUM_INTEGER) {
+        WARNING_MSG("Wrong type of arguments on \"integer->char\"");
+        return NULL;
+    } else if (car(o)->val.number.val.integer < 0) {
+        WARNING_MSG("Can not convert negative number to char");
+        return NULL;
+    } else {
+        return make_character((char) car(o)->val.number.val.integer);
+    }
+}
+
 object prim_is_eq(object o) {
     if (list_length(o) < 2) { /* (eq?) or (eq? argument1 ) ==> #t */
         return _true;

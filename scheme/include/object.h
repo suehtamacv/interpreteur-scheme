@@ -61,6 +61,9 @@ object make_symbol_table(void);
 object make_symbol(string);
 object make_string(string);
 object make_number(uint type);
+object make_character(char);
+object make_integer(int);
+
 
 /* The following functions are to verify the type of object */
 Bool is_True(object o);

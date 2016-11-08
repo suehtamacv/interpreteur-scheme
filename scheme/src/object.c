@@ -70,6 +70,12 @@ object make_string(string s) {
     return o;
 }
 
+object make_character (char i){
+    object o = make_object(SFS_CHARACTER);
+    o->val.character = i;
+    return o;
+}
+
 object make_number(uint type) {
     object o = make_object(SFS_NUMBER);
     o->val.number.numtype = type;
