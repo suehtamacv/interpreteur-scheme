@@ -14,6 +14,8 @@
 #include <limits.h>
 #include <strings.h>
 #include "read.h"
+#include "primitives.h"
+#include "lists.h"
 
 void flip( uint *i ) {
 
@@ -611,17 +613,17 @@ object sfs_read_symbol(char *input, uint *h) {
 
 object sfs_read_integer_number(char *input, uint *h) {
     short k = 1;
-    object atom = make_object(SFS_NUMBER);
+    object atom = make_number(0);
 
     if (input[*h] == '+') {
-        atom->val.number.numtype = NUM_INTEGER;
+        atom->val.number->numtype = NUM_INTEGER;
         (*h)++;
     } else if (input[*h] == '-') {
-        atom->val.number.numtype = NUM_INTEGER;
+        atom->val.number->numtype = NUM_INTEGER;
         (*h)++;
         k = -1;
     } else {
-        atom->val.number.numtype = NUM_UINTEGER;
+        atom->val.number->numtype = NUM_UINTEGER;
     }
 
     long int cur_num = 0;
@@ -636,9 +638,9 @@ object sfs_read_integer_number(char *input, uint *h) {
 
         if (cur_num > INT_MAX) { /* Test si un overflow a eu lieu. */
             if (k == 1) {
-                atom->val.number.numtype = NUM_PINFTY;
+                atom->val.number->numtype = NUM_PINFTY;
             } else {
-                atom->val.number.numtype = NUM_MINFTY;
+                atom->val.number->numtype = NUM_MINFTY;
             }
         }
     } while (input[*h] != ' ' &&
@@ -650,107 +652,47 @@ object sfs_read_integer_number(char *input, uint *h) {
              input[*h] != EOF);
 
     /* Considere que le nombre peut etre negatif */
-    atom->val.number.val.integer = cur_num * k;
+    atom->val.number->val.integer = cur_num * k;
 
-    if (atom->val.number.numtype == NUM_INTEGER) {
-        DEBUG_MSG("Reading a NUM_INTEGER: %d", atom->val.number.val.integer);
-    } else if (atom->val.number.numtype == NUM_UINTEGER) {
-        DEBUG_MSG("Reading a NUM_UINTEGER: %d", atom->val.number.val.integer);
+    if (atom->val.number->numtype == NUM_INTEGER) {
+        DEBUG_MSG("Reading a NUM_INTEGER: %d", atom->val.number->val.integer);
+    } else if (atom->val.number->numtype == NUM_UINTEGER) {
+        DEBUG_MSG("Reading a NUM_UINTEGER: %d", atom->val.number->val.integer);
     }
     return atom;
 }
 
 object sfs_read_complex_number(char *input, uint *h) {
-    object atom = make_object(SFS_NUMBER);
-    short k = 1;
-    atom->val.number.numtype = NUM_COMPLEX;
-    double real = 0, imag = 0;
+    object atom = make_number(NUM_COMPLEX);
 
-    if (input[*h] == '-') {
-        k = -1;
-        (*h)++;
-    } else if (input[*h] == '+') {
+    uint real_p = 0;
+    uint imag_p = 0;
+    string realpart, imagpart;
+
+    short is_negative = 0;
+    if (input[*h] == '+' || input[*h] == '-') {
+        is_negative = (input[*h] == '-' ? -1 : 1);
         (*h)++;
     }
+    sscanf(input + *h, "%[^+-]%[^ij]", realpart, imagpart);
 
-    do { /* Ca lit la partie entiere de la partie reele chiffre par chiffre */
-        if (!isdigit(input[*h])) {
-            WARNING_MSG("Invalid number found. \"%c\" is not a valid character in a number",
-                        input[*h]);
-            return NULL;
-        }
-        real  = 10 * real  + (input[*h] - '0');
-        (*h)++;
-    } while (input[*h] != '.' && input[*h] != '+' && input[*h] != '-');
-
-    if (input[*h] == '.') {
-        (*h)++;
-        double frac_constant = 0.1;
-        do { /* Ca lit la partie fractionnaire de la partie reele chiffre par chiffre */
-            if (!isdigit(input[*h])) {
-                WARNING_MSG("Invalid number found. \"%c\" is not a valid character in a number",
-                            input[*h]);
-                return NULL;
-            }
-            real = real  + frac_constant * (input[*h] - '0');
-            frac_constant /= 10.0;
-            (*h)++;
-        } while (input[*h] != '+' &&
-                 input[*h] != '-');
+    atom->val.number->val.complex->real = sfs_read_number(realpart, &real_p);
+    atom->val.number->val.complex->imag = sfs_read_number(imagpart, &imag_p);
+    if (is_negative == -1) {
+        atom->val.number->val.complex->real = prim_arith_minus(cons(
+                atom->val.number->val.complex->real, nil));
     }
 
-    real *= k;
-    if (input[*h] == '+') {
-        k = 1;
-    } else {
-        k = -1;
-    }
+    *h += real_p + imag_p + 1;
 
-    (*h)++; /* Apres le plus ou le moins */
-
-    do { /* Ca lit la partie entiere de la partie reele chiffre par chiffre */
-        if (!isdigit(input[*h])) {
-            WARNING_MSG("Invalid number found. \"%c\" is not a valid character in a number",
-                        input[*h]);
-            return NULL;
-        }
-        imag = 10 * imag + (input[*h] - '0');
-        (*h)++;
-    } while (input[*h] != '.' && input[*h] != ' ' && input[*h] != ')' &&
-             input[*h] != '(' && input[*h] != '\n' && input[*h] != '\0' &&
-             input[*h] != 'j' && input[*h] != 'i' && input[*h] != '"');
-
-    if (input[*h] == '.') {
-        (*h)++;
-        double frac_constant = 0.1;
-        do { /* Ca lit la partie fractionnaire de la partie reele chiffre par chiffre */
-            if (!isdigit(input[*h])) {
-                WARNING_MSG("Invalid number found. \"%c\" is not a valid character in a number",
-                            input[*h]);
-                return NULL;
-            }
-            imag = imag + frac_constant * (input[*h] - '0');
-            frac_constant /= 10.0;
-            (*h)++;
-        } while (input[*h] != ' ' && input[*h] != ')' && input[*h] != '(' &&
-                 input[*h] != '\n' && input[*h] != '\0' && input[*h] != 'j' &&
-                 input[*h] != 'i' && input[*h] != '"');
-    }
-    (*h)++;
-
-    imag *= k;
-
-    atom->val.number.val.complex.real = real;
-    atom->val.number.val.complex.imag = imag;
-
-    DEBUG_MSG("Reading a NUM_COMPLEX: (%f) + j (%f)", real, imag);
+    DEBUG_MSG("Reading a NUM_COMPLEX");
     return atom;
 }
 
 object sfs_read_real_number(char *input, uint *h) {
-    object atom = make_object(SFS_NUMBER);
+    object atom = make_number(0);
     short k = 1;
-    atom->val.number.numtype = NUM_REAL;
+    atom->val.number->numtype = NUM_REAL;
 
     if (input[*h] == '-') {
         k = -1; /* Une constante pour considerer les nombres negatifs */
@@ -789,8 +731,8 @@ object sfs_read_real_number(char *input, uint *h) {
              input[*h] != EOF);
 
     /* Considere que le nombre peut etre negatif */
-    atom->val.number.val.real = cur_number * k;
+    atom->val.number->val.real = cur_number * k;
 
-    DEBUG_MSG("Reading a NUM_REAL: %f", atom->val.number.val.real);
+    DEBUG_MSG("Reading a NUM_REAL: %f", atom->val.number->val.real);
     return atom;
 }

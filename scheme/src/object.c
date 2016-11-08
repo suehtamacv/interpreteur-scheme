@@ -11,7 +11,7 @@
 #include "forms.h"
 #include "mem.h"
 #include "number.h"
-
+#include <math.h>
 
 object make_object(object_type type) {
     object t = sfs_malloc(sizeof(*t));
@@ -78,7 +78,13 @@ object make_character (char i){
 
 object make_number(uint type) {
     object o = make_object(SFS_NUMBER);
-    o->val.number.numtype = type;
+    o->val.number = sfs_malloc(sizeof(*o->val.number));
+    o->val.number->numtype = type;
+
+    if (type == NUM_COMPLEX) {
+        o->val.number->val.complex = sfs_malloc(sizeof(*o->val.number->val.complex));
+    }
+
     return o;
 }
 
@@ -128,7 +134,7 @@ Bool is_Char(object o) {
 }
 
 Bool is_Nil(object o) {
-    if (o && o->type == SFS_NIL) {
+    if (o && o == nil) {
         return True;
     }
     return False;
@@ -143,7 +149,7 @@ Bool is_Number(object o) {
 
 Bool is_Complex(object o) {
     if (o && o->type == SFS_NUMBER) {
-        switch (o->val.number.numtype) {
+        switch (o->val.number->numtype) {
         case NUM_INTEGER:
         case NUM_UINTEGER:
         case NUM_REAL:
@@ -157,12 +163,109 @@ Bool is_Complex(object o) {
     return False;
 }
 
+Bool is_Zero(object o) {
+    if (o && is_Number(o) == True) {
+        switch (o->val.number->numtype) {
+        case NUM_UNDEF:
+        case NUM_PINFTY:
+        case NUM_MINFTY:
+            return False;
+
+        case NUM_INTEGER:
+        case NUM_UINTEGER:
+            return (o->val.number->val.integer == 0 ? True : False);
+
+        case NUM_REAL:
+            return (o->val.number->val.real == 0 ? True : False);
+
+        case NUM_COMPLEX:
+            return (is_Zero(real_part(o->val.number)) == True &&
+                    is_Zero(imag_part(o->val.number)) == True) ?
+                   True : False;
+        }
+    }
+    return False;
+}
+
+Bool is_Positive(object o) {
+    if (!o) {
+        WARNING_MSG("Invalid object");
+        return -1;
+    }
+    if (o->type != SFS_NUMBER) {
+        WARNING_MSG("Only numbers can be said to be positive");
+        return -1;
+    }
+
+    switch (o->val.number->numtype) {
+    case NUM_PINFTY:
+        return True;
+
+    case NUM_MINFTY:
+        return False;
+
+    case NUM_UINTEGER:
+    case NUM_INTEGER:
+        return (o->val.number->val.integer > 0 ? True : False);
+
+    case NUM_REAL:
+        return (o->val.number->val.real > 0 ? True : False);
+
+    case NUM_COMPLEX:
+        WARNING_MSG("There is no ordering relation on the complex numbers");
+        return -1;
+
+    default:
+        WARNING_MSG("Wrong number type (%d)", o->val.number->numtype);
+        return -1;
+    }
+}
+
+Bool is_Negative(object o) {
+    if (is_Zero(o) == True) {
+        return False;
+    }
+    if (is_Positive(o) == True) {
+        return False;
+    }
+
+    return (is_Zero(o) != (unsigned) - 1 &&
+            is_Positive(o) != (unsigned) - 1 ? True : (unsigned) - 1);
+}
+
 Bool is_Integer(object o) {
     if (o && o->type == SFS_NUMBER) {
-        switch (o->val.number.numtype) {
+        switch (o->val.number->numtype) {
         case NUM_INTEGER:
         case NUM_UINTEGER:
             return True;
+
+        case NUM_REAL:
+            return (fmod(o->val.number->val.real, 1.0) == 0 ? True : False);
+
+        case NUM_COMPLEX:
+            if (is_Zero(imag_part(o->val.number)) == False) {
+                return False;
+            } else {
+                switch (real_part(o->val.number)->val.number->numtype) {
+                case NUM_PINFTY:
+                case NUM_MINFTY:
+                case NUM_COMPLEX:
+                case NUM_UNDEF:
+                    return False;
+                    break;
+
+                case NUM_INTEGER:
+                case NUM_UINTEGER:
+                    return True;
+                    break;
+
+                case NUM_REAL:
+                    return (fmod(real_part(o->val.number)->val.number->val.real,
+                                 1.0) == 0 ? True : False);
+                    break;
+                }
+            }
 
         default:
             return False;
@@ -173,7 +276,7 @@ Bool is_Integer(object o) {
 
 Bool is_Real(object o) {
     if (o && o->type == SFS_NUMBER) {
-        switch (o->val.number.numtype) {
+        switch (o->val.number->numtype) {
         case NUM_INTEGER:
         case NUM_UINTEGER:
         case NUM_REAL:
@@ -181,7 +284,7 @@ Bool is_Real(object o) {
             break;
 
         case NUM_COMPLEX:
-            return (o->val.number.val.complex.imag == 0 ? True : False);
+            return is_Zero(imag_part(o->val.number));
             break;
 
         default:

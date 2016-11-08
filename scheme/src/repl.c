@@ -32,6 +32,7 @@ void usage_error( char *command ) {
 
 /* Singletons */
 object nil;
+object _void;
 object _true;
 object _false;
 object symbol_table;
@@ -42,6 +43,7 @@ object NaN;
 void init_interpreter (void) {
     /* Crée les singletons */
     nil = make_nil();
+    _void = make_nil();
     _true = make_true();
     _false = make_false();
     plus_inf = make_number(NUM_PINFTY);
@@ -159,6 +161,10 @@ int main (int argc, char *argv[]) {
             }
             /*sinon on rend la main à l'utilisateur*/
             continue ;
+        }
+
+        if (output == _void) {
+            continue;
         }
 
         printf( "==> " );

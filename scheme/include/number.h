@@ -20,7 +20,8 @@ typedef enum number_type_t {
     NUM_REAL, NUM_INTEGER, NUM_UINTEGER, NUM_COMPLEX, NUM_UNDEF, NUM_PINFTY, NUM_MINFTY
 } number_type;
 
-struct num_t;
+typedef struct num_t *number;
+typedef struct object_t *object;
 
 /**
  * @brief The complex_t struct is used to create the structure of a
@@ -31,12 +32,12 @@ typedef struct complex_t {
     /**
      * @brief real is the real part of the complex number.
      */
-    double real;
+    object real;
     /**
      * @brief imag is the imaginary part of the complex number.
      */
-    double imag;
-} complex;
+    object imag;
+} *complex;
 
 typedef struct num_t {
 
@@ -47,18 +48,22 @@ typedef struct num_t {
         complex      complex;
     } val;
 
-} num;
+} *num;
 
-typedef struct object_t *object;
 
 object make_integer(int);
 object make_uinteger(int);
 object make_real(double);
-object make_complex(double, double);
+object make_complex(object, object);
 
 object to_integer(object);
 object to_real(object);
 object to_complex(object);
+
+object real_part(number);
+object imag_part(number);
+object num_abs(object);
+object num_conj(object);
 
 #ifdef __cplusplus
 }

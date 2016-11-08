@@ -98,7 +98,7 @@ restart:
     }
 
     if (define_result == 0) {
-        return car(o);    /* Define returns symbol itself */
+        return _void;    /* Define returns void */
     } else {
         return NULL; /* Could not define */
     }
@@ -142,7 +142,7 @@ object form_set(object o) {
     }
 
     if (set_symbol(car(o), cadr(o), 0) == 0) { /* Success */
-        return car(o);
+        return _void;
     } else {
         return NULL;
     }

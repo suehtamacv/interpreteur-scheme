@@ -138,27 +138,26 @@ void sfs_print_number(object o) {
         sfs_print(o);
     }
 
-    switch (o->val.number.numtype) {
+    switch (o->val.number->numtype) {
     case NUM_UINTEGER:
-        printf("%d", o->val.number.val.integer);
+        printf("%d", o->val.number->val.integer);
         break;
 
     case NUM_INTEGER:
-        printf("%d", o->val.number.val.integer);
+        printf("%d", o->val.number->val.integer);
         break;
 
     case NUM_REAL:
-        printf("%lg", o->val.number.val.real);
+        printf("%lg", o->val.number->val.real);
         break;
 
     case NUM_COMPLEX:
-        if (o->val.number.val.complex.imag >= 0) {
-            printf("%lg+%lgj", o->val.number.val.complex.real,
-                   o->val.number.val.complex.imag);
-        } else {
-            printf("%lg%lgj", o->val.number.val.complex.real,
-                   o->val.number.val.complex.imag);
+        sfs_print_number(real_part(o->val.number));
+        if (imag_part(o->val.number) == NaN || is_Negative(imag_part(o->val.number)) == False) {
+            printf("+");
         }
+        sfs_print_number(imag_part(o->val.number));
+        printf("j");
         break;
 
     case NUM_PINFTY:

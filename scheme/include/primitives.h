@@ -54,6 +54,7 @@ object prim_arith_plus(object);
 object prim_arith_minus(object);
 object prim_arith_times(object);
 object prim_arith_division(object);
-
+object prim_arith_remainder(object);
+object prim_arith_quotient(object);
 
 #endif /* PRIMITIVES_H */

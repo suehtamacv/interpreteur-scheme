@@ -59,3 +59,7 @@ object caddr(object o) {
 object cons(object o, object list) {
     return make_pair(o, list);
 }
+
+object list(object a, object b) {
+    return cons(a, cons(b, nil));
+}
