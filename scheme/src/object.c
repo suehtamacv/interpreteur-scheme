@@ -72,7 +72,13 @@ object make_string(string s) {
 
 object make_number(uint type) {
     object o = make_object(SFS_NUMBER);
+    o->val.number = sfs_malloc(sizeof(*o->val.number));
     o->val.number->numtype = type;
+
+    if (type == NUM_COMPLEX) {
+        o->val.number->val.complex = sfs_malloc(sizeof(*o->val.number->val.complex));
+    }
+
     return o;
 }
 
@@ -217,7 +223,8 @@ Bool is_Negative(object o) {
         return False;
     }
 
-    return (is_Zero(o) != -1 && is_Positive(o) != -1 ? True : -1);
+    return (is_Zero(o) != (unsigned) - 1 &&
+            is_Positive(o) != (unsigned) - 1 ? True : (unsigned) - 1);
 }
 
 Bool is_Integer(object o) {

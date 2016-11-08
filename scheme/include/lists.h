@@ -54,7 +54,7 @@ object cons(object o, object list);
  * @return is the list
  */
 object list(object a, object b);
-/* Function reverse list*/
+/* Function reverse list */
 object reverse(object o);
 
 #endif /* LISTS_H */

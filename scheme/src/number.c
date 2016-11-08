@@ -154,7 +154,7 @@ object real_part(number n) {
         return NULL;
     }
 
-    object o = make_object(SFS_NUMBER);
+    object o = make_number(0);
 
     switch (n->numtype) {
     case NUM_MINFTY:
