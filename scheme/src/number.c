@@ -1,5 +1,7 @@
 #include "number.h"
 #include "object.h"
+#include "primitives.h"
+#include "lists.h"
 #include <math.h>
 
 object make_integer(int i) {
@@ -191,5 +193,83 @@ object imag_part(number n) {
         return n->val.complex->imag;
         break;
     }
+    return NULL;
+}
+
+object num_abs(object n) {
+    if (!n) {
+        return NULL;
+    }
+    if (is_Number(n) == False) {
+        WARNING_MSG("Cannot take the absolute value of something that is not a number");
+        return NULL;
+    }
+
+    object absval = make_integer(0);
+
+    switch (n->val.number->numtype) {
+    case NUM_PINFTY:
+    case NUM_MINFTY:
+        return plus_inf;
+        break;
+
+    case NUM_UNDEF:
+        return NaN;
+        break;
+
+    case NUM_UINTEGER:
+        return n;
+        break;
+
+    case NUM_REAL:
+        return make_real(fabs(n->val.number->val.real));
+        break;
+
+    case NUM_INTEGER:
+        return make_integer(abs(n->val.number->val.integer));
+        break;
+
+    case NUM_COMPLEX:
+        absval = prim_arith_plus(list(absval,
+                                      prim_arith_times(list(
+                                              real_part(n->val.number),
+                                              real_part(n->val.number)))));
+        absval = prim_arith_plus(list(absval,
+                                      prim_arith_times(list(
+                                              imag_part(n->val.number),
+                                              imag_part(n->val.number)))));
+        absval = to_real(absval);
+        return absval;
+        break;
+    }
+
+    return NULL;
+}
+
+object num_conj(object n) {
+    if (!n) {
+        return NULL;
+    }
+    if (is_Number(n) == False) {
+        WARNING_MSG("Cannot take the conjugate of something that is not a number");
+        return NULL;
+    }
+
+    switch (n->val.number->numtype) {
+    case NUM_PINFTY:
+    case NUM_MINFTY:
+    case NUM_UNDEF:
+    case NUM_UINTEGER:
+    case NUM_REAL:
+    case NUM_INTEGER:
+        return n;
+        break;
+
+    case NUM_COMPLEX:
+        return make_complex(real_part(n->val.number),
+                            prim_arith_minus(imag_part(n->val.number)));
+        break;
+    }
+
     return NULL;
 }

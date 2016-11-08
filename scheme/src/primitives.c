@@ -77,7 +77,8 @@ object prim_arith_quotient(object o) {
 
     object num = to_integer(car(o));
     object den = to_integer(cadr(o));
-    return make_integer(num->val.number->val.integer / den->val.number->val.integer);
+    return make_integer(num->val.number->val.integer /
+                        den->val.number->val.integer);
 }
 
 object prim_arith_remainder(object o) {
@@ -93,7 +94,8 @@ object prim_arith_remainder(object o) {
 
     object num = to_integer(car(o));
     object den = to_integer(cadr(o));
-    return make_integer(num->val.number->val.integer % den->val.number->val.integer);
+    return make_integer(num->val.number->val.integer %
+                        den->val.number->val.integer);
 }
 
 object prim_equal(object o) {
@@ -124,14 +126,15 @@ restart:
         break;
 
     case NUM_COMPLEX:
-        if (car(o)->val.number->val.complex->imag != 0) {
+        if (is_Zero(real_part(car(o)->val.number)) == False) {
             /* z = a + bj with b != 0 */
             if(cadr(o)->val.number->numtype != NUM_COMPLEX) {
                 return _false;
             } else {
-                if (
-                    car(o)->val.number->val.complex->real != cadr(o)->val.number->val.complex->real ||
-                    car(o)->val.number->val.complex->imag != cadr(o)->val.number->val.complex->imag) {
+                if ((prim_equal(list(real_part(car(o)->val.number),
+                                     real_part(cadr(o)->val.number))) == _false) ||
+                        (prim_equal(list(imag_part(car(o)->val.number),
+                                         imag_part(cadr(o)->val.number))) == _false)) {
                     return _false;
                 }
             }
@@ -144,17 +147,9 @@ restart:
                 break;
 
             case NUM_REAL:
-                if (
-                    car(o)->val.number->val.complex->real !=
-                    cadr(o)->val.number->val.real) {/* compare a + 0j with real */
-                    return _false;
-                }
-                break;
-
             case NUM_UINTEGER:
             case NUM_INTEGER:
-                /* compare z = a + 0j with integer  */
-                if (cadr(o)->val.number->val.integer != car(o)->val.number->val.complex->real) {
+                if (prim_equal(list(real_part(car(o)->val.number), cadr(o))) == _false) {
                     return _false;
                 }
                 break;
@@ -188,9 +183,8 @@ restart:
             break;
 
         case NUM_COMPLEX:
-
-            if (cadr(o)->val.number->val.complex->real != car(o)->val.number->val.integer ||
-                    cadr(o)->val.number->val.complex->imag != 0 ) {
+            if (is_Zero(imag_part(cadr(o)->val.number)) == False ||
+                    prim_equal(list(real_part(cadr(o)->val.number), car(o))) == _false) {
                 return _false;
             }
             break;
@@ -222,11 +216,10 @@ restart:
             break;
 
         case NUM_COMPLEX:
-            if (cadr(o)->val.number->val.complex->imag != 0) {
+            if (is_Zero(imag_part(cadr(o)->val.number)) == False) {
                 return _false;
-
             } else {
-                if (car(o)->val.number->val.real != cadr(o)->val.number->val.complex->real) {
+                if (prim_equal(list(car(o), real_part(cadr(o)->val.number))) == _false) {
                     return _false;
                 }
             }
@@ -284,23 +277,17 @@ restart:
         break;
 
     case NUM_COMPLEX:
-        if(car(o)->val.number->val.complex->imag != 0) {
+        if(is_Zero(imag_part(car(o)->val.number)) == False) {
             /* There isn't a comparison with complex numbers having imaginary part not zero */
             WARNING_MSG("Wrong type of arguments on \"<\"");
             return NULL;
         } else {
             switch (cadr(o)->val.number->numtype) {
+            /* Comparing z = a + 0j with numbers */
             case NUM_REAL:
-                if (car(o)->val.number->val.complex->real != cadr(o)->val.number->val.real) {
-                    /* Comparing a + 0j with real */
-                    return _false;
-                }
-                break;
-
             case NUM_UINTEGER:
             case NUM_INTEGER:
-                /* Comparing z = a + 0j with integer */
-                if( cadr(o)->val.number->val.integer >= car(o)->val.number->val.complex->real) {
+                if (prim_smaller(list(cadr(o), real_part(car(o)->val.number))) == _false) {
                     return _false;
                 }
                 break;
@@ -342,11 +329,11 @@ restart:
             break;
 
         case NUM_COMPLEX:
-            if (cadr(o)->val.number->val.complex->imag != 0) {
+            if (is_Zero(imag_part(cadr(o)->val.number)) == False) {
                 WARNING_MSG("Wrong type of arguments on \"<\"");
                 return NULL;
             }
-            if(car(o)->val.number->val.integer >= cadr(o)->val.number->val.complex->real) {
+            if (prim_smaller(list(car(o), real_part(cadr(o)->val.number))) == _false) {
                 return _false;
             }
             break;
@@ -710,8 +697,12 @@ restart:
 
         case NUM_COMPLEX:
             result = to_complex(result);
-            result->val.number->val.complex->real += next_number->val.number->val.complex->real;
-            result->val.number->val.complex->imag += next_number->val.number->val.complex->imag;
+            result->val.number->val.complex->real = prim_arith_plus(list(
+                    real_part(result->val.number),
+                    real_part(next_number->val.number)));
+            result->val.number->val.complex->real = prim_arith_plus(list(
+                    imag_part(result->val.number),
+                    imag_part(next_number->val.number)));
             break;
         }
         break;
@@ -740,8 +731,12 @@ restart:
 
         case NUM_COMPLEX:
             result = to_complex(result);
-            result->val.number->val.complex->real += next_number->val.number->val.complex->real;
-            result->val.number->val.complex->imag += next_number->val.number->val.complex->imag;
+            result->val.number->val.complex->real = prim_arith_plus(list(
+                    real_part(result->val.number),
+                    real_part(next_number->val.number)));
+            result->val.number->val.complex->real = prim_arith_plus(list(
+                    imag_part(result->val.number),
+                    imag_part(next_number->val.number)));
             break;
         }
         break;
@@ -761,16 +756,19 @@ restart:
 
         case NUM_INTEGER:
         case NUM_UINTEGER:
-            result->val.number->val.complex->real += next_number->val.number->val.integer;
-            break;
-
         case NUM_REAL:
-            result->val.number->val.complex->real += next_number->val.number->val.real;
+            result->val.number->val.complex->real = prim_arith_plus(list(
+                    real_part(result->val.number),
+                    next_number));
             break;
 
         case NUM_COMPLEX:
-            result->val.number->val.complex->real += next_number->val.number->val.complex->real;
-            result->val.number->val.complex->imag += next_number->val.number->val.complex->imag;
+            result->val.number->val.complex->real = prim_arith_plus(list(
+                    real_part(result->val.number),
+                    real_part(next_number->val.number)));
+            result->val.number->val.complex->real = prim_arith_plus(list(
+                    imag_part(result->val.number),
+                    imag_part(next_number->val.number)));
             break;
         }
         break;
@@ -788,8 +786,7 @@ object prim_arith_minus(object o) {
     if (list_length(o) == 0) {
         return make_integer(0);
     } else if (list_length(o) == 1) {
-        return prim_arith_minus(cons(make_integer(0), cons(car(o),
-                                     nil))); /* (- a) = (- 0 a) */
+        return prim_arith_minus(list(make_integer(0), car(o))); /* (- a) = (- 0 a) */
     }
 
     object result = car(o);
@@ -818,12 +815,13 @@ object prim_arith_minus(object o) {
         break;
 
     case NUM_COMPLEX:
-        negative_part = make_complex(-negative_part->val.number->val.complex->real,
-                                     -negative_part->val.number->val.complex->imag);
+        negative_part = make_complex(
+                            prim_arith_minus(real_part(negative_part->val.number)),
+                            prim_arith_minus(imag_part(negative_part->val.number)));
         break;
     }
 
-    return prim_arith_plus(cons(result, cons(negative_part, nil)));
+    return prim_arith_plus(list(result, negative_part));
 }
 
 object prim_arith_times(object o) {
@@ -948,13 +946,13 @@ restart:
 
         case NUM_COMPLEX:
             result = to_complex(result);
-            result = make_complex(
-                         /* Real part */
-                         next_number->val.number->val.complex->real *
-                         result->val.number->val.complex->real,
-                         /* Imaginary part */
-                         next_number->val.number->val.complex->imag *
-                         result->val.number->val.complex->real);
+            object rescpy = result;
+            result->val.number->val.complex->real =
+                prim_arith_times(list(real_part(rescpy->val.number),
+                                      real_part(next_number->val.number)));
+            result->val.number->val.complex->real =
+                prim_arith_times(list(imag_part(rescpy->val.number),
+                                      imag_part(next_number->val.number)));
             break;
         }
         break;
@@ -989,10 +987,13 @@ restart:
 
         case NUM_COMPLEX:
             result = to_complex(result);
-            result = make_complex(next_number->val.number->val.complex->real *
-                                  result->val.number->val.complex->real,
-                                  next_number->val.number->val.complex->imag *
-                                  result->val.number->val.complex->real);
+            object rescpy = result;
+            result->val.number->val.complex->real =
+                prim_arith_times(list(real_part(rescpy->val.number),
+                                      real_part(next_number->val.number)));
+            result->val.number->val.complex->real =
+                prim_arith_times(list(imag_part(rescpy->val.number),
+                                      imag_part(next_number->val.number)));
             break;
         }
         break;
@@ -1009,27 +1010,26 @@ restart:
 
         case NUM_UINTEGER:
         case NUM_INTEGER:
-            result->val.number->val.complex->real *= next_number->val.number->val.integer;
-            result->val.number->val.complex->imag *= next_number->val.number->val.integer;
-            break;
-
         case NUM_REAL:
-            result->val.number->val.complex->real *= next_number->val.number->val.real;
-            result->val.number->val.complex->imag *= next_number->val.number->val.real;
+            result->val.number->val.complex->real = prim_arith_times(list(real_part(
+                    result->val.number), next_number));
+            result->val.number->val.complex->imag = prim_arith_times(list(imag_part(
+                    result->val.number), next_number));
             break;
 
         case NUM_COMPLEX:
-            result = make_complex(
-                         /* Real part */
-                         next_number->val.number->val.complex->real *
-                         result->val.number->val.complex->real -
-                         next_number->val.number->val.complex->imag *
-                         result->val.number->val.complex->imag,
-                         /* Imaginary part */
-                         next_number->val.number->val.complex->real *
-                         result->val.number->val.complex->imag +
-                         next_number->val.number->val.complex->imag *
-                         result->val.number->val.complex->real);
+            result = to_complex(result);
+            object rescpy = result;
+            result->val.number->val.complex->real = prim_arith_minus(list(
+                    prim_arith_times(list(real_part(next_number->val.number),
+                                          real_part(rescpy->val.number))),
+                    prim_arith_times(list(imag_part(next_number->val.number),
+                                          imag_part(rescpy->val.number)))));
+            result->val.number->val.complex->imag = prim_arith_plus(list(
+                    prim_arith_times(list(real_part(next_number->val.number),
+                                          imag_part(rescpy->val.number))),
+                    prim_arith_times(list(imag_part(next_number->val.number),
+                                          real_part(rescpy->val.number)))));
             break;
         }
         break;
@@ -1047,7 +1047,7 @@ object prim_arith_division(object o) {
     if (list_length(o) == 0) {
         return make_integer(1);
     } else if (list_length(o) == 1) {
-        return prim_arith_division(cons(make_integer(1), cons(car(o), nil)));
+        return prim_arith_division(list(make_integer(1), car(o)));
         /* (/ a) = (/ 1 a) */
     }
 
@@ -1059,7 +1059,6 @@ object prim_arith_division(object o) {
         return NULL;
     }
 
-    double abs = 0;
     switch (denominator->val.number->numtype) {
     case NUM_PINFTY:
     case NUM_MINFTY:
@@ -1080,13 +1079,9 @@ object prim_arith_division(object o) {
         break;
 
     case NUM_COMPLEX:
-        abs = pow(denominator->val.number->val.complex->real, 2) +
-              pow(denominator->val.number->val.complex->imag, 2);
-        sfs_print(denominator);
-        denominator = make_complex(denominator->val.number->val.complex->real / abs,
-                                   -denominator->val.number->val.complex->imag / abs);
+        denominator = prim_arith_division(list(num_conj(denominator), num_abs(denominator)));
         break;
     }
 
-    return prim_arith_times(cons(result, cons(denominator, nil)));
+    return prim_arith_times(list(result, denominator));
 }

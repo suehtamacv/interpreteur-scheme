@@ -62,6 +62,8 @@ object to_complex(object);
 
 object real_part(number);
 object imag_part(number);
+object num_abs(object);
+object num_conj(object);
 
 #ifdef __cplusplus
 }

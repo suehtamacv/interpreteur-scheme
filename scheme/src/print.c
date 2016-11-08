@@ -152,13 +152,12 @@ void sfs_print_number(object o) {
         break;
 
     case NUM_COMPLEX:
-        if (o->val.number->val.complex->imag >= 0) {
-            printf("%lg+%lgj", o->val.number->val.complex->real,
-                   o->val.number->val.complex->imag);
-        } else {
-            printf("%lg%lgj", o->val.number->val.complex->real,
-                   o->val.number->val.complex->imag);
+        sfs_print_number(real_part(o->val.number));
+        if (is_Negative(imag_part(o->val.number)) == False) {
+            printf("+");
         }
+        sfs_print_number(imag_part(o->val.number));
+        printf("j");
         break;
 
     case NUM_PINFTY:
