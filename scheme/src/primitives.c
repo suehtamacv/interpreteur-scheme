@@ -37,6 +37,8 @@ void create_basic_primitives() {
     create_primitive("positive?", prim_is_positive);
     create_primitive("negative?", prim_is_negative);
     create_primitive("zero?", prim_is_zero);
+    create_primitive("equal?", prim_is_equal);
+    create_primitive("eq?", prim_is_eq);
 
     /* Those are the basic list handling functions */
     create_primitive("car", prim_car);
@@ -51,6 +53,7 @@ void create_basic_primitives() {
     create_primitive("<", prim_smaller);
     create_primitive("=", prim_equal);
 
+
     /* Those are the basic arithmetic primitives */
     create_primitive("+", prim_arith_plus);
     create_primitive("-", prim_arith_minus);
@@ -63,7 +66,37 @@ void create_primitive(string prim_name, object (*func)(object)) {
     define_symbol(make_symbol(prim_name), make_primitive(func, prim_name), 0);
 
 }
+object prim_is_eq(object o) {
+    if (list_length(o) < 2) { /* (eq?) or (eq? argument1 ) ==> #t */
+        return _true;
+    }
+restart:
+    if (car(o) != cadr(o)) {
+        return _false;
+    } else {
+        o = cdr(o);
+        if(list_length(o) == 1) {
+            return _true;
+        }
+    }
+    goto restart;
 
+}
+object prim_is_equal(object o) {
+    if (list_length(o) < 2) { /* (equal?) or (equal? argument1 ) ==> #t */
+        return _true;
+    }
+restart:
+    if (car(o)->val.primitive.f != cadr(o)->val.primitive.f) {
+        return _false;
+    } else {
+        o = cdr(o);
+        if(list_length(o) == 1) {
+            return _true;
+        }
+    }
+    goto restart;
+}
 object prim_equal(object o) {
     if (list_length(o) < 2) { /* (=) or (= _) ==> #t */
         return _true;

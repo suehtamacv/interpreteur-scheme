@@ -24,6 +24,8 @@ object prim_is_complex(object);
 object prim_is_positive(object);
 object prim_is_negative(object);
 object prim_is_zero(object);
+object prim_is_eq(object);
+object prim_is_equal(object);
 
 /* Those are the basic list handling functions */
 object prim_car(object);
@@ -33,10 +35,12 @@ object prim_set_cdr(object);
 object prim_cons(object);
 object prim_list(object);
 
+
 /* Those are ordering primitives */
 object prim_larger(object);
 object prim_smaller(object);
 object prim_equal(object);
+
 
 /* Those are basic arithmetic functions */
 object prim_arith_plus(object);

@@ -2,6 +2,7 @@
 #include "symbols.h"
 #include "eval.h"
 #include "lists.h"
+#include "print.h"
 #include <limits.h>
 #include <strings.h>
 
@@ -82,9 +83,19 @@ object form_define(object o) {
         return NULL;
     }
 
-    int define_result = (is_Quote(cadr(o)) == True) ?
-                        define_symbol(car(o), cadr(o), 0) :
-                        define_symbol(car(o), sfs_eval(cadr(o)), 0);
+    object nom = car(o);
+    object val = cadr(o);
+    int define_result;
+
+restart:
+    if (is_Quote(val) == True) {
+        define_result = define_symbol(nom, val, 0);
+    } else if (is_Symbol(val) == True) {
+        val = *locate_symbol(val, 0);
+        goto restart;
+    } else {
+        define_result = define_symbol(nom, sfs_eval(val), 0);
+    }
 
     if (define_result == 0) {
         return car(o);    /* Define returns symbol itself */
