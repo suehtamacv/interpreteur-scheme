@@ -261,7 +261,7 @@ object num_conj(object n) {
 
     case NUM_COMPLEX:
         return make_complex(real_part(n->val.number),
-                            prim_arith_minus(imag_part(n->val.number)));
+                            prim_arith_minus(cons(imag_part(n->val.number), nil)));
         break;
     }
 
