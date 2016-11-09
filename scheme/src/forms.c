@@ -17,7 +17,7 @@ void create_basic_forms(object env) {
     create_form("eval", form_eval, env);
 }
 
-void create_form(string form_name, object (*f)(object,object), object env) {
+void create_form(string form_name, object (*f)(object, object), object env) {
     if (is_Environment(env) == False) {
         WARNING_MSG("Can't create a form into something who is not an environment");
     }
@@ -105,8 +105,14 @@ restart:
     if (is_Quote(val) == True) {
         define_result = define_symbol(nom, val, &env);
     } else if (is_Symbol(val) == True) {
-        val = *locate_symbol(val, env);
-        goto restart;
+        object *found = locate_symbol(val, env);
+        if (found) {
+            val = *found;
+            goto restart;
+        } else {
+            WARNING_MSG("Can't define something to an unbound variable");
+            return NULL;
+        }
     } else {
         define_result = define_symbol(nom, sfs_eval(val, env), &env);
     }
