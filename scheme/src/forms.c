@@ -133,7 +133,7 @@ object form_quote(object o, object env) {
 }
 
 object form_if(object o, object env) {
-    if (list_length(o) != 3) {
+    if (list_length(o) < 2 || list_length(o) > 3) {
         WARNING_MSG("Wrong number of arguments on \"if\"");
         return NULL;
     }
@@ -142,7 +142,11 @@ object form_if(object o, object env) {
     if (result && is_True(result) == True) {
         o = sfs_eval(cadr(o), env);
     } else if (result) {
-        o = sfs_eval(caddr(o), env);
+        if (is_Pair(cddr(o)) == True) {
+            o = sfs_eval(caddr(o), env);
+        } else {
+            return _void;
+        }
     } else {
         return NULL;
     }
