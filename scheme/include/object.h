@@ -81,6 +81,7 @@ Bool is_Integer(object o);
 Bool is_Real(object o);
 Bool is_List(object o);
 Bool is_Complex(object o);
+Bool is_Void(object o);
 Bool is_Zero(object o);
 Bool is_Positive(object o);
 Bool is_Negative(object o);

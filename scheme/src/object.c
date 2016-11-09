@@ -103,11 +103,19 @@ Bool is_AutoEvaluable(object o) {
            is_String(o) ||
            is_Primitive(o) ||
            is_Form(o) ||
+           is_Void(o) ||
            is_Environment(o);
 }
 
 Bool is_False(object o) {
     if (is_Boolean(o) == True && o->val.boolean == False) {
+        return True;
+    }
+    return False;
+}
+
+Bool is_Void(object o) {
+    if (o && o == _void) {
         return True;
     }
     return False;

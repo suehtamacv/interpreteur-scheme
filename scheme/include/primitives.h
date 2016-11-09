@@ -66,6 +66,14 @@ object prim_sin(object);
 object prim_cos(object);
 object prim_tan(object);
 
+/* Those are the primitives related to complex numbers */
+object prim_make_rectangular(object);
+object prim_make_polar(object);
+object prim_real_part(object);
+object prim_imag_part(object);
+object prim_magnitude(object);
+object prim_angle(object);
+
 /* This is the primitive to create a new standard environment */
 object prim_interaction_environment(object);
 

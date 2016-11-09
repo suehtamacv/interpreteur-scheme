@@ -31,7 +31,7 @@ object form_eval(object o, object env) {
         return NULL;
     }
     env = sfs_eval(cadr(o), env);
-    return (env ? sfs_eval(car(o), env) : NULL);
+    return (env ? sfs_eval(sfs_eval(car(o), env), env) : NULL);
 }
 
 object form_and(object o, object env) {

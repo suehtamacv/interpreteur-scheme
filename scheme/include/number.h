@@ -64,6 +64,7 @@ object real_part(number);
 object imag_part(number);
 object num_abs(object);
 object num_conj(object);
+object num_phase(object);
 
 #ifdef __cplusplus
 }

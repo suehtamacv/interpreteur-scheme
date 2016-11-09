@@ -81,6 +81,14 @@ void create_basic_primitives(object env) {
     create_primitive("cos", prim_cos, env);
     create_primitive("tan", prim_tan, env);
 
+    /* Those are the primitives related to complex numbers */
+    create_primitive("make-rectangular", prim_make_rectangular, env);
+    create_primitive("make-polar", prim_make_polar, env);
+    create_primitive("real-part", prim_real_part, env);
+    create_primitive("imag-part", prim_imag_part, env);
+    create_primitive("magnitude", prim_magnitude, env);
+    create_primitive("angle", prim_angle, env);
+
     /* This is the primitive to create a new standard environment */
     create_primitive("interaction-environment", prim_interaction_environment, env);
 }
@@ -90,6 +98,72 @@ void create_primitive(string prim_name, object (*func)(object), object env) {
         WARNING_MSG("Can't create a primitive into something who is not an environment");
     }
     define_symbol(make_symbol(prim_name), make_primitive(func, prim_name), &env);
+}
+
+object prim_make_rectangular(object o) {
+    TEST_NUMB_ARGUMENT_EQ(2, "make-rectangular");
+    if (is_Real(car(o)) == False || is_Real(cadr(o)) == False) {
+        WARNING_MSG("Wrong type of arguments on \"make-rectangular\"");
+        return NULL;
+    }
+    return make_complex(car(o), cadr(o));
+}
+
+object prim_make_polar(object o) {
+    TEST_NUMB_ARGUMENT_EQ(2, "make-rectangular");
+    if (is_Real(car(o)) == False || is_Real(cadr(o)) == False) {
+        WARNING_MSG("Wrong type of arguments on \"make-rectangular\"");
+        return NULL;
+    }
+
+    object phase = prim_times(list(
+                                  make_complex(make_integer(0), make_integer(1)),
+                                  cadr(o)));
+    return prim_times(list(car(o), prim_exp(cons(phase, nil))));
+}
+
+object prim_real_part(object o) {
+    TEST_NUMB_ARGUMENT_EQ(1, "real-part");
+    o = car(o);
+    if (is_Number(o) == False) {
+        WARNING_MSG("Wrong type of arguments on \"real-part\"");
+        return NULL;
+    }
+
+    return real_part(o->val.number);
+}
+
+object prim_imag_part(object o) {
+    TEST_NUMB_ARGUMENT_EQ(1, "imag-part");
+    o = car(o);
+    if (is_Number(o) == False) {
+        WARNING_MSG("Wrong type of arguments on \"imag-part\"");
+        return NULL;
+    }
+
+    return imag_part(o->val.number);
+}
+
+object prim_magnitude(object o) {
+    TEST_NUMB_ARGUMENT_EQ(1, "magnitude");
+    o = car(o);
+    if (is_Number(o) == False) {
+        WARNING_MSG("Wrong type of arguments on \"magnitude\"");
+        return NULL;
+    }
+
+    return num_abs(o);
+}
+
+object prim_angle(object o) {
+    TEST_NUMB_ARGUMENT_EQ(1, "angle");
+    o = car(o);
+    if (is_Number(o) == False) {
+        WARNING_MSG("Wrong type of arguments on \"angle\"");
+        return NULL;
+    }
+
+    return num_phase(o);
 }
 
 object prim_interaction_environment(object o) {

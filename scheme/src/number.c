@@ -225,13 +225,13 @@ object num_abs(object n) {
 
     case NUM_COMPLEX:
         absval = prim_plus(list(absval,
-                                      prim_times(list(
-                                              real_part(n->val.number),
-                                              real_part(n->val.number)))));
+                                prim_times(list(
+                                               real_part(n->val.number),
+                                               real_part(n->val.number)))));
         absval = prim_plus(list(absval,
-                                      prim_times(list(
-                                              imag_part(n->val.number),
-                                              imag_part(n->val.number)))));
+                                prim_times(list(
+                                               imag_part(n->val.number),
+                                               imag_part(n->val.number)))));
         absval = to_real(absval);
         return absval;
         break;
@@ -239,6 +239,158 @@ object num_abs(object n) {
 
     return NULL;
 }
+
+object num_phase(object n) {
+    if (!n) {
+        return NULL;
+    }
+    if (is_Number(n) == False) {
+        WARNING_MSG("Cannot take the phase of something that is not a number");
+        return NULL;
+    }
+
+    switch (n->val.number->numtype) {
+    case NUM_PINFTY:
+        return make_integer(0);
+        break;
+
+    case NUM_MINFTY:
+        return make_real(acos(-1));
+        break;
+
+    case NUM_UNDEF:
+        return NaN;
+        break;
+
+    case NUM_UINTEGER:
+    case NUM_INTEGER:
+        if (n->val.number->val.integer >= 0) {
+            return make_integer(0);
+        } else if (n->val.number->val.integer < 0) {
+            return make_real(acos(-1));
+        }
+        break;
+
+    case NUM_REAL:
+        if (n->val.number->val.real >= 0) {
+            return make_integer(0);
+        } else if (n->val.number->val.real < 0) {
+            return make_real(acos(-1));
+        }
+        break;
+
+    case NUM_COMPLEX:
+        (void) n;
+        num real = real_part(n->val.number)->val.number;
+        num imag = imag_part(n->val.number)->val.number;
+
+        switch (real->numtype) {
+        case NUM_COMPLEX:
+            return NULL;
+            break;
+
+        case NUM_UNDEF:
+            return NaN;
+            break;
+
+        case NUM_PINFTY:
+            switch (imag->numtype) {
+            case NUM_PINFTY:
+            case NUM_MINFTY:
+            case NUM_UNDEF:
+                return NaN;
+                break;
+
+            case NUM_COMPLEX:
+                return NULL;
+
+            case NUM_REAL:
+            case NUM_INTEGER:
+            case NUM_UINTEGER:
+                return make_integer(0);
+            }
+
+        case NUM_MINFTY:
+            switch (imag->numtype) {
+            case NUM_PINFTY:
+            case NUM_MINFTY:
+            case NUM_UNDEF:
+                return NaN;
+                break;
+
+            case NUM_COMPLEX:
+                return NULL;
+
+            case NUM_REAL:
+            case NUM_INTEGER:
+            case NUM_UINTEGER:
+                return make_real(acos(-1));
+            }
+
+        case NUM_INTEGER:
+        case NUM_UINTEGER:
+            switch (imag->numtype) {
+            case NUM_COMPLEX:
+                return NULL;
+                break;
+
+            case NUM_UNDEF:
+                return NaN;
+                break;
+
+            case NUM_PINFTY:
+                return make_real(acos(-1) / 2);
+                break;
+
+            case NUM_MINFTY:
+                return make_real(-acos(-1) / 2);
+                break;
+
+            case NUM_REAL:
+                return make_real(atan2(imag->val.real, real->val.integer));
+                break;
+
+            case NUM_INTEGER:
+            case NUM_UINTEGER:
+                return make_real(atan2(imag->val.integer, real->val.integer));
+                break;
+            }
+
+        case NUM_REAL:
+            switch (imag->numtype) {
+            case NUM_COMPLEX:
+                return NULL;
+                break;
+
+            case NUM_UNDEF:
+                return NaN;
+                break;
+
+            case NUM_PINFTY:
+                return make_real(acos(-1) / 2);
+                break;
+
+            case NUM_MINFTY:
+                return make_real(-acos(-1) / 2);
+                break;
+
+            case NUM_REAL:
+                return make_real(atan2(imag->val.real, real->val.real));
+                break;
+
+            case NUM_INTEGER:
+            case NUM_UINTEGER:
+                return make_real(atan2(imag->val.integer, real->val.real));
+                break;
+            }
+        }
+
+        break;
+    }
+
+    return NULL;
+}
+
 
 object num_conj(object n) {
     if (!n) {
