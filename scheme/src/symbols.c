@@ -15,6 +15,10 @@
 #include "lists.h"
 
 object create_env_layer(object environment) {
+    if (is_Environment(environment) == False) {
+        WARNING_MSG("Can't create a subenvironment into something who is not an environment");
+        return NULL;
+    }
     return make_pair(nil, environment);
 }
 
@@ -23,7 +27,7 @@ object* locate_symbol(object name, object environment) {
         ERROR_MSG("Invalid environment requested");
         return NULL;
     }
-    if (is_Pair(environment) == False) {
+    if (is_Environment(environment) == False) {
         WARNING_MSG("Invalid environment");
         return NULL;
     }
@@ -36,7 +40,7 @@ object* locate_symbol(object name, object environment) {
         }
         environment = cdr(environment);
         env_layer = &((*environment).val.pair.car);
-        if (env_layer == NULL) {
+        if (*env_layer == nil) {
             break;
         }
     } while(1);
@@ -61,7 +65,11 @@ object* locate_symbol_in_env(object name, object env_layer) {
 }
 
 int define_symbol(object name, object val, object *environment) {
-    DEBUG_MSG("Defining object '%s", name->val.string);
+    if (is_Environment(*environment) == False) {
+        WARNING_MSG("Can't define a symbol into something who is not an environment");
+    }
+
+    DEBUG_MSG("Defining object '%s'", name->val.string);
     object env_layer = (*environment)->val.pair.car;
     object *old_symbol = locate_symbol_in_env(name, env_layer);
 

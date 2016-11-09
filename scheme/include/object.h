@@ -18,7 +18,7 @@ extern "C" {
 #include "number.h"
 
 typedef enum object_type_t {
-    SFS_NUMBER, SFS_CHARACTER, SFS_STRING, SFS_PAIR, SFS_NIL, SFS_BOOLEAN, SFS_SYMBOL, SFS_PRIMITIVE, SFS_FORM
+    SFS_NUMBER, SFS_CHARACTER, SFS_STRING, SFS_PAIR, SFS_NIL, SFS_BOOLEAN, SFS_SYMBOL, SFS_PRIMITIVE, SFS_FORM, SFS_ENV
 } object_type;
 
 typedef struct object_t {
@@ -57,7 +57,7 @@ object make_true(void);
 object make_false(void);
 object make_primitive(object (*f)(object), string func_name);
 object make_form(object (*f)(object,object), string func_name);
-object make_symbol_table(void);
+object make_env_list(void);
 object make_symbol(string);
 object make_string(string);
 object make_number(uint type);
@@ -84,6 +84,7 @@ Bool is_Complex(object o);
 Bool is_Zero(object o);
 Bool is_Positive(object o);
 Bool is_Negative(object o);
+Bool is_Environment(object o);
 
 Bool is_AutoEvaluable(object o);
 

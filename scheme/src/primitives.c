@@ -76,13 +76,16 @@ void create_basic_primitives(object env) {
 }
 
 void create_primitive(string prim_name, object (*func)(object), object env) {
+    if (is_Environment(env) == False) {
+        WARNING_MSG("Can't create a primitive into something who is not an environment");
+    }
     define_symbol(make_symbol(prim_name), make_primitive(func, prim_name), &env);
 }
 
 object prim_interaction_environment(object o) {
     TEST_NUMB_ARGUMENT_EQ(0, "interaction-environment");
 
-    object environment = make_symbol_table();
+    object environment = make_env_list();
     create_env_layer(environment);
     create_basic_forms(environment);
     create_basic_primitives(environment);

@@ -70,6 +70,9 @@ restart:
         case SFS_PAIR:
             sfs_print_pair(o);
             break;
+
+        case SFS_ENV:
+            break;
         }
     }
 }

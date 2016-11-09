@@ -18,6 +18,9 @@ void create_basic_forms(object env) {
 }
 
 void create_form(string form_name, object (*f)(object,object), object env) {
+    if (is_Environment(env) == False) {
+        WARNING_MSG("Can't create a form into something who is not an environment");
+    }
     define_symbol(make_symbol(form_name), make_form(f, form_name), &env);
 }
 
@@ -27,7 +30,8 @@ object form_eval(object o, object env) {
         WARNING_MSG("Wrong number of arguments on \"eval\"");
         return NULL;
     }
-    return sfs_eval(car(o), cadr(o));
+    env = sfs_eval(cadr(o), env);
+    return (env ? sfs_eval(car(o), env) : NULL);
 }
 
 object form_and(object o, object env) {

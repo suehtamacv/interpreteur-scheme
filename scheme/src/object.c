@@ -51,7 +51,7 @@ object make_primitive(object (*func)(object), string func_name) {
     return f;
 }
 
-object make_form(object (*func)(object,object), string func_name) {
+object make_form(object (*func)(object, object), string func_name) {
     object f = make_object(SFS_FORM);
     f->val.form.f = func;
     strcpy(f->val.primitive.func_name, func_name);
@@ -70,7 +70,7 @@ object make_string(string s) {
     return o;
 }
 
-object make_character (char i){
+object make_character (char i) {
     object o = make_object(SFS_CHARACTER);
     o->val.character = i;
     return o;
@@ -88,8 +88,8 @@ object make_number(uint type) {
     return o;
 }
 
-object make_symbol_table() {
-    object symb = make_object(SFS_PAIR);
+object make_env_list() {
+    object symb = make_object(SFS_ENV);
     symb->val.pair.car = nil;
     symb->val.pair.cdr = nil;
     return symb;
@@ -102,7 +102,8 @@ Bool is_AutoEvaluable(object o) {
            is_Number(o) ||
            is_String(o) ||
            is_Primitive(o) ||
-           is_Form(o);
+           is_Form(o) ||
+           is_Environment(o);
 }
 
 Bool is_False(object o) {
@@ -128,6 +129,13 @@ Bool is_Boolean(object o) {
 
 Bool is_Char(object o) {
     if (o && o->type == SFS_CHARACTER) {
+        return True;
+    }
+    return False;
+}
+
+Bool is_Environment(object o) {
+    if (o && o->type == SFS_ENV) {
         return True;
     }
     return False;
@@ -313,7 +321,7 @@ restart:
 }
 
 Bool is_Pair(object o) {
-    if (o && o->type == SFS_PAIR) {
+    if (o && (o->type == SFS_PAIR || o->type == SFS_ENV)) {
         return True;
     }
     return False;

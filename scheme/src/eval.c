@@ -24,7 +24,7 @@ restart:
         return input;
     } else if (is_Symbol(input) == True) {
         DEBUG_MSG("Resolving a symbol by searching for it in the symbol table");
-        object *l_symb = locate_symbol(input, 0);
+        object *l_symb = locate_symbol(input, env);
         if (l_symb == NULL) {
             WARNING_MSG("Unbound variable: %s", input->val.symbol);
             return NULL;
@@ -39,7 +39,7 @@ restart:
             return NULL;
         }
 
-        object *symb = locate_symbol(car(input), 0);
+        object *symb = locate_symbol(car(input), env);
         if (!symb ||
                 (is_Primitive(*symb) == False &&
                  is_Form(*symb) == False)) {
