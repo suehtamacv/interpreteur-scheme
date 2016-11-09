@@ -19,7 +19,9 @@ object create_env_layer(object environment) {
         WARNING_MSG("Can't create a subenvironment into something who is not an environment");
         return NULL;
     }
-    return make_pair(nil, environment);
+    environment = list(nil, environment);
+    environment->type = SFS_ENV;
+    return environment;
 }
 
 object* locate_symbol(object name, object environment) {

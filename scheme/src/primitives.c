@@ -45,6 +45,10 @@ void create_basic_primitives(object env) {
     /* Those are the basic list handling functions */
     create_primitive("car", prim_car, env);
     create_primitive("cdr", prim_cdr, env);
+    create_primitive("caar", prim_caar, env);
+    create_primitive("cadr", prim_cadr, env);
+    create_primitive("cdar", prim_cdar, env);
+    create_primitive("cddr", prim_cddr, env);
     create_primitive("set-car!", prim_set_car, env);
     create_primitive("set-cdr!", prim_set_cdr, env);
     create_primitive("cons", prim_cons, env);
@@ -682,8 +686,9 @@ object prim_set_cdr(object o) {
 
 object prim_car(object o) {
     TEST_NUMB_ARGUMENT_EQ(1, "car");
-    if(is_Pair(o) == True && is_Pair(car(o)) == True) {
-        return car(car(o));
+    o = car(o);
+    if(is_Pair(o) == True) {
+        return car(o);
     }
     WARNING_MSG("Wrong type of arguments on \"car\"");
     return NULL;
@@ -691,10 +696,51 @@ object prim_car(object o) {
 
 object prim_cdr(object o) {
     TEST_NUMB_ARGUMENT_EQ(1, "cdr");
+    o = car(o);
+    if (is_Pair(o) == True) {
+        return cdr(o);
+    }
+    WARNING_MSG("Wrong type of arguments on \"cdr\"");
+    return NULL;
+}
+
+object prim_caar(object o) {
+    TEST_NUMB_ARGUMENT_EQ(1, "caar");
+    o = car(o);
+    if(is_Pair(o) == True && is_Pair(car(o)) == True) {
+        return car(car(o));
+    }
+    WARNING_MSG("Wrong type of arguments on \"caar\"");
+    return NULL;
+}
+
+object prim_cadr(object o) {
+    TEST_NUMB_ARGUMENT_EQ(1, "cadr");
+    o = car(o);
+    if (is_Pair(o) == True && is_Pair(cdr(o)) == True) {
+        return car(cdr(o));
+    }
+    WARNING_MSG("Wrong type of arguments on \"cadr\"");
+    return NULL;
+}
+
+object prim_cdar(object o) {
+    TEST_NUMB_ARGUMENT_EQ(1, "cdar");
+    o = car(o);
     if(is_Pair(o) == True && is_Pair(car(o)) == True) {
         return cdr(car(o));
     }
-    WARNING_MSG("Wrong type of arguments on \"cdr\"");
+    WARNING_MSG("Wrong type of arguments on \"cdar\"");
+    return NULL;
+}
+
+object prim_cddr(object o) {
+    TEST_NUMB_ARGUMENT_EQ(1, "cddr");
+    o = car(o);
+    if(is_Pair(o) == True && is_Pair(cdr(o)) == True) {
+        return cdr(cdr(o));
+    }
+    WARNING_MSG("Wrong type of arguments on \"cddr\"");
     return NULL;
 }
 

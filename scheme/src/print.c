@@ -14,12 +14,12 @@
 
 void sfs_print(object o) {
     /* Le premier paranthèse ouvrante des listes */
-    if (is_List(o) == True && is_Nil(o) == False) {
+    if (is_List(o) == True && is_Nil(o) == False && is_Environment(o) == False) {
         printf("(");
     }
 
 restart:
-    if (is_List(o) == True && is_Nil(o) == False) {
+    if (is_List(o) == True && is_Nil(o) == False && is_Environment(o) == False) {
         sfs_print(car(o));
         o = cdr(o); /* On part au prochain element de la liste */
 
@@ -72,6 +72,7 @@ restart:
             break;
 
         case SFS_ENV:
+            sfs_print_environment(o);
             break;
         }
     }
@@ -215,4 +216,13 @@ void sfs_print_form(object o) {
     }
 
     printf("#<procedure %s>", o->val.form.func_name);
+}
+
+void sfs_print_environment(object o) {
+    if (o->type != SFS_ENV) {
+        WARNING_MSG("Trying to print object of type %d as environment (%d).", o->type,
+                    SFS_ENV);
+        sfs_print(o);
+    }
+    printf("#<environment>");
 }

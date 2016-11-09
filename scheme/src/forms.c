@@ -103,9 +103,9 @@ object form_define(object o, object env) {
 
 restart:
     if (is_Quote(val) == True) {
-        define_result = define_symbol(nom, val, 0);
+        define_result = define_symbol(nom, val, &env);
     } else if (is_Symbol(val) == True) {
-        val = *locate_symbol(val, 0);
+        val = *locate_symbol(val, env);
         goto restart;
     } else {
         define_result = define_symbol(nom, sfs_eval(val, env), &env);
