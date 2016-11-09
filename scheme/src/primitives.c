@@ -20,61 +20,75 @@
         return NULL;\
     }
 
-void create_basic_primitives() {
+void create_basic_primitives(object env) {
     /* Those are the basic type comparison functions */
-    create_primitive("boolean?", prim_is_boolean);
-    create_primitive("null?", prim_is_null);
-    create_primitive("string?", prim_is_string);
-    create_primitive("pair?", prim_is_pair);
-    create_primitive("symbol?", prim_is_symbol);
-    create_primitive("char?", prim_is_char);
-    create_primitive("number?", prim_is_number);
-    create_primitive("list?", prim_is_list);
-    create_primitive("procedure?", prim_is_procedure);
+    create_primitive("boolean?", prim_is_boolean, env);
+    create_primitive("null?", prim_is_null, env);
+    create_primitive("string?", prim_is_string, env);
+    create_primitive("pair?", prim_is_pair, env);
+    create_primitive("symbol?", prim_is_symbol, env);
+    create_primitive("char?", prim_is_char, env);
+    create_primitive("number?", prim_is_number, env);
+    create_primitive("list?", prim_is_list, env);
+    create_primitive("procedure?", prim_is_procedure, env);
 
     /* Those are the number related comparison functions */
-    create_primitive("real?", prim_is_real);
-    create_primitive("complex?", prim_is_complex);
-    create_primitive("integer?", prim_is_integer);
-    create_primitive("positive?", prim_is_positive);
-    create_primitive("negative?", prim_is_negative);
-    create_primitive("zero?", prim_is_zero);
-    create_primitive("equal?", prim_is_equal);
-    create_primitive("eq?", prim_is_eq);
+    create_primitive("real?", prim_is_real, env);
+    create_primitive("complex?", prim_is_complex, env);
+    create_primitive("integer?", prim_is_integer, env);
+    create_primitive("positive?", prim_is_positive, env);
+    create_primitive("negative?", prim_is_negative, env);
+    create_primitive("zero?", prim_is_zero, env);
+    create_primitive("equal?", prim_is_equal, env);
+    create_primitive("eq?", prim_is_eq, env);
 
     /* Those are the basic list handling functions */
-    create_primitive("car", prim_car);
-    create_primitive("cdr", prim_cdr);
-    create_primitive("set-car!", prim_set_car);
-    create_primitive("set-cdr!", prim_set_cdr);
-    create_primitive("cons", prim_cons);
-    create_primitive("list", prim_list);
+    create_primitive("car", prim_car, env);
+    create_primitive("cdr", prim_cdr, env);
+    create_primitive("set-car!", prim_set_car, env);
+    create_primitive("set-cdr!", prim_set_cdr, env);
+    create_primitive("cons", prim_cons, env);
+    create_primitive("list", prim_list, env);
 
     /* Those are ordering primitives */
-    create_primitive(">", prim_larger);
-    create_primitive("<", prim_smaller);
-    create_primitive("=", prim_equal);
+    create_primitive(">", prim_larger, env);
+    create_primitive("<", prim_smaller, env);
+    create_primitive("=", prim_equal, env);
 
     /* Those are conversation primitives */
-    create_primitive("integer->char", prim_integer_to_char);
-    create_primitive("char->integer", prim_char_to_integer);
-    create_primitive("number->string", prim_number_to_string);
-    create_primitive("string->number", prim_string_to_number);
-    create_primitive("symbol->string", prim_symbol_to_string);
-    create_primitive("string->symbol", prim_string_to_symbol);
-
+    create_primitive("integer->char", prim_integer_to_char, env);
+    create_primitive("char->integer", prim_char_to_integer, env);
+    create_primitive("number->string", prim_number_to_string, env);
+    create_primitive("string->number", prim_string_to_number, env);
+    create_primitive("symbol->string", prim_symbol_to_string, env);
+    create_primitive("string->symbol", prim_string_to_symbol, env);
 
     /* Those are the basic arithmetic primitives */
-    create_primitive("+", prim_arith_plus);
-    create_primitive("-", prim_arith_minus);
-    create_primitive("*", prim_arith_times);
-    create_primitive("/", prim_arith_division);
-    create_primitive("remainder", prim_arith_remainder);
-    create_primitive("quotient", prim_arith_quotient);
+    create_primitive("+", prim_arith_plus, env);
+    create_primitive("-", prim_arith_minus, env);
+    create_primitive("*", prim_arith_times, env);
+    create_primitive("/", prim_arith_division, env);
+    create_primitive("remainder", prim_arith_remainder, env);
+    create_primitive("quotient", prim_arith_quotient, env);
+
+    /* This is the primitive to create a new standard environment */
+    create_primitive("interaction-environment", prim_interaction_environment, env);
 }
 
-void create_primitive(string prim_name, object (*func)(object)) {
-    define_symbol(make_symbol(prim_name), make_primitive(func, prim_name), 0);
+void create_primitive(string prim_name, object (*func)(object), object env) {
+    define_symbol(make_symbol(prim_name), make_primitive(func, prim_name), &env);
+}
+
+object prim_interaction_environment(object o) {
+    TEST_NUMB_ARGUMENT_EQ(0, "interaction-environment");
+
+    object environment = make_symbol_table();
+    create_env_layer(environment);
+    create_basic_forms(environment);
+    create_basic_primitives(environment);
+    define_symbol(make_symbol("NaN"), NaN, &environment);
+
+    return environment;
 }
 
 object prim_arith_quotient(object o) {

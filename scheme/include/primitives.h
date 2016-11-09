@@ -3,8 +3,8 @@
 
 #include <object.h>
 
-void create_basic_primitives(void);
-void create_primitive(string, object (*)(object));
+void create_basic_primitives(object);
+void create_primitive(string, object (*)(object), object);
 
 /* Those are the basic type testing functions */
 object prim_is_boolean(object);
@@ -48,7 +48,6 @@ object prim_larger(object);
 object prim_smaller(object);
 object prim_equal(object);
 
-
 /* Those are basic arithmetic functions */
 object prim_arith_plus(object);
 object prim_arith_minus(object);
@@ -56,5 +55,8 @@ object prim_arith_times(object);
 object prim_arith_division(object);
 object prim_arith_remainder(object);
 object prim_arith_quotient(object);
+
+/* This is the primitive to create a new standard environment */
+object prim_interaction_environment(object);
 
 #endif /* PRIMITIVES_H */

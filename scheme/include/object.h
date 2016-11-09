@@ -43,7 +43,7 @@ typedef struct object_t {
         } primitive;
 
         struct {
-            struct object_t* (*f)(struct object_t *);
+            struct object_t* (*f)(struct object_t *, struct object_t *);
             string func_name;
         } form;
     } val;
@@ -56,7 +56,7 @@ object make_nil(void);
 object make_true(void);
 object make_false(void);
 object make_primitive(object (*f)(object), string func_name);
-object make_form(object (*f)(object), string func_name);
+object make_form(object (*f)(object,object), string func_name);
 object make_symbol_table(void);
 object make_symbol(string);
 object make_string(string);
@@ -91,7 +91,7 @@ extern object nil;
 extern object _void;
 extern object _true;
 extern object _false;
-extern object symbol_table;
+extern object master_environment;
 extern object plus_inf;
 extern object minus_inf;
 extern object NaN;

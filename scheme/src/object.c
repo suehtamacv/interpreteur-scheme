@@ -51,7 +51,7 @@ object make_primitive(object (*func)(object), string func_name) {
     return f;
 }
 
-object make_form(object (*func)(object), string func_name) {
+object make_form(object (*func)(object,object), string func_name) {
     object f = make_object(SFS_FORM);
     f->val.form.f = func;
     strcpy(f->val.primitive.func_name, func_name);
