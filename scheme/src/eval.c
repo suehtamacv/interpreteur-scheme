@@ -33,21 +33,14 @@ restart:
         }
         goto restart;
     } else if (is_Pair(input) == True) {
-        if (is_Symbol(car(input)) == False) {
+        object symb = sfs_eval(car(input), env);
+        if (is_Form(symb) == False && is_Primitive(symb) == False) {
             WARNING_MSG("Ill-formed expression: first list element "
                         "can not be resolved into a procedure");
             return NULL;
         }
 
-        object *symb = locate_symbol(car(input), env);
-        if (!symb ||
-                (is_Primitive(*symb) == False &&
-                 is_Form(*symb) == False)) {
-            WARNING_MSG("Procedure \"%s\" not found", car(input)->val.symbol);
-            return NULL;
-        }
-
-        if ((*symb)->type == SFS_PRIMITIVE) {
+        if (symb->type == SFS_PRIMITIVE) {
             /* Must evaluate the arguments */
             object rev_eval_list = nil;
 
@@ -68,10 +61,10 @@ restart:
             }
 
             /* Calls the function */
-            return (*symb)->val.primitive.f(reverse(rev_eval_list));
-        } else if (((*symb)->type == SFS_FORM)) {
+            return symb->val.primitive.f(reverse(rev_eval_list));
+        } else if ((symb->type == SFS_FORM)) {
             /* Calls the function */
-            return (*symb)->val.form.f(cdr(input), env);
+            return symb->val.form.f(cdr(input), env);
         }
 
         goto restart;
