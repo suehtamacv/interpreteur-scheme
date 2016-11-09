@@ -224,12 +224,12 @@ object num_abs(object n) {
         break;
 
     case NUM_COMPLEX:
-        absval = prim_arith_plus(list(absval,
-                                      prim_arith_times(list(
+        absval = prim_plus(list(absval,
+                                      prim_times(list(
                                               real_part(n->val.number),
                                               real_part(n->val.number)))));
-        absval = prim_arith_plus(list(absval,
-                                      prim_arith_times(list(
+        absval = prim_plus(list(absval,
+                                      prim_times(list(
                                               imag_part(n->val.number),
                                               imag_part(n->val.number)))));
         absval = to_real(absval);
@@ -261,7 +261,7 @@ object num_conj(object n) {
 
     case NUM_COMPLEX:
         return make_complex(real_part(n->val.number),
-                            prim_arith_minus(cons(imag_part(n->val.number), nil)));
+                            prim_minus(cons(imag_part(n->val.number), nil)));
         break;
     }
 

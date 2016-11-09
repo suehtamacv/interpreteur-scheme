@@ -53,12 +53,18 @@ object prim_smaller(object);
 object prim_equal(object);
 
 /* Those are basic arithmetic functions */
-object prim_arith_plus(object);
-object prim_arith_minus(object);
-object prim_arith_times(object);
-object prim_arith_division(object);
-object prim_arith_remainder(object);
-object prim_arith_quotient(object);
+object prim_plus(object);
+object prim_minus(object);
+object prim_times(object);
+object prim_division(object);
+object prim_remainder(object);
+object prim_quotient(object);
+object prim_modulo(object);
+object prim_abs(object);
+object prim_exp(object);
+object prim_sin(object);
+object prim_cos(object);
+object prim_tan(object);
 
 /* This is the primitive to create a new standard environment */
 object prim_interaction_environment(object);

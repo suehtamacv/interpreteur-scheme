@@ -679,7 +679,7 @@ object sfs_read_complex_number(char *input, uint *h) {
     atom->val.number->val.complex->real = sfs_read_number(realpart, &real_p);
     atom->val.number->val.complex->imag = sfs_read_number(imagpart, &imag_p);
     if (is_negative == -1) {
-        atom->val.number->val.complex->real = prim_arith_minus(cons(
+        atom->val.number->val.complex->real = prim_minus(cons(
                 atom->val.number->val.complex->real, nil));
     }
 
