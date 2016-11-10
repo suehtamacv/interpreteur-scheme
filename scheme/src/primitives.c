@@ -253,7 +253,7 @@ object prim_cos(object o) {
 
     case NUM_COMPLEX:
         (void) o;
-        //cos(o) = (exp(jo) + exp(-jo))/2
+        /* cos(o) = (exp(jo) + exp(-jo))/2 */
         object exp1 = prim_exp(cons(prim_times(list(
                 make_complex(make_integer(0), make_integer(1)), o)), nil));
         object exp2 = prim_exp(cons(prim_times(list(
@@ -345,7 +345,6 @@ object prim_string_to_number(object o) {
 }
 
 object prim_string_to_symbol(object o) {
-    // TODO Faut corriger
     TEST_NUMB_ARGUMENT_EQ(1, "string->symbol");
     if(is_String(car(o)) != True) {
         WARNING_MSG("Wrong type of arguments on \"string->symbol\"");
