@@ -18,13 +18,12 @@ extern "C" {
 #include "basic.h"
 #include "object.h"
 
-void create_environment(int depth);
-object* get_environment(int);
+object create_env_layer(object environment);
 
-int define_symbol(object symbol_name, object, int);
-int set_symbol(object symbol_name, object, int);
-object *locate_symbol(object symbol_name, int);
-object *locate_symbol_in_environment(object symbol_name, int);
+int define_symbol(object name, object val, object *environment);
+int set_symbol(object name, object val, object environment);
+object *locate_symbol(object name, object environment);
+object *locate_symbol_in_env(object name, object env_layer);
 
 #ifdef __cplusplus
 }

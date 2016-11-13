@@ -35,7 +35,7 @@ object nil;
 object _void;
 object _true;
 object _false;
-object symbol_table;
+object master_environment;
 object plus_inf;
 object minus_inf;
 object NaN;
@@ -51,16 +51,7 @@ void init_interpreter (void) {
     NaN = make_number(NUM_UNDEF);
 
     /* Crée l'environment top-level */
-    symbol_table = make_symbol_table();
-    create_environment(-1);
-
-    /* Crée les formes */
-    create_basic_forms();
-
-    /* Crée les primitives */
-    create_basic_primitives();
-
-    define_symbol(make_symbol("NaN"), NaN, 0);
+    master_environment = prim_interaction_environment(nil);
 }
 
 int main (int argc, char *argv[]) {
@@ -151,7 +142,7 @@ int main (int argc, char *argv[]) {
             continue ;
         }
 
-        output = sfs_eval( sexpr );
+        output = sfs_eval(sexpr, master_environment);
         if(NULL == output) {
             /* si fichier alors on sort*/
             if (mode == SCRIPT) {

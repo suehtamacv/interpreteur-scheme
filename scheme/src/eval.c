@@ -12,66 +12,59 @@
 #include "lists.h"
 #include <strings.h>
 
-object sfs_eval(object in) {
+object sfs_eval(object input, object env) {
 restart:
     /* NULL pointer handling */
-    if (!in) {
+    if (!input) {
         return NULL;
     }
 
-    if (is_AutoEvaluable(in) == True) {
+    if (is_AutoEvaluable(input) == True) {
         DEBUG_MSG("Evaluating auto-evaluable object");
-        return in;
-    } else if (is_Symbol(in) == True) {
+        return input;
+    } else if (is_Symbol(input) == True) {
         DEBUG_MSG("Resolving a symbol by searching for it in the symbol table");
-        object *l_symb = locate_symbol(in, 0);
+        object *l_symb = locate_symbol(input, env);
         if (l_symb == NULL) {
-            WARNING_MSG("Unbound variable: %s", in->val.symbol);
+            WARNING_MSG("Unbound variable: %s", input->val.symbol);
             return NULL;
         } else {
-            in = *l_symb;
+            input = *l_symb;
         }
         goto restart;
-    } else if (is_Pair(in) == True) {
-        if (is_Symbol(car(in)) == False) {
+    } else if (is_Pair(input) == True) {
+        object symb = sfs_eval(car(input), env);
+        if (is_Form(symb) == False && is_Primitive(symb) == False) {
             WARNING_MSG("Ill-formed expression: first list element "
                         "can not be resolved into a procedure");
             return NULL;
         }
 
-        object *symb = locate_symbol(car(in), 0);
-        if (!symb ||
-                (is_Primitive(*symb) == False &&
-                 is_Form(*symb) == False)) {
-            WARNING_MSG("Procedure \"%s\" not found", car(in)->val.symbol);
-            return NULL;
-        }
-
-        if ((*symb)->type == SFS_PRIMITIVE) {
+        if (symb->type == SFS_PRIMITIVE) {
             /* Must evaluate the arguments */
             object rev_eval_list = nil;
 
-            in = cdr(in);
-            while (is_Nil(in) == False) {
-                if (is_Define(car(in)) == True) {
+            input = cdr(input);
+            while (is_Nil(input) == False) {
+                if (is_Define(car(input)) == True) {
                     WARNING_MSG("Definitions not allowed in expression context");
                     return NULL;
                 }
 
-                object eval_element = sfs_eval(car(in));
+                object eval_element = sfs_eval(car(input), env);
                 if (eval_element) {
                     rev_eval_list = cons(eval_element, rev_eval_list);
                 } else {
                     return NULL;
                 }
-                in = cdr(in);
+                input = cdr(input);
             }
 
             /* Calls the function */
-            return (*symb)->val.primitive.f(reverse(rev_eval_list));
-        } else if (((*symb)->type == SFS_FORM)) {
+            return symb->val.primitive.f(reverse(rev_eval_list));
+        } else if ((symb->type == SFS_FORM)) {
             /* Calls the function */
-            return (*symb)->val.form.f(cdr(in));
+            return symb->val.form.f(cdr(input), env);
         }
 
         goto restart;

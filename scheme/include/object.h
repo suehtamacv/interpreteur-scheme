@@ -18,7 +18,7 @@ extern "C" {
 #include "number.h"
 
 typedef enum object_type_t {
-    SFS_NUMBER, SFS_CHARACTER, SFS_STRING, SFS_PAIR, SFS_NIL, SFS_BOOLEAN, SFS_SYMBOL, SFS_PRIMITIVE, SFS_FORM
+    SFS_NUMBER, SFS_CHARACTER, SFS_STRING, SFS_PAIR, SFS_NIL, SFS_BOOLEAN, SFS_SYMBOL, SFS_PRIMITIVE, SFS_FORM, SFS_ENV
 } object_type;
 
 typedef struct object_t {
@@ -43,7 +43,7 @@ typedef struct object_t {
         } primitive;
 
         struct {
-            struct object_t* (*f)(struct object_t *);
+            struct object_t* (*f)(struct object_t *, struct object_t *);
             string func_name;
         } form;
     } val;
@@ -56,8 +56,8 @@ object make_nil(void);
 object make_true(void);
 object make_false(void);
 object make_primitive(object (*f)(object), string func_name);
-object make_form(object (*f)(object), string func_name);
-object make_symbol_table(void);
+object make_form(object (*f)(object,object), string func_name);
+object make_env_list(void);
 object make_symbol(string);
 object make_string(string);
 object make_number(uint type);
@@ -81,9 +81,11 @@ Bool is_Integer(object o);
 Bool is_Real(object o);
 Bool is_List(object o);
 Bool is_Complex(object o);
+Bool is_Void(object o);
 Bool is_Zero(object o);
 Bool is_Positive(object o);
 Bool is_Negative(object o);
+Bool is_Environment(object o);
 
 Bool is_AutoEvaluable(object o);
 
@@ -91,7 +93,7 @@ extern object nil;
 extern object _void;
 extern object _true;
 extern object _false;
-extern object symbol_table;
+extern object master_environment;
 extern object plus_inf;
 extern object minus_inf;
 extern object NaN;

@@ -17,7 +17,7 @@ extern "C" {
 #include "object.h"
 #include "symbols.h"
 
-object sfs_eval(object);
+object sfs_eval(object input, object env);
 
 #ifdef __cplusplus
 }

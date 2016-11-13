@@ -6,21 +6,35 @@
 #include <limits.h>
 #include <strings.h>
 
-void create_basic_forms() {
+void create_basic_forms(object env) {
     /* Create associations in the symbol table */
-    create_form("and", form_and);
-    create_form("or", form_or);
-    create_form("define", form_define);
-    create_form("quote", form_quote);
-    create_form("if", form_if);
-    create_form("set!", form_set);
+    create_form("and", form_and, env);
+    create_form("or", form_or, env);
+    create_form("define", form_define, env);
+    create_form("quote", form_quote, env);
+    create_form("if", form_if, env);
+    create_form("set!", form_set, env);
+    create_form("eval", form_eval, env);
 }
 
-void create_form(string form_name, object (*f)(object)) {
-    define_symbol(make_symbol(form_name), make_form(f, form_name), 0);
+void create_form(string form_name, object (*f)(object, object), object env) {
+    if (is_Environment(env) == False) {
+        WARNING_MSG("Can't create a form into something who is not an environment");
+    }
+    define_symbol(make_symbol(form_name), make_form(f, form_name), &env);
 }
 
-object form_and(object o) {
+object form_eval(object o, object env) {
+    (void) env;
+    if (list_length(o) != 2) {
+        WARNING_MSG("Wrong number of arguments on \"eval\"");
+        return NULL;
+    }
+    env = sfs_eval(cadr(o), env);
+    return (env ? sfs_eval(sfs_eval(car(o), env), env) : NULL);
+}
+
+object form_and(object o, object env) {
     /* An and with one element is the element itself */
     if (list_length(o) == 1) {
         return car(o);
@@ -37,7 +51,7 @@ restart:
         WARNING_MSG("Definitions not allowed in expression context");
         return NULL;
     }
-    result = sfs_eval(car(o));
+    result = sfs_eval(car(o), env);
 
     /* Court circuit si on trouve un #f */
     if (is_True(result) == False) {
@@ -48,7 +62,7 @@ restart:
     goto restart;
 }
 
-object form_or(object o) {
+object form_or(object o, object env) {
     /* An or with one element is the element itself */
     if (list_length(o) == 1) {
         return car(o);
@@ -66,7 +80,7 @@ restart:
         WARNING_MSG("Definitions not allowed in expression context");
         return NULL;
     }
-    result = sfs_eval(car(o));
+    result = sfs_eval(car(o), env);
 
     /* Court circuit si on trouve un #t */
     if (is_True(result) == True) {
@@ -77,7 +91,7 @@ restart:
     goto restart;
 }
 
-object form_define(object o) {
+object form_define(object o, object env) {
     if (list_length(o) != 2) {
         WARNING_MSG("Wrong number of arguments on \"define\"");
         return NULL;
@@ -89,12 +103,18 @@ object form_define(object o) {
 
 restart:
     if (is_Quote(val) == True) {
-        define_result = define_symbol(nom, val, 0);
+        define_result = define_symbol(nom, val, &env);
     } else if (is_Symbol(val) == True) {
-        val = *locate_symbol(val, 0);
-        goto restart;
+        object *found = locate_symbol(val, env);
+        if (found) {
+            val = *found;
+            goto restart;
+        } else {
+            WARNING_MSG("Can't define something to an unbound variable");
+            return NULL;
+        }
     } else {
-        define_result = define_symbol(nom, sfs_eval(val), 0);
+        define_result = define_symbol(nom, sfs_eval(val, env), &env);
     }
 
     if (define_result == 0) {
@@ -104,25 +124,29 @@ restart:
     }
 }
 
-object form_quote(object o) {
+object form_quote(object o, object env) {
     if (list_length(o) != 1) {
         WARNING_MSG("Wrong number of arguments on \"quote\"");
         return NULL;
     }
-    return car(o);
+    return (env ? car(o) : NULL);
 }
 
-object form_if(object o) {
-    if (list_length(o) != 3) {
+object form_if(object o, object env) {
+    if (list_length(o) < 2 || list_length(o) > 3) {
         WARNING_MSG("Wrong number of arguments on \"if\"");
         return NULL;
     }
-    object result = sfs_eval(car(o));
+    object result = sfs_eval(car(o), env);
 
     if (result && is_True(result) == True) {
-        o = sfs_eval(cadr(o));
+        o = sfs_eval(cadr(o), env);
     } else if (result) {
-        o = sfs_eval(caddr(o));
+        if (is_Pair(cddr(o)) == True) {
+            o = sfs_eval(caddr(o), env);
+        } else {
+            return _void;
+        }
     } else {
         return NULL;
     }
@@ -135,13 +159,13 @@ object form_if(object o) {
     return o;
 }
 
-object form_set(object o) {
+object form_set(object o, object env) {
     if (list_length(o) != 2) {
         WARNING_MSG("Wrong number of arguments on \"set!\"");
         return NULL;
     }
 
-    if (set_symbol(car(o), cadr(o), 0) == 0) { /* Success */
+    if (set_symbol(car(o), cadr(o), env) == 0) { /* Success */
         return _void;
     } else {
         return NULL;

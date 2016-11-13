@@ -58,6 +58,10 @@ void sfs_print_form(object);
  * @brief sfs_print_pair prints a pair.
  */
 void sfs_print_pair(object);
+/**
+ * @brief sfs_print_pair prints an environment.
+ */
+void sfs_print_environment(object);
 
 #ifdef __cplusplus
 }

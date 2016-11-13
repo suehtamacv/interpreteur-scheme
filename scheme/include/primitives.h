@@ -3,8 +3,8 @@
 
 #include <object.h>
 
-void create_basic_primitives(void);
-void create_primitive(string, object (*)(object));
+void create_basic_primitives(object);
+void create_primitive(string, object (*)(object), object);
 
 /* Those are the basic type testing functions */
 object prim_is_boolean(object);
@@ -30,6 +30,10 @@ object prim_is_equal(object);
 /* Those are the basic list handling functions */
 object prim_car(object);
 object prim_cdr(object);
+object prim_caar(object);
+object prim_cadr(object);
+object prim_cdar(object);
+object prim_cddr(object);
 object prim_set_car(object);
 object prim_set_cdr(object);
 object prim_cons(object);
@@ -48,13 +52,29 @@ object prim_larger(object);
 object prim_smaller(object);
 object prim_equal(object);
 
-
 /* Those are basic arithmetic functions */
-object prim_arith_plus(object);
-object prim_arith_minus(object);
-object prim_arith_times(object);
-object prim_arith_division(object);
-object prim_arith_remainder(object);
-object prim_arith_quotient(object);
+object prim_plus(object);
+object prim_minus(object);
+object prim_times(object);
+object prim_division(object);
+object prim_remainder(object);
+object prim_quotient(object);
+object prim_modulo(object);
+object prim_abs(object);
+object prim_exp(object);
+object prim_sin(object);
+object prim_cos(object);
+object prim_tan(object);
+
+/* Those are the primitives related to complex numbers */
+object prim_make_rectangular(object);
+object prim_make_polar(object);
+object prim_real_part(object);
+object prim_imag_part(object);
+object prim_magnitude(object);
+object prim_angle(object);
+
+/* This is the primitive to create a new standard environment */
+object prim_interaction_environment(object);
 
 #endif /* PRIMITIVES_H */
