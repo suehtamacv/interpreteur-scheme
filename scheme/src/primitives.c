@@ -7,7 +7,8 @@
 #include <math.h>
 #include <stdio.h>
 #include <mem.h>
-#include<stdlib.h>
+#include <read.h>
+#include <stdlib.h>
 
 #define TEST_NUMB_ARGUMENT_EQ(n_Arg, nomFunction) \
     if (list_length(o) != n_Arg) { \
@@ -118,7 +119,7 @@ object prim_string_to_number(object o) {
         WARNING_MSG("Wrong type of arguments on \"string->number\"");
         return NULL;
     } else {
-        uint h;
+        uint h = 0;
         return sfs_read_number(car(o)->val.string, &h);
     }
 }
@@ -139,46 +140,90 @@ object prim_symbol_to_string(object o) {
         WARNING_MSG("Wrong type of arguments on \"symbol->string\"");
         return NULL;
     } else {
-        return make_string(car(o)->val.string);
+        return make_string(car(o)->val.symbol);
     }
 }
 
 object prim_number_to_string(object o) {
-    TEST_NUMB_ARGUMENT_EQ(1, "number->string");
-    if(is_Number(car(o)) != True) {
+    if (list_length(o) > 2) {
+        WARNING_MSG("Wrong number of arguments on \"number->string\"");
+        return NULL;
+    }
+    if (is_Number(car(o)) == False) {
+        WARNING_MSG("Wrong type of arguments on \"number->string\"");
+        return NULL;
+    } else if (list_length(o) == 2 && is_Integer(cadr(o)) == False) {
         WARNING_MSG("Wrong type of arguments on \"number->string\"");
         return NULL;
     } else {
-        object str = make_string("");
+        string str = "";
         switch (car(o)->val.number->numtype) {
         case NUM_INTEGER:
         case NUM_UINTEGER:
-            sprintf(str->val.string, "%d", car(o)->val.number->val.integer);
+            if (list_length(o) == 2) {
+                switch (cadr(o)->val.number->val.integer) {
+                case 2:
+#define bitN(arg,n) (((arg)>>(n))&1)
+                    for (int s = sizeof(int) * CHAR_BIT; s >= 0; s--) {
+                        str[sizeof(int) * CHAR_BIT - s] =
+                            bitN(car(o)->val.number->val.integer, s) == 1 ? '1' : '0';
+                    }
+                    str[sizeof(int) * CHAR_BIT + 1] = '\0';
+#undef bitN
+                    break;
+
+                case 8:
+                    sprintf(str, "%o", car(o)->val.number->val.integer);
+                    break;
+
+                case 16:
+                    sprintf(str, "%X", car(o)->val.number->val.integer);
+                    break;
+
+                case 10:
+                    sprintf(str, "%d", car(o)->val.number->val.integer);
+                    break;
+
+                default:
+                    WARNING_MSG("Invalid radix (must be 2, 8, 10 or 16)");
+                    return NULL;
+                }
+            } else {
+                sprintf(str, "%d", car(o)->val.number->val.integer);
+            }
             break;
 
         case NUM_REAL:
-            sprintf(str->val.string, "%f", car(o)->val.number->val.real);
+            sprintf(str, "%lg", car(o)->val.number->val.real);
             break;
 
         case NUM_UNDEF:
-            sprintf(str->val.string, "NaN");
+            sprintf(str, "NaN");
             break;
 
         case NUM_PINFTY:
-            sprintf(str->val.string, "+inf");
+            sprintf(str, "+inf");
             break;
 
         case NUM_MINFTY:
-            sprintf(str->val.string, "-inf");
-            break;
-        case NUM_COMPLEX:
-            sfs_print(car(o)->val.number->val.complex->real);
-            object newComplex = to_complex(car(o));
-            sprintf(str->val.string, "%x", car(o)->val.number->val.complex->real);
+            sprintf(str, "-inf");
             break;
 
+        case NUM_COMPLEX:
+            (void) o;
+            object realpart = prim_number_to_string(cons(real_part(car(o)->val.number),
+                                                    nil));
+            object imagpart = prim_number_to_string(cons(imag_part(car(o)->val.number),
+                                                    nil));
+            if (imag_part(car(o)->val.number) == NaN ||
+                    is_Negative(imag_part(car(o)->val.number)) == False) {
+                sprintf(str, "%s+%sj", realpart->val.string, imagpart->val.string);
+            } else {
+                sprintf(str, "%s-%sj", realpart->val.string, imagpart->val.string);
+            }
+            break;
         }
-        return str;
+        return make_string(str);
     }
     return NULL;
 }
