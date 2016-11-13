@@ -57,6 +57,16 @@
 <p>Pour faciliter sa exécution, le projet informatique a été divisé en quatre livrables intermédiaires.</p>
 
 <h2>
+<a id="livrable-3--primitives" class="anchor" href="#livrable-3--primitives" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Livrable 3 : Primitives</h2>
+
+<p>Dans le troisième livrable, la grosse partie du travail c'est d'implémenter les primitives basiques de <code>Scheme</code>, c'est-à-dire, les fonctions que ne sont pas de formes (couvertes le livrable précèdent). Comme presque tout en <code>Scheme</code>, une primitive est-elle un objet, particulièrement du type <code>SFS_PRIMITIVE</code>. On trouve sur la squelette d'une primitive qu'elle peut être régardé comme un pointeur pour une fonction qui prenne un objet et retourne un objet,
+et aussi une <code>string</code> pour sauvegarder le nom de la primitive.</p>
+
+<p>Sur ce livrable, on a aussi ajouté une dernière forme à l'interpréteur, à savoir la forme <code>eval</code>, et la primitive <code>interaction-environment</code>.</p>
+
+<p>Ce livrable peut être trouvé <a href="https://github.com/suehtamacv/interpreteur-scheme/releases/tag/v3-troisiemeLivrable">ici</a>.</p>
+
+<h2>
 <a id="livrable-2--Évaluation-et-environnement" class="anchor" href="#livrable-2--%C3%89valuation-et-environnement" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Livrable 2 : Évaluation et environnement</h2>
 
 <p>Le but du deuxième livrable, c'est de définir des variables dans l'environnement et aussi d'implémenter et utiliser les formes, à savoir, <code>quote</code>, <code>define</code>, <code>set!</code>, <code>if</code>, <code>and</code> et <code>or</code>.  Pendant l'exécution du deuxième livrable, il faut que les étudiants continuent à construire sur le code qu'ils ont fait pour le premier livrable, en ajoutant les nouvelles fonctionnalités. Les étudiants doivent aussi écrire un nouveau jeu de tests pour qu'ils puissent savoir si leur code est correcte.</p>
