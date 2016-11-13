@@ -7,6 +7,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <mem.h>
+#include<stdlib.h>
 
 #define TEST_NUMB_ARGUMENT_EQ(n_Arg, nomFunction) \
     if (list_length(o) != n_Arg) { \
@@ -117,12 +118,8 @@ object prim_string_to_number(object o) {
         WARNING_MSG("Wrong type of arguments on \"string->number\"");
         return NULL;
     } else {
-        /*if(is_Number(o->val.string) != True) {
-            WARNING_MSG("Can't convert string which isn't number");
-            return NULL;
-        } else {
-             if(is_Complex(o->val.string) == T)
-        }*/
+        uint h;
+        return sfs_read_number(car(o)->val.string, &h);
     }
 }
 
@@ -173,6 +170,11 @@ object prim_number_to_string(object o) {
 
         case NUM_MINFTY:
             sprintf(str->val.string, "-inf");
+            break;
+        case NUM_COMPLEX:
+            sfs_print(car(o)->val.number->val.complex->real);
+            object newComplex = to_complex(car(o));
+            sprintf(str->val.string, "%x", car(o)->val.number->val.complex->real);
             break;
 
         }
