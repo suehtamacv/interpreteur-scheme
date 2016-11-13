@@ -19,7 +19,7 @@ object create_env_layer(object environment) {
         WARNING_MSG("Can't create a subenvironment into something who is not an environment");
         return NULL;
     }
-    environment = list(nil, environment);
+    environment = cons(nil, environment);
     environment->type = SFS_ENV;
     return environment;
 }
@@ -42,7 +42,7 @@ object* locate_symbol(object name, object environment) {
         }
         environment = cdr(environment);
         env_layer = &((*environment).val.pair.car);
-        if (*env_layer == nil) {
+        if (environment == nil) {
             break;
         }
     } while(1);

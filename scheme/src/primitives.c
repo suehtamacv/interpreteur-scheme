@@ -174,8 +174,10 @@ object prim_interaction_environment(object o) {
     object environment = make_env_list();
     create_env_layer(environment);
     create_basic_forms(environment);
+    environment = create_env_layer(environment);
     create_basic_primitives(environment);
     define_symbol(make_symbol("NaN"), NaN, &environment);
+    environment = create_env_layer(environment);
 
     return environment;
 }

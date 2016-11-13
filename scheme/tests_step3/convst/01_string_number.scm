@@ -9,6 +9,8 @@
 (number->string +inf)
 (number->string -inf)
 (number->string NaN)
+(number->string 1+2j)
+(number->string 1.72-3j)
 (char? (integer->char 97))
 (+ (char->integer #\D) (char->integer #\d))
 (define x (char->integer #\E))

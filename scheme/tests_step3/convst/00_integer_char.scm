@@ -10,7 +10,7 @@
 (char->integer #\c)
 (number? (char->integer #\a))
 (char? (integer->char 97))
-(+ (char->integer #\D) (char->integer #\d))
+(- (char->integer #\d) (char->integer #\D))
 (define x (char->integer #\E))
 (define y x)
 (- (* 2 x) y y)
