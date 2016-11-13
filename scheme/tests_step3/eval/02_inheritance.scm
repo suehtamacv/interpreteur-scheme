@@ -19,7 +19,7 @@ x
 (eval 'y (eval 'Env2 (eval 'Env1 Env0)))
 (eval 'y (eval 'Env1 Env0))
 
-(define if +)
-(if 1 2 3)
-(eval '(if 1 2 3) Env0)
-(eval 'z Env0)
+(eval '(define y "No Longer 42") (eval 'Env2 (eval 'Env1 Env0)))
+(eval 'y (eval 'Env2 (eval 'Env1 Env0)))
+(eval 'y (eval 'Env1 Env0))
+

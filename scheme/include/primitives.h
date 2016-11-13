@@ -74,7 +74,4 @@ object prim_imag_part(object);
 object prim_magnitude(object);
 object prim_angle(object);
 
-/* This is the primitive to create a new standard environment */
-object prim_interaction_environment(object);
-
 #endif /* PRIMITIVES_H */

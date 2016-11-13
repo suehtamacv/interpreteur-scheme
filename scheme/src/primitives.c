@@ -90,9 +90,6 @@ void create_basic_primitives(object env) {
     create_primitive("imag-part", prim_imag_part, env);
     create_primitive("magnitude", prim_magnitude, env);
     create_primitive("angle", prim_angle, env);
-
-    /* This is the primitive to create a new standard environment */
-    create_primitive("interaction-environment", prim_interaction_environment, env);
 }
 
 void create_primitive(string prim_name, object (*func)(object), object env) {
@@ -166,20 +163,6 @@ object prim_angle(object o) {
     }
 
     return num_phase(o);
-}
-
-object prim_interaction_environment(object o) {
-    TEST_NUMB_ARGUMENT_EQ(0, "interaction-environment");
-
-    object environment = make_env_list();
-    create_env_layer(environment);
-    create_basic_forms(environment);
-    environment = create_env_layer(environment);
-    create_basic_primitives(environment);
-    define_symbol(make_symbol("NaN"), NaN, &environment);
-    environment = create_env_layer(environment);
-
-    return environment;
 }
 
 object prim_exp(object o) {
@@ -438,7 +421,7 @@ object prim_number_to_string(object o) {
                     is_Negative(imag_part(car(o)->val.number)) == False) {
                 sprintf(str, "%s+%sj", realpart->val.string, imagpart->val.string);
             } else {
-                sprintf(str, "%s-%sj", realpart->val.string, imagpart->val.string);
+                sprintf(str, "%s%sj", realpart->val.string, imagpart->val.string);
             }
             break;
         }

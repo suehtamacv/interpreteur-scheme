@@ -14,6 +14,7 @@ object form_quote(object, object);
 object form_if(object, object);
 object form_set(object, object);
 object form_eval(object, object);
+object form_interaction_environment(object, object);
 
 /* Those are auxiliary functions */
 uint list_length(object);

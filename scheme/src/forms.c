@@ -5,6 +5,7 @@
 #include "print.h"
 #include <limits.h>
 #include <strings.h>
+#include <primitives.h>
 
 void create_basic_forms(object env) {
     /* Create associations in the symbol table */
@@ -15,6 +16,7 @@ void create_basic_forms(object env) {
     create_form("if", form_if, env);
     create_form("set!", form_set, env);
     create_form("eval", form_eval, env);
+    create_form("interaction-environment", form_interaction_environment, env);
 }
 
 void create_form(string form_name, object (*f)(object, object), object env) {
@@ -22,6 +24,21 @@ void create_form(string form_name, object (*f)(object, object), object env) {
         WARNING_MSG("Can't create a form into something who is not an environment");
     }
     define_symbol(make_symbol(form_name), make_form(f, form_name), &env);
+}
+
+object form_interaction_environment(object o, object env) {
+    if (list_length(o) != 0) {
+        WARNING_MSG("Wrong number of arguments on \"interaction-environment\"");
+        return NULL;
+    }
+
+    object environment = create_env_layer(env);
+    create_basic_forms(environment);
+    create_basic_primitives(environment);
+    define_symbol(make_symbol("NaN"), NaN, &environment);
+    environment = create_env_layer(environment);
+
+    return environment;
 }
 
 object form_eval(object o, object env) {

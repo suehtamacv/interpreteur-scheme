@@ -15,7 +15,7 @@
 #include "lists.h"
 
 object create_env_layer(object environment) {
-    if (is_Environment(environment) == False) {
+    if (is_Environment(environment) == False && is_Nil(environment) == False) {
         WARNING_MSG("Can't create a subenvironment into something who is not an environment");
         return NULL;
     }

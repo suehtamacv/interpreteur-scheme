@@ -46,12 +46,13 @@ void init_interpreter (void) {
     _void = make_nil();
     _true = make_true();
     _false = make_false();
+    master_environment = make_env_list();
     plus_inf = make_number(NUM_PINFTY);
     minus_inf = make_number(NUM_MINFTY);
     NaN = make_number(NUM_UNDEF);
 
     /* Crée l'environment top-level */
-    master_environment = prim_interaction_environment(nil);
+    master_environment = form_interaction_environment(nil, master_environment);
 }
 
 int main (int argc, char *argv[]) {
