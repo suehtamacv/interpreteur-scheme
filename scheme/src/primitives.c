@@ -82,6 +82,7 @@ void create_basic_primitives(object env) {
     create_primitive("sin", prim_sin, env);
     create_primitive("cos", prim_cos, env);
     create_primitive("tan", prim_tan, env);
+    create_primitive("sqrt", prim_sqrt, env);
 
     /* Those are the primitives related to complex numbers */
     create_primitive("make-rectangular", prim_make_rectangular, env);
@@ -208,10 +209,79 @@ object prim_exp(object o) {
     return NULL;
 }
 
+object prim_sqrt(object o) {
+    TEST_NUMB_ARGUMENT_EQ(1, "sqrt");
+    o = car(o);
+
+    if (is_Number(o) == False) {
+        WARNING_MSG("\"sqrt\" can only be applied to numbers");
+        return NULL;
+    }
+
+    object mag = to_real(num_abs(o));
+    object pha = to_real(num_phase(o));
+
+    switch (o->val.number->numtype) {
+    case NUM_UNDEF:
+        return NaN;
+        break;
+
+    case NUM_PINFTY:
+        return plus_inf;
+        break;
+
+    case NUM_MINFTY:
+        return make_complex(make_integer(0), plus_inf);
+        break;
+
+    case NUM_INTEGER:
+    case NUM_UINTEGER:
+    case NUM_REAL:
+    case NUM_COMPLEX:
+        if (!pha || pha == NaN) {
+            return NaN;
+        } else if (is_Zero(pha) == True) {
+            return make_real(sqrt(mag->val.number->val.real));
+        } else {
+            return prim_make_polar(list(make_real(sqrt(mag->val.number->val.real)),
+                                        make_real(pha->val.number->val.real / 2)));
+        }
+        break;
+    }
+
+    return NULL;
+}
+
 object prim_sin(object o) {
     TEST_NUMB_ARGUMENT_EQ(1, "sin");
-    object pi_sur_deux = make_real(acos(-1) / 2.0);
-    return prim_cos(cons(prim_minus(list(pi_sur_deux, car(o))), nil));
+    o = car(o);
+
+    if (is_Number(o) == False) {
+        WARNING_MSG("\"sin\" can only be applied to numbers");
+        return NULL;
+    }
+    switch (o->val.number->numtype) {
+    case NUM_UNDEF:
+    case NUM_MINFTY:
+    case NUM_PINFTY:
+        return NaN;
+        break;
+
+    case NUM_INTEGER:
+    case NUM_UINTEGER:
+        return make_real(sin((double)o->val.number->val.integer));
+        break;
+
+    case NUM_REAL:
+        return make_real(sin((double)o->val.number->val.real));
+        break;
+
+    case NUM_COMPLEX:
+        (void) o;
+        return prim_cos(cons(prim_minus(list(make_real(acos(-1) / 2.0), car(o))), nil));
+        break;
+    }
+    return NULL;
 }
 
 object prim_cos(object o) {
@@ -219,7 +289,7 @@ object prim_cos(object o) {
     o = car(o);
 
     if (is_Number(o) == False) {
-        WARNING_MSG("\"sin\" can only be applied to numbers");
+        WARNING_MSG("\"cos\" can only be applied to numbers");
         return NULL;
     }
     switch (o->val.number->numtype) {
@@ -1588,7 +1658,7 @@ object prim_division(object o) {
 
     case NUM_COMPLEX:
         denominator = prim_division(list(num_conj(denominator),
-                                         num_abs(denominator)));
+                                         prim_times(list(num_abs(denominator), num_abs(denominator)))));
         break;
     }
 

@@ -232,7 +232,7 @@ object num_abs(object n) {
                                 prim_times(list(
                                                imag_part(n->val.number),
                                                imag_part(n->val.number)))));
-        absval = to_real(absval);
+        absval = prim_sqrt(cons(to_real(absval), nil));
         return absval;
         break;
     }

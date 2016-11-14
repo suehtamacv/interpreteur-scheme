@@ -65,6 +65,7 @@ object prim_exp(object);
 object prim_sin(object);
 object prim_cos(object);
 object prim_tan(object);
+object prim_sqrt(object);
 
 /* Those are the primitives related to complex numbers */
 object prim_make_rectangular(object);
