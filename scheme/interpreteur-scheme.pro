@@ -4,7 +4,7 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 QMAKE_CXX = gcc
-QMAKE_CFLAGS = -x c -g -DDEBUG
+QMAKE_CFLAGS = -x c
 
 HEADERS += include/basic.h \
            include/eval.h \
@@ -29,7 +29,8 @@ SOURCES += src/eval.c \
            src/symbols.c \
            src/forms.c \
            src/primitives.c \
-           src/lists.c
+           src/lists.c \
+    src/number.c
 
 OTHER_FILES += .astylerc
 

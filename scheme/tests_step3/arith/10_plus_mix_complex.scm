@@ -1,0 +1,32 @@
+;;; En tete pour script de test ;;;;;;;;;;
+; TEST_RETURN_CODE=PASS
+; TEST_COMMENT=Tests "+" which has more than 2 arguments 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(+ 1 2 3)
+(+ 1 (+ 2 3) 4)
+(+ 1 (+ 2 3 4) (+ 5 6 7 8))
+(+ 1 (+ 1 +inf) (+ 2 -inf))
+(+ 1 (+ 2 +inf) (- 3 +inf))
+(+ 1 (+ 2 3+4i -inf) (+ 0+2i 0+3i))
+(+ 1 (+ 2 3+4i -inf) (+ 0+2i 0+3i) NaN)
+(+ 1 (+ 2 3 4) (- 5 6 7 8))
+(+ 1 (- 2 3 4) (- 5 6 7 8))
+(+ 1 (+ 2 3 4) (* 5 6 7 8))
+(+ 1 (* 2 3 4) (* 5 6 7 8))
+(+ 1 (+ 2 3 4) (quotient 56 7))
+(+ 1 (quotient 23 4) (quotient 56 7))
+(+ 1 (+ 2 3 4) (remainder 56 7))
+(+ 1 (remainder 23 4) (remainder 56 7))
+(+ 1 (- 2 3 4) (* 5 6 7))
+(+ 1 (* 2 3 4) (- 5 6 7))
+(+ 1 (- 2 3 4) (quotient 56 7))
+(+ 1 (quotient 23 4) (- 5 6 7))
+(+ 1 (- 2 3 4) (remainder 56 7))
+(+ 1 (remainder 23 4) (- 5 6 7))
+(+ 1 (* 2 3 4) (quotient 56 7))
+(+ 1 (quotient 23 4) (* 5 6 7))
+(+ 1 (* 2 3 4) (remainder 56 7))
+(+ 1 (remainder 23 4) (* 5 6 7))
+(+ 1 (- 2 3 4) (* 5 6 7) (quotient 89 2))
+(+ 1 (- 2 3 4) (* 5 6 7) (quotient 89 2) (remainder 34 5))

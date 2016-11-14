@@ -16,13 +16,12 @@ extern "C" {
 
 #include "basic.h"
 
-#define NUM_REAL     0x00
-#define NUM_INTEGER  0x01
-#define NUM_UINTEGER 0x02
-#define NUM_COMPLEX  0x03
-#define NUM_UNDEF    0x04
-#define NUM_PINFTY   0x05
-#define NUM_MINFTY   0x06
+typedef enum number_type_t {
+    NUM_REAL, NUM_INTEGER, NUM_UINTEGER, NUM_COMPLEX, NUM_UNDEF, NUM_PINFTY, NUM_MINFTY
+} number_type;
+
+typedef struct num_t *number;
+typedef struct object_t *object;
 
 /**
  * @brief The complex_t struct is used to create the structure of a
@@ -33,23 +32,39 @@ typedef struct complex_t {
     /**
      * @brief real is the real part of the complex number.
      */
-    double real;
+    object real;
     /**
      * @brief imag is the imaginary part of the complex number.
      */
-    double imag;
-} complex;
+    object imag;
+} *complex;
 
 typedef struct num_t {
 
-    uint numtype;
+    number_type numtype;
     union {
-        double       real;
+        long double  real;
         int          integer;
         complex      complex;
     } val;
 
-} num;
+} *num;
+
+
+object make_integer(int);
+object make_uinteger(int);
+object make_real(long double);
+object make_complex(object, object);
+
+object to_integer(object);
+object to_real(object);
+object to_complex(object);
+
+object real_part(number);
+object imag_part(number);
+object num_abs(object);
+object num_conj(object);
+object num_phase(object);
 
 #ifdef __cplusplus
 }

@@ -17,9 +17,13 @@ extern "C" {
 #include "boolean.h"
 #include "number.h"
 
+typedef enum object_type_t {
+    SFS_NUMBER, SFS_CHARACTER, SFS_STRING, SFS_PAIR, SFS_NIL, SFS_BOOLEAN, SFS_SYMBOL, SFS_PRIMITIVE, SFS_FORM, SFS_ENV
+} object_type;
+
 typedef struct object_t {
 
-    uint type;
+    object_type type;
     union {
         num              number;
         Bool             boolean;
@@ -35,26 +39,31 @@ typedef struct object_t {
 
         struct {
             struct object_t* (*f)(struct object_t *);
+            string func_name;
         } primitive;
 
         struct {
-            struct object_t* (*f)(struct object_t *);
+            struct object_t* (*f)(struct object_t *, struct object_t *);
+            string func_name;
         } form;
     } val;
 
 } *object;
 
-object make_object(uint type);
+object make_object(object_type type);
 object make_pair(object car, object cdr);
 object make_nil(void);
 object make_true(void);
 object make_false(void);
-object make_primitive(object (*f)(object));
-object make_form(object (*f)(object));
-object make_symbol_table(void);
+object make_primitive(object (*f)(object), string func_name);
+object make_form(object (*f)(object,object), string func_name);
+object make_env_list(void);
 object make_symbol(string);
 object make_string(string);
 object make_number(uint type);
+object make_character(char);
+object make_integer(int);
+
 
 /* The following functions are to verify the type of object */
 Bool is_True(object o);
@@ -68,25 +77,26 @@ Bool is_Boolean(object o);
 Bool is_Symbol(object o);
 Bool is_Primitive(object o);
 Bool is_Form(object o);
+Bool is_Integer(object o);
+Bool is_Real(object o);
+Bool is_List(object o);
+Bool is_Complex(object o);
+Bool is_Void(object o);
+Bool is_Zero(object o);
+Bool is_Positive(object o);
+Bool is_Negative(object o);
+Bool is_Environment(object o);
+
 Bool is_AutoEvaluable(object o);
 
-#define SFS_NUMBER       0x00
-#define SFS_CHARACTER    0x01
-#define SFS_STRING       0x02
-#define SFS_PAIR         0x03
-#define SFS_NIL          0x04
-#define SFS_BOOLEAN      0x05
-#define SFS_SYMBOL       0x06
-#define SFS_PRIMITIVE    0x07
-#define SFS_FORM         0x08
-
 extern object nil;
+extern object _void;
 extern object _true;
 extern object _false;
-extern object _quote;
-extern object _if;
-extern object _set;
-extern object symbol_table;
+extern object master_environment;
+extern object plus_inf;
+extern object minus_inf;
+extern object NaN;
 
 #ifdef __cplusplus
 }

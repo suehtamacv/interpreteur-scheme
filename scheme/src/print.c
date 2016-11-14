@@ -14,14 +14,12 @@
 
 void sfs_print(object o) {
     /* Le premier paranthèse ouvrante des listes */
-    if (is_Pair(o) == True) {
+    if (is_List(o) == True && is_Nil(o) == False && is_Environment(o) == False) {
         printf("(");
     }
 
 restart:
-
-    if (is_Pair(o) == True) {
-
+    if (is_List(o) == True && is_Nil(o) == False && is_Environment(o) == False) {
         sfs_print(car(o));
         o = cdr(o); /* On part au prochain element de la liste */
 
@@ -68,6 +66,14 @@ restart:
         case SFS_FORM:
             sfs_print_form(o);
             break;
+
+        case SFS_PAIR:
+            sfs_print_pair(o);
+            break;
+
+        case SFS_ENV:
+            sfs_print_environment(o);
+            break;
         }
     }
 }
@@ -89,6 +95,21 @@ void sfs_print_char(object o) {
         printf("#\\%c", o->val.character);
     }
 }
+
+void sfs_print_pair(object o) {
+    if (o->type != SFS_PAIR) {
+        WARNING_MSG("Trying to print object of type %d as character (%d).", o->type,
+                    SFS_PAIR);
+        return sfs_print(o);
+    }
+
+    printf("(");
+    sfs_print(o->val.pair.car);
+    printf(" . ");
+    sfs_print(o->val.pair.cdr);
+    printf(")");
+}
+
 
 void sfs_print_nil(object o) {
     if (o->type != SFS_NIL) {
@@ -121,27 +142,28 @@ void sfs_print_number(object o) {
         sfs_print(o);
     }
 
-    switch (o->val.number.numtype) {
+    switch (o->val.number->numtype) {
     case NUM_UINTEGER:
-        printf("%d", o->val.number.val.integer);
+        printf("%d", o->val.number->val.integer);
         break;
 
     case NUM_INTEGER:
-        printf("%d", o->val.number.val.integer);
+        printf("%d", o->val.number->val.integer);
         break;
 
     case NUM_REAL:
-        printf("%lg", o->val.number.val.real);
+        printf("%Lg", o->val.number->val.real);
         break;
 
     case NUM_COMPLEX:
-        if (o->val.number.val.complex.imag >= 0) {
-            printf("%lg+%lgj", o->val.number.val.complex.real,
-                   o->val.number.val.complex.imag);
-        } else {
-            printf("%lg%lgj", o->val.number.val.complex.real,
-                   o->val.number.val.complex.imag);
+        sfs_print_number(real_part(o->val.number));
+        if ((imag_part(o->val.number) == NaN ||
+                is_Negative(imag_part(o->val.number)) == False) &&
+                (imag_part(o->val.number)->val.number->numtype != NUM_PINFTY)) {
+            printf("+");
         }
+        sfs_print_number(imag_part(o->val.number));
+        printf("j");
         break;
 
     case NUM_PINFTY:
@@ -185,7 +207,7 @@ void sfs_print_primitive(object o) {
         sfs_print(o);
     }
 
-    printf("<#primitive %p>", o->val.primitive.f);
+    printf("#<procedure %s>", o->val.primitive.func_name);
 }
 
 void sfs_print_form(object o) {
@@ -195,5 +217,14 @@ void sfs_print_form(object o) {
         sfs_print(o);
     }
 
-    printf("<#form %p>", o->val.form.f);
+    printf("#<procedure %s>", o->val.form.func_name);
+}
+
+void sfs_print_environment(object o) {
+    if (o->type != SFS_ENV) {
+        WARNING_MSG("Trying to print object of type %d as environment (%d).", o->type,
+                    SFS_ENV);
+        sfs_print(o);
+    }
+    printf("#<environment>");
 }

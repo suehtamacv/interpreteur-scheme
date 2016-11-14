@@ -1,0 +1,15 @@
+==> #<procedure boolean?>
+==> #<procedure char?>
+==> #<procedure null?>
+==> #<procedure string?>
+==> #<procedure symbol?>
+==> #<procedure pair?>
+==> #<procedure list?>
+==> #<procedure procedure?>
+==> #<procedure number?>
+==> #<procedure integer?> 
+==> #<procedure real?> 
+==> #<procedure complex?>
+==> #<procedure positive?>
+==> #<procedure negative?>
+==> #<procedure zero?>

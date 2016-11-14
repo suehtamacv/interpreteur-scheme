@@ -47,5 +47,14 @@ object caddr(object o);
  * @return the list (a list).
  */
 object cons(object o, object list);
+/**
+ * @brief list creates a new list with the objects a and b
+ * @param a is the first element of the list
+ * @param b is the second element of the list
+ * @return is the list
+ */
+object list(object a, object b);
+/* Function reverse list */
+object reverse(object o);
 
 #endif /* LISTS_H */

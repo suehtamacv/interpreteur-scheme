@@ -1,4 +1,6 @@
 # Object files
+test_sum.txt
+*~
 *.user
 *.o
 *.ko

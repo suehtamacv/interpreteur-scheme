@@ -32,28 +32,27 @@ void usage_error( char *command ) {
 
 /* Singletons */
 object nil;
+object _void;
 object _true;
 object _false;
-object _quote;
-object _if;
-object _set;
-object symbol_table;
+object master_environment;
+object plus_inf;
+object minus_inf;
+object NaN;
 
 void init_interpreter (void) {
     /* Crée les singletons */
     nil = make_nil();
+    _void = make_nil();
     _true = make_true();
     _false = make_false();
+    master_environment = make_env_list();
+    plus_inf = make_number(NUM_PINFTY);
+    minus_inf = make_number(NUM_MINFTY);
+    NaN = make_number(NUM_UNDEF);
 
     /* Crée l'environment top-level */
-    symbol_table = make_symbol_table();
-    create_environment(-1);
-
-    /* Crée les formes */
-    create_basic_forms();
-
-    /* Crée les primitives */
-    create_basic_primitives();
+    master_environment = form_interaction_environment(nil, master_environment);
 }
 
 int main (int argc, char *argv[]) {
@@ -67,13 +66,13 @@ int main (int argc, char *argv[]) {
 
     /* exemples d'utilisation des macros du fichier notify.h */
     /* WARNING_MSG : sera toujours affiche */
-    WARNING_MSG("Un message WARNING_MSG !");
+    /* WARNING_MSG("Un message WARNING_MSG !"); */
 
     /* macro INFO_MSG : uniquement si compil avec -DVERBOSE. Cf Makefile*/
-    INFO_MSG("Un message INFO_MSG : Debut du programme %s", argv[0]);
+    /* INFO_MSG("Un message INFO_MSG : Debut du programme %s", argv[0]); */
 
     /* macro DEBUG_MSG : uniquement si compil avec -DDEBUG (ie : compil avec make debug). Cf Makefile */
-    DEBUG_MSG("Un message DEBUG_MSG !");
+    /* DEBUG_MSG("Un message DEBUG_MSG !"); */
 
     /* La ligne suivante provoquerait l'affichage du message
        puis la sortie du programme avec un code erreur non nul (EXIT_FAILURE) */
@@ -144,7 +143,7 @@ int main (int argc, char *argv[]) {
             continue ;
         }
 
-        output = sfs_eval( sexpr );
+        output = sfs_eval(sexpr, master_environment);
         if(NULL == output) {
             /* si fichier alors on sort*/
             if (mode == SCRIPT) {
@@ -154,6 +153,10 @@ int main (int argc, char *argv[]) {
             }
             /*sinon on rend la main à l'utilisateur*/
             continue ;
+        }
+
+        if (output == _void) {
+            continue;
         }
 
         printf( "==> " );

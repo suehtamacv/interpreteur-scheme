@@ -3,15 +3,18 @@
 
 #include "object.h"
 
-void create_basic_forms(void);
+void create_basic_forms(object env);
+void create_form(string, object (*)(object, object), object);
 
 /* Those are the basic forms */
-object form_and(object);
-object form_or(object);
-object form_define(object);
-object form_quote(object);
-object form_if(object);
-object form_set(object);
+object form_and(object, object);
+object form_or(object, object);
+object form_define(object, object);
+object form_quote(object, object);
+object form_if(object, object);
+object form_set(object, object);
+object form_eval(object, object);
+object form_interaction_environment(object, object);
 
 /* Those are auxiliary functions */
 uint list_length(object);
