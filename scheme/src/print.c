@@ -152,12 +152,14 @@ void sfs_print_number(object o) {
         break;
 
     case NUM_REAL:
-        printf("%lg", o->val.number->val.real);
+        printf("%Lg", o->val.number->val.real);
         break;
 
     case NUM_COMPLEX:
         sfs_print_number(real_part(o->val.number));
-        if (imag_part(o->val.number) == NaN || is_Negative(imag_part(o->val.number)) == False) {
+        if ((imag_part(o->val.number) == NaN ||
+                is_Negative(imag_part(o->val.number)) == False) &&
+                (imag_part(o->val.number) != plus_inf)) {
             printf("+");
         }
         sfs_print_number(imag_part(o->val.number));

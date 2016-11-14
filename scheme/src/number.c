@@ -20,7 +20,7 @@ object make_uinteger(int i) {
     return o;
 }
 
-object make_real(double r) {
+object make_real(long double r) {
     object o = make_number(NUM_REAL);
     o->val.number->val.real = r;
     return o;
@@ -103,7 +103,7 @@ object to_real(object o) {
     case NUM_PINFTY:
     case NUM_MINFTY:
         WARNING_MSG("Cannot convert +inf or -inf to real");
-        return NULL;
+        return o;
 
     case NUM_COMPLEX:
         if (is_Zero(imag_part(o->val.number)) == True) {
@@ -115,7 +115,7 @@ object to_real(object o) {
 
     case NUM_UNDEF:
         WARNING_MSG("Cannot convert NaN to real");
-        return NULL;
+        return o;
     }
 
     return NULL;

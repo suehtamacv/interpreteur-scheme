@@ -466,7 +466,7 @@ object prim_number_to_string(object o) {
             break;
 
         case NUM_REAL:
-            sprintf(str, "%lg", car(o)->val.number->val.real);
+            sprintf(str, "%Lg", car(o)->val.number->val.real);
             break;
 
         case NUM_UNDEF:
@@ -1418,6 +1418,7 @@ restart:
             break;
 
         case NUM_COMPLEX:
+            result = to_complex(result);
             result->val.number->val.complex->real = prim_times(list(plus_inf,
                                                     real_part(result->val.number)));
             result->val.number->val.complex->imag = prim_times(list(plus_inf,
@@ -1456,6 +1457,7 @@ restart:
             break;
 
         case NUM_COMPLEX:
+            result = to_complex(result);
             result->val.number->val.complex->real = prim_times(list(minus_inf,
                                                     real_part(result->val.number)));
             result->val.number->val.complex->imag = prim_times(list(minus_inf,
