@@ -43,7 +43,7 @@ typedef struct num_t {
 
     number_type numtype;
     union {
-        double       real;
+        long double  real;
         int          integer;
         complex      complex;
     } val;
@@ -53,7 +53,7 @@ typedef struct num_t {
 
 object make_integer(int);
 object make_uinteger(int);
-object make_real(double);
+object make_real(long double);
 object make_complex(object, object);
 
 object to_integer(object);
