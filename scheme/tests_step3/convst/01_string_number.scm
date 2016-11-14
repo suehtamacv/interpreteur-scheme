@@ -17,6 +17,10 @@
 (define y x)
 (- (* 2 x) y y)
 (- x y)
+(number->string 55 8)
+(number->string 55 10)
+(number->string 15 16)
+(number->string 46 16)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;(string->number _)
 (string->number "123")
