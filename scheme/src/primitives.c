@@ -403,7 +403,14 @@ object prim_string_to_symbol(object o) {
         WARNING_MSG("Wrong type of arguments on \"string->symbol\"");
         return NULL;
     } else {
-        return make_symbol(car(o)->val.string);
+        uint h = 0;
+        object symb = sfs_read(car(o)->val.string, &h);
+        if (is_Symbol(symb) == True) {
+            return symb;
+        } else {
+            WARNING_MSG("Can't create a symbol \"%s\"",car(o)->val.string);
+            return NULL;
+        }
     }
 }
 object prim_symbol_to_string(object o) {
