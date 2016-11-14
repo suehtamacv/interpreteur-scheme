@@ -46,6 +46,7 @@ object prim_number_to_string(object);
 object prim_string_to_number(object);
 object prim_symbol_to_string(object);
 object prim_string_to_symbol(object);
+object prim_string_to_list(object);
 
 /* Those are ordering primitives */
 object prim_larger(object);

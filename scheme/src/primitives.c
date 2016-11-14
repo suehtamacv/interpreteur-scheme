@@ -68,6 +68,7 @@ void create_basic_primitives(object env) {
     create_primitive("string->number", prim_string_to_number, env);
     create_primitive("symbol->string", prim_symbol_to_string, env);
     create_primitive("string->symbol", prim_string_to_symbol, env);
+    create_primitive("string->list", prim_string_to_list, env);
 
     /* Those are the basic arithmetic primitives */
     create_primitive("+", prim_plus, env);
@@ -397,6 +398,25 @@ object prim_string_to_number(object o) {
     }
 }
 
+object prim_string_to_list(object o) {
+    TEST_NUMB_ARGUMENT_EQ(1, "string->list");
+    o = car(o);
+    if (is_String(o) == False) {
+        WARNING_MSG("Wrong type of arguments on \"string->symbol\"");
+        return NULL;
+    }
+
+    object res = nil;
+    uint i = 0;
+
+restart:
+    res = cons(make_character(o->val.string[i++]), res);
+    if (o->val.string[i] != '\0') {
+        goto restart;
+    }
+    return reverse(res);
+}
+
 object prim_string_to_symbol(object o) {
     TEST_NUMB_ARGUMENT_EQ(1, "string->symbol");
     if(is_String(car(o)) != True) {
@@ -408,7 +428,7 @@ object prim_string_to_symbol(object o) {
         if (is_Symbol(symb) == True) {
             return symb;
         } else {
-            WARNING_MSG("Can't create a symbol \"%s\"",car(o)->val.string);
+            WARNING_MSG("Can't create a symbol \"%s\"", car(o)->val.string);
             return NULL;
         }
     }
