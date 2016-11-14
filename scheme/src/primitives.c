@@ -462,12 +462,14 @@ object prim_number_to_string(object o) {
             if (list_length(o) == 2) {
                 switch (cadr(o)->val.number->val.integer) {
                 case 2:
+                    (void) o;
+                    int s;
 #define bitN(arg,n) (((arg)>>(n))&1)
-                    for (int s = sizeof(int) * CHAR_BIT; s >= 0; s--) {
-                        str[sizeof(int) * CHAR_BIT - s] =
+                    for (s = sizeof(int) * CHAR_BIT - 1; s >= 0; s--) {
+                        str[sizeof(int) * CHAR_BIT - s - 1] =
                             bitN(car(o)->val.number->val.integer, s) == 1 ? '1' : '0';
                     }
-                    str[sizeof(int) * CHAR_BIT + 1] = '\0';
+                    str[sizeof(int) * CHAR_BIT] = '\0';
 #undef bitN
                     break;
 
