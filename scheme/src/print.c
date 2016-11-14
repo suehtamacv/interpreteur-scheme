@@ -159,7 +159,7 @@ void sfs_print_number(object o) {
         sfs_print_number(real_part(o->val.number));
         if ((imag_part(o->val.number) == NaN ||
                 is_Negative(imag_part(o->val.number)) == False) &&
-                (imag_part(o->val.number) != plus_inf)) {
+                (imag_part(o->val.number)->val.number->numtype != NUM_PINFTY)) {
             printf("+");
         }
         sfs_print_number(imag_part(o->val.number));

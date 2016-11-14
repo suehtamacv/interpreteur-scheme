@@ -296,6 +296,9 @@ Bool is_Real(object o) {
         case NUM_INTEGER:
         case NUM_UINTEGER:
         case NUM_REAL:
+        case NUM_UNDEF:
+        case NUM_PINFTY:
+        case NUM_MINFTY:
             return True;
             break;
 
