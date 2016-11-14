@@ -278,7 +278,7 @@ object prim_sin(object o) {
 
     case NUM_COMPLEX:
         (void) o;
-        return prim_cos(cons(prim_minus(list(make_real(acos(-1) / 2.0), car(o))), nil));
+        return prim_cos(cons(prim_minus(list(make_real(acos(-1) / 2.0), o)), nil));
         break;
     }
     return NULL;
