@@ -72,7 +72,7 @@ restart:
             break;
 
         case SFS_ENV:
-            sfs_print_environment(o);
+            sfs_print_environment(o, 0);
             break;
 
         case SFS_COMPOUND:
@@ -224,13 +224,42 @@ void sfs_print_form(object o) {
     printf("#<procedure %s>", o->val.form.func_name);
 }
 
-void sfs_print_environment(object o) {
+void sfs_print_environment(object o, int depth) {
     if (o->type != SFS_ENV) {
         WARNING_MSG("Trying to print object of type %d as environment (%d).", o->type,
                     SFS_ENV);
         sfs_print(o);
     }
-    printf("#<environment>");
+
+    int curr_depth = depth;
+    while (curr_depth > 0) {
+        printf("  ");
+        curr_depth--;
+    }
+    printf("#<environment>\n");
+    object obj = car(o);
+
+restart:
+    if (is_Nil(obj) == True) {
+        if (is_Nil(cdr(o)) == False) {
+            o = cdr(o);
+            obj = car(o);
+            sfs_print_environment(o, ++depth);
+        }
+        return;
+    }
+    curr_depth = depth;
+    while (curr_depth > 0) {
+        printf("  ");
+        curr_depth--;
+    }
+
+    sfs_print(car(car(obj)));
+    printf(" => ");
+    sfs_print(cdr(car(obj)));
+    printf("\n");
+    obj = cdr(obj);
+    goto restart;
 }
 
 void sfs_print_compound(object o) {

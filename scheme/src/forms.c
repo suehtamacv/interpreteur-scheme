@@ -48,8 +48,8 @@ object form_begin(object o, object env) {
 object form_lambda(object o, object env) {
     object parms = car(o);
     object inst_list = cdr(o);
-    if (is_Symbol(parms) == False && is_List(o) == False) {
-        WARNING_MSG("The parameters of a lambda are either a list or a symbol");
+    if (is_List(o) == False) {
+        WARNING_MSG("The parameters of a lambda must be lists");
         return NULL;
     }
 

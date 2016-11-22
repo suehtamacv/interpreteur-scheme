@@ -73,28 +73,26 @@ restart:
             object parms = f->val.compound.parms;
             object run_env = create_env_layer(f->val.compound.env);
 
-            /* A single symbol */
-            if (is_Symbol(parms) == True) {
-                define_symbol(parms, cdr(input), &run_env);
-            }
-            /* A list of symbols */
-            else if (is_List(parms) == True) {
-                object cur_list = parms;
-                object cur_vals = cdr(input);
-
-                if (list_length(cur_list) != list_length(cur_vals)) {
-                    WARNING_MSG("Wrong number of arguments on lambda expression");
-                    return NULL;
-                }
-
-                while (is_Nil(cur_list) == False) {
-                    define_symbol(car(cur_list), car(cur_vals), &run_env);
-                    cur_list = cdr(cur_list);
-                    cur_vals = cdr(cur_vals);
-                }
+            object cur_list = parms;
+            object cur_vals = cdr(input);
+            if (list_length(cur_list) != list_length(cur_vals)) {
+                WARNING_MSG("Wrong number of arguments on lambda expression");
+                return NULL;
             }
 
-            return form_begin(f->val.compound.body, run_env);
+            while (is_Nil(cur_list) == False) {
+                sfs_print(car(cur_list));
+                printf("\n");
+                sfs_print(car(cur_vals));
+                printf("\n");
+                sfs_print(run_env);
+                printf("\n");
+                define_symbol(car(cur_list), car(cur_vals), &run_env);
+                cur_list = cdr(cur_list);
+                cur_vals = cdr(cur_vals);
+            }
+
+            return sfs_eval(f->val.compound.body, run_env);
         }
 
         goto restart;
