@@ -43,7 +43,7 @@ object form_lambda(object o, object env) {
     }
     object body = cadr(o);
 
-    return make_compound(parms, body, env);
+    return make_compound(parms, body, create_env_layer(env));
 }
 
 object form_interaction_environment(object o, object env) {

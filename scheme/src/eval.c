@@ -10,6 +10,7 @@
 #include "eval.h"
 #include "forms.h"
 #include "lists.h"
+#include <print.h>
 #include <strings.h>
 
 object sfs_eval(object input, object env) {
@@ -33,14 +34,14 @@ restart:
         }
         goto restart;
     } else if (is_Pair(input) == True) {
-        object symb = sfs_eval(car(input), env);
-        if (is_Form(symb) == False && is_Primitive(symb) == False) {
+        object f = sfs_eval(car(input), env);
+        if (is_Form(f) == False && is_Primitive(f) == False) {
             WARNING_MSG("Ill-formed expression: first list element "
                         "can not be resolved into a procedure");
             return NULL;
         }
 
-        if (symb->type == SFS_PRIMITIVE) {
+        if (f->type == SFS_PRIMITIVE) {
             /* Must evaluate the arguments */
             object rev_eval_list = nil;
 
@@ -61,12 +62,31 @@ restart:
             }
 
             /* Calls the function */
-            return symb->val.primitive.f(reverse(rev_eval_list));
-        } else if ((symb->type == SFS_FORM)) {
+            return f->val.primitive.f(reverse(rev_eval_list));
+        } else if ((f->type == SFS_FORM)) {
             /* Calls the function */
-            return symb->val.form.f(cdr(input), env);
-        } else if (symb->type == SFS_COMPOUND) {
-            DEBUG_MSG("I don't know yet!");
+            return f->val.form.f(cdr(input), env);
+        } else if (f->type == SFS_COMPOUND) {
+            object parms = f->val.compound.parms;
+            if (is_Symbol(parms) == True) {
+                define_symbol(parms, cadr(input), &(f->val.compound.env));
+            } else if (is_List(parms) == True) {
+                object cur_list = parms;
+                object cur_vals = cdr(input);
+
+                if (list_length(cur_list) != list_length(cur_vals)) {
+                    WARNING_MSG("Wrong number of arguments on lambda expression");
+                    return NULL;
+                }
+
+                while (is_Nil(cur_list) == False) {
+                    define_symbol(car(cur_list), car(cur_vals), &(f->val.compound.env));
+                    cur_list = cdr(cur_list);
+                    cur_vals = cdr(cur_vals);
+                }
+            }
+
+            return sfs_eval(f->val.compound.body, f->val.compound.env);
         }
 
         goto restart;
