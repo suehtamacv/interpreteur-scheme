@@ -65,13 +65,18 @@ restart:
 
             /* Calls the function */
             return f->val.primitive.f(reverse(rev_eval_list));
-        } else if ((f->type == SFS_FORM)) {
+        } else if (f->type == SFS_FORM) {
             DEBUG_MSG("Evaluating form \"%s\"", f->val.form.func_name);
             /* Calls the function */
             return f->val.form.f(cdr(input), env);
         } else if (f->type == SFS_COMPOUND) {
             object parms = f->val.compound.parms;
-            object run_env = create_env_layer(f->val.compound.env);
+            object run_env;
+            if (f->val.compound.env) {
+                 run_env = create_env_layer(f->val.compound.env);
+            } else {
+                run_env = create_env_layer(env);
+            }
 
             object cur_list = parms;
             object cur_vals = cdr(input);
@@ -85,6 +90,9 @@ restart:
                 cur_list = cdr(cur_list);
                 cur_vals = cdr(cur_vals);
             }
+
+            sfs_print(run_env);
+            printf("\n");
 
             return sfs_eval(f->val.compound.body, run_env);
         }

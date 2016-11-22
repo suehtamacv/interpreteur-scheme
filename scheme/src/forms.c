@@ -157,7 +157,7 @@ restart:
             return NULL;
         }
     } else if (is_List(nom) == True) {
-        object c = make_compound(cdr(nom), val, env);
+        object c = make_compound(cdr(nom), val, NULL);
         define_result = define_symbol(car(nom), c, &env);
     } else {
         define_result = define_symbol(nom, sfs_eval(val, env), &env);
