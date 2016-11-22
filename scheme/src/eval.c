@@ -24,7 +24,8 @@ restart:
         DEBUG_MSG("Evaluating auto-evaluable object");
         return input;
     } else if (is_Symbol(input) == True) {
-        DEBUG_MSG("Resolving a symbol by searching for it in the symbol table");
+        DEBUG_MSG("Resolving symbol \"%s\" by searching for it in the symbol table",
+                  input->val.symbol);
         object *l_symb = locate_symbol(input, env);
         if (l_symb == NULL) {
             WARNING_MSG("Unbound variable: %s", input->val.symbol);
@@ -42,6 +43,7 @@ restart:
         }
 
         if (f->type == SFS_PRIMITIVE) {
+            DEBUG_MSG("Evaluating primitive \"%s\"", f->val.primitive.func_name);
             /* Must evaluate the arguments */
             object rev_eval_list = nil;
 
@@ -64,13 +66,19 @@ restart:
             /* Calls the function */
             return f->val.primitive.f(reverse(rev_eval_list));
         } else if ((f->type == SFS_FORM)) {
+            DEBUG_MSG("Evaluating form \"%s\"", f->val.form.func_name);
             /* Calls the function */
             return f->val.form.f(cdr(input), env);
         } else if (f->type == SFS_COMPOUND) {
             object parms = f->val.compound.parms;
+            object run_env = create_env_layer(f->val.compound.env);
+
+            /* A single symbol */
             if (is_Symbol(parms) == True) {
-                define_symbol(parms, cadr(input), &(f->val.compound.env));
-            } else if (is_List(parms) == True) {
+                define_symbol(parms, cdr(input), &run_env);
+            }
+            /* A list of symbols */
+            else if (is_List(parms) == True) {
                 object cur_list = parms;
                 object cur_vals = cdr(input);
 
@@ -80,13 +88,13 @@ restart:
                 }
 
                 while (is_Nil(cur_list) == False) {
-                    define_symbol(car(cur_list), car(cur_vals), &(f->val.compound.env));
+                    define_symbol(car(cur_list), car(cur_vals), &run_env);
                     cur_list = cdr(cur_list);
                     cur_vals = cdr(cur_vals);
                 }
             }
 
-            return sfs_eval(f->val.compound.body, f->val.compound.env);
+            return form_begin(f->val.compound.body, run_env);
         }
 
         goto restart;

@@ -23,6 +23,7 @@ void create_basic_forms(object env) {
     create_form("set!", form_set, env);
     create_form("eval", form_eval, env);
     create_form("lambda", form_lambda, env);
+    create_form("begin", form_begin, env);
     create_form("interaction-environment", form_interaction_environment, env);
 }
 
@@ -33,17 +34,31 @@ void create_form(string form_name, object (*f)(object, object), object env) {
     define_symbol(make_symbol(form_name), make_form(f, form_name), &env);
 }
 
-object form_lambda(object o, object env) {
-    TEST_NUMB_ARGUMENT_EQ(2, "lambda");
+object form_begin(object o, object env) {
+    object result = nil;
 
+    while (is_Nil(o) == False) {
+        result = sfs_eval(car(o), env);
+        o = cdr(o);
+    }
+
+    return result;
+}
+
+object form_lambda(object o, object env) {
     object parms = car(o);
-    if (is_List(parms) == False && is_Symbol(parms) == False) {
+    object inst_list = cdr(o);
+    if (is_Symbol(parms) == False && is_List(o) == False) {
         WARNING_MSG("The parameters of a lambda are either a list or a symbol");
         return NULL;
     }
-    object body = cadr(o);
 
-    return make_compound(parms, body, create_env_layer(env));
+    object body = cons(make_symbol("begin"), nil);
+    while (is_Nil(inst_list) == False) {
+        body = cons(car(inst_list), body);
+        inst_list = cdr(inst_list);
+    }
+    return make_compound(parms, reverse(body), env);
 }
 
 object form_interaction_environment(object o, object env) {
@@ -141,6 +156,9 @@ restart:
             WARNING_MSG("Can't define something to an unbound variable");
             return NULL;
         }
+    } else if (is_List(nom) == True) {
+        object c = make_compound(cdr(nom), val, env);
+        define_result = define_symbol(car(nom), c, &env);
     } else {
         define_result = define_symbol(nom, sfs_eval(val, env), &env);
     }

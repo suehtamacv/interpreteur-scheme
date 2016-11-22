@@ -15,6 +15,7 @@ object form_if(object, object);
 object form_set(object, object);
 object form_eval(object, object);
 object form_lambda(object, object);
+object form_begin(object, object);
 object form_interaction_environment(object, object);
 
 /* Those are auxiliary functions */
