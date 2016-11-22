@@ -24,7 +24,6 @@ void create_basic_forms(object env) {
     create_form("eval", form_eval, env);
     create_form("lambda", form_lambda, env);
     create_form("begin", form_begin, env);
-    create_form("interaction-environment", form_interaction_environment, env);
 }
 
 void create_form(string form_name, object (*f)(object, object), object env) {
@@ -59,18 +58,6 @@ object form_lambda(object o, object env) {
         inst_list = cdr(inst_list);
     }
     return make_compound(parms, reverse(body), env);
-}
-
-object form_interaction_environment(object o, object env) {
-    TEST_NUMB_ARGUMENT_EQ(0, "interaction-environment");
-
-    object environment = create_env_layer(env);
-    create_basic_forms(environment);
-    create_basic_primitives(environment);
-    define_symbol(make_symbol("NaN"), NaN, &environment);
-    environment = create_env_layer(environment);
-
-    return environment;
 }
 
 object form_eval(object o, object env) {

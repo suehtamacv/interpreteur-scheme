@@ -55,6 +55,7 @@ void create_basic_primitives(object env) {
     create_primitive("set-cdr!", prim_set_cdr, env);
     create_primitive("cons", prim_cons, env);
     create_primitive("list", prim_list, env);
+    create_primitive("interaction-environment", prim_interaction_environment, env);
 
     /* Those are ordering primitives */
     create_primitive(">", prim_larger, env);
@@ -99,6 +100,18 @@ void create_primitive(string prim_name, object (*func)(object), object env) {
         WARNING_MSG("Can't create a primitive into something who is not an environment");
     }
     define_symbol(make_symbol(prim_name), make_primitive(func, prim_name), &env);
+}
+
+object prim_interaction_environment(object o) {
+    TEST_NUMB_ARGUMENT_EQ(0, "interaction-environment");
+
+    object environment = make_env_list();
+    create_basic_forms(environment);
+    create_basic_primitives(environment);
+    define_symbol(make_symbol("NaN"), NaN, &environment);
+    environment = create_env_layer(environment);
+
+    return environment;
 }
 
 object prim_make_rectangular(object o) {
