@@ -74,6 +74,10 @@ restart:
         case SFS_ENV:
             sfs_print_environment(o);
             break;
+
+        case SFS_COMPOUND:
+            sfs_print_compound(o);
+            break;
         }
     }
 }
@@ -227,4 +231,13 @@ void sfs_print_environment(object o) {
         sfs_print(o);
     }
     printf("#<environment>");
+}
+
+void sfs_print_compound(object o) {
+    if (o->type != SFS_COMPOUND) {
+        WARNING_MSG("Trying to print object of type %d as compound (%d).", o->type,
+                    SFS_COMPOUND);
+        sfs_print(o);
+    }
+    printf("#<procedure>");
 }

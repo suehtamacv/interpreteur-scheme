@@ -65,6 +65,8 @@ restart:
         } else if ((symb->type == SFS_FORM)) {
             /* Calls the function */
             return symb->val.form.f(cdr(input), env);
+        } else if (symb->type == SFS_COMPOUND) {
+            DEBUG_MSG("I don't know yet!");
         }
 
         goto restart;

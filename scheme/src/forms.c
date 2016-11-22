@@ -7,6 +7,12 @@
 #include <strings.h>
 #include <primitives.h>
 
+#define TEST_NUMB_ARGUMENT_EQ(n_Arg, nomFunction) \
+    if (list_length(o) != n_Arg) { \
+        WARNING_MSG("Wrong number of arguments on \"" nomFunction "\""); \
+        return NULL;\
+    }
+
 void create_basic_forms(object env) {
     /* Create associations in the symbol table */
     create_form("and", form_and, env);
@@ -16,6 +22,7 @@ void create_basic_forms(object env) {
     create_form("if", form_if, env);
     create_form("set!", form_set, env);
     create_form("eval", form_eval, env);
+    create_form("lambda", form_lambda, env);
     create_form("interaction-environment", form_interaction_environment, env);
 }
 
@@ -26,11 +33,21 @@ void create_form(string form_name, object (*f)(object, object), object env) {
     define_symbol(make_symbol(form_name), make_form(f, form_name), &env);
 }
 
-object form_interaction_environment(object o, object env) {
-    if (list_length(o) != 0) {
-        WARNING_MSG("Wrong number of arguments on \"interaction-environment\"");
+object form_lambda(object o, object env) {
+    TEST_NUMB_ARGUMENT_EQ(2, "lambda");
+
+    object parms = car(o);
+    if (is_List(parms) == False && is_Symbol(parms) == False) {
+        WARNING_MSG("The parameters of a lambda are either a list or a symbol");
         return NULL;
     }
+    object body = cadr(o);
+
+    return make_compound(parms, body, env);
+}
+
+object form_interaction_environment(object o, object env) {
+    TEST_NUMB_ARGUMENT_EQ(0, "interaction-environment");
 
     object environment = create_env_layer(env);
     create_basic_forms(environment);
@@ -43,10 +60,7 @@ object form_interaction_environment(object o, object env) {
 
 object form_eval(object o, object env) {
     (void) env;
-    if (list_length(o) != 2) {
-        WARNING_MSG("Wrong number of arguments on \"eval\"");
-        return NULL;
-    }
+    TEST_NUMB_ARGUMENT_EQ(2, "eval");
     env = sfs_eval(cadr(o), env);
     return (env ? sfs_eval(sfs_eval(car(o), env), env) : NULL);
 }
@@ -109,10 +123,7 @@ restart:
 }
 
 object form_define(object o, object env) {
-    if (list_length(o) != 2) {
-        WARNING_MSG("Wrong number of arguments on \"define\"");
-        return NULL;
-    }
+    TEST_NUMB_ARGUMENT_EQ(2, "define");
 
     object nom = car(o);
     object val = cadr(o);
@@ -142,10 +153,7 @@ restart:
 }
 
 object form_quote(object o, object env) {
-    if (list_length(o) != 1) {
-        WARNING_MSG("Wrong number of arguments on \"quote\"");
-        return NULL;
-    }
+    TEST_NUMB_ARGUMENT_EQ(1, "quote");
     return (env ? car(o) : NULL);
 }
 
@@ -177,10 +185,7 @@ object form_if(object o, object env) {
 }
 
 object form_set(object o, object env) {
-    if (list_length(o) != 2) {
-        WARNING_MSG("Wrong number of arguments on \"set!\"");
-        return NULL;
-    }
+    TEST_NUMB_ARGUMENT_EQ(2, "set!");
 
     if (set_symbol(car(o), cadr(o), env) == 0) { /* Success */
         return _void;
