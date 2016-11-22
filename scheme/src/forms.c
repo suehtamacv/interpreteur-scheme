@@ -57,11 +57,10 @@ object form_lambda(object o, object env) {
         body = cons(car(inst_list), body);
         inst_list = cdr(inst_list);
     }
-    return make_compound(parms, reverse(body), env);
+    return make_compound(parms, reverse(body), create_env_layer(env));
 }
 
 object form_eval(object o, object env) {
-    (void) env;
     TEST_NUMB_ARGUMENT_EQ(2, "eval");
     env = sfs_eval(cadr(o), env);
     return (env ? sfs_eval(sfs_eval(car(o), env), env) : NULL);

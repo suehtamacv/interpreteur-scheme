@@ -73,8 +73,10 @@ restart:
             object parms = f->val.compound.parms;
             object run_env;
             if (f->val.compound.env) {
-                 run_env = create_env_layer(f->val.compound.env);
+                run_env = f->val.compound.env;
             } else {
+                /* There are functions that do not have a dedicated environment, and thus
+                 * extend the current environment when called */
                 run_env = create_env_layer(env);
             }
 
@@ -86,13 +88,10 @@ restart:
             }
 
             while (is_Nil(cur_list) == False) {
-                define_symbol(car(cur_list), car(cur_vals), &run_env);
+                form_define(list(car(cur_list), car(cur_vals)), run_env);
                 cur_list = cdr(cur_list);
                 cur_vals = cdr(cur_vals);
             }
-
-            sfs_print(run_env);
-            printf("\n");
 
             return sfs_eval(f->val.compound.body, run_env);
         }
