@@ -205,7 +205,7 @@ object form_if(object o, object env) {
 object form_set(object o, object env) {
     TEST_NUMB_ARGUMENT_EQ(2, "set!");
 
-    if (set_symbol(car(o), cadr(o), env) == 0) { /* Success */
+    if (set_symbol(car(o), sfs_eval(cadr(o), env), env) == 0) { /* Success */
         return _void;
     } else {
         return NULL;

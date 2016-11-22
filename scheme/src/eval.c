@@ -81,12 +81,6 @@ restart:
             }
 
             while (is_Nil(cur_list) == False) {
-                sfs_print(car(cur_list));
-                printf("\n");
-                sfs_print(car(cur_vals));
-                printf("\n");
-                sfs_print(run_env);
-                printf("\n");
                 define_symbol(car(cur_list), car(cur_vals), &run_env);
                 cur_list = cdr(cur_list);
                 cur_vals = cdr(cur_vals);
