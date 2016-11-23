@@ -13,72 +13,50 @@
 #include <stdio.h>
 
 void sfs_print(object o) {
-    /* Le premier paranthèse ouvrante des listes */
-    if (is_List(o) == True && is_Nil(o) == False && is_Environment(o) == False) {
-        printf("(");
-    }
+    switch (o->type) {
+    case SFS_CHARACTER:
+        sfs_print_char(o);
+        break;
 
-restart:
-    if (is_List(o) == True && is_Nil(o) == False && is_Environment(o) == False) {
-        sfs_print(car(o));
-        o = cdr(o); /* On part au prochain element de la liste */
+    case SFS_BOOLEAN:
+        sfs_print_bool(o);
+        break;
 
-        /* Le cdr vaut nil, donc il s'agit de la fin de la liste */
-        if (o == nil) {
-            printf(")");
-            return;
-        } else {
-            printf(" ");
-            /* Il faut encore imprimer le prochain element */
-            goto restart;
-        }
+    case SFS_NUMBER:
+        sfs_print_number(o);
+        break;
 
-    } else {
-        switch (o->type) {
-        case SFS_CHARACTER:
-            sfs_print_char(o);
-            break;
+    case SFS_STRING:
+        sfs_print_string(o);
+        break;
 
-        case SFS_BOOLEAN:
-            sfs_print_bool(o);
-            break;
+    case SFS_SYMBOL:
+        sfs_print_symbol(o);
+        break;
 
-        case SFS_NUMBER:
-            sfs_print_number(o);
-            break;
+    case SFS_NIL:
+        sfs_print_nil(o);
+        break;
 
-        case SFS_STRING:
-            sfs_print_string(o);
-            break;
+    case SFS_PRIMITIVE:
+        sfs_print_primitive(o);
+        break;
 
-        case SFS_SYMBOL:
-            sfs_print_symbol(o);
-            break;
+    case SFS_FORM:
+        sfs_print_form(o);
+        break;
 
-        case SFS_NIL:
-            sfs_print_nil(o);
-            break;
+    case SFS_PAIR:
+        sfs_print_pair(o);
+        break;
 
-        case SFS_PRIMITIVE:
-            sfs_print_primitive(o);
-            break;
+    case SFS_ENV:
+        sfs_print_environment(o, 0);
+        break;
 
-        case SFS_FORM:
-            sfs_print_form(o);
-            break;
-
-        case SFS_PAIR:
-            sfs_print_pair(o);
-            break;
-
-        case SFS_ENV:
-            sfs_print_environment(o, 0);
-            break;
-
-        case SFS_COMPOUND:
-            sfs_print_compound(o);
-            break;
-        }
+    case SFS_COMPOUND:
+        sfs_print_compound(o);
+        break;
     }
 }
 
@@ -107,13 +85,29 @@ void sfs_print_pair(object o) {
         return sfs_print(o);
     }
 
+    /* Le paranthèse ouvrante des listes et paires */
     printf("(");
-    sfs_print(o->val.pair.car);
-    printf(" . ");
-    sfs_print(o->val.pair.cdr);
-    printf(")");
-}
 
+restart:
+    sfs_print(car(o));
+    o = cdr(o); /* On part au prochain element de la liste */
+
+    if (is_Pair(o) == True || is_Nil(o) == True) {
+        /* Le cdr vaut nil, donc il s'agit de la fin de la liste */
+        if (o == nil) {
+            printf(")");
+            return;
+        } else {
+            printf(" ");
+            /* Il faut encore imprimer le prochain element */
+            goto restart;
+        }
+    } else {
+        printf(" . ");
+        sfs_print(o);
+        printf(")");
+    }
+}
 
 void sfs_print_nil(object o) {
     if (o->type != SFS_NIL) {
