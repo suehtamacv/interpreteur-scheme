@@ -144,7 +144,7 @@ object form_define(object o, object env) {
 
 restart:
     if (is_Quote(val) == True) {
-        define_result = define_symbol(nom, val, &env);
+        define_result = define_symbol(nom, cadr(val), &env);
     } else if (is_Symbol(val) == True) {
         object *found = locate_symbol(val, env);
         if (found) {

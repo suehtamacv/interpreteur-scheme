@@ -14,7 +14,6 @@
 #include <strings.h>
 
 object sfs_eval(object input, object env) {
-restart:
     /* NULL pointer handling */
     if (!input) {
         return NULL;
@@ -31,9 +30,8 @@ restart:
             WARNING_MSG("Unbound variable: %s", input->val.symbol);
             return NULL;
         } else {
-            input = *l_symb;
+            return *l_symb;
         }
-        goto restart;
     } else if (is_Pair(input) == True) {
         object f = sfs_eval(car(input), env);
         if (is_Form(f) == False && is_Primitive(f) == False) {
@@ -95,9 +93,8 @@ restart:
 
             return sfs_eval(f->val.compound.body, run_env);
         }
-
-        goto restart;
     }
 
-    goto restart;
+    WARNING_MSG("Could not evaluate");
+    return NULL;
 }
