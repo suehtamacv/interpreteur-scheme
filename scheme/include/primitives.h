@@ -38,7 +38,6 @@ object prim_set_car(object);
 object prim_set_cdr(object);
 object prim_cons(object);
 object prim_list(object);
-object prim_interaction_environment(object);
 
 /* Those are the conversation primitives */
 object prim_integer_to_char(object);

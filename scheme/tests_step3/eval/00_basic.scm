@@ -3,6 +3,5 @@
 ; TEST_COMMENT=Tests if the environment related primitives are implemented 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(interaction-environment)
 (define myenv (interaction-environment))
 (eval '"toto" myenv)

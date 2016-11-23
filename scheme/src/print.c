@@ -249,14 +249,18 @@ restart:
         return;
     }
     curr_depth = depth;
-    while (curr_depth > 0) {
+    while (curr_depth > -2) {
         printf("  ");
         curr_depth--;
     }
 
     sfs_print(car(car(obj)));
     printf(" => ");
-    sfs_print(cdr(car(obj)));
+    if (is_Environment(cdr(car(obj))) == False) {
+        sfs_print(cdr(car(obj)));
+    } else {
+        printf("#<environment>");
+    }
     printf("\n");
     obj = cdr(obj);
     goto restart;
