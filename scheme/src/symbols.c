@@ -73,7 +73,7 @@ int define_symbol(object name, object val, object *environment) {
 
     DEBUG_MSG("Defining object '%s'", name->val.string);
     object env_layer = (*environment)->val.pair.car;
-    object *old_symbol = locate_symbol(name, *environment);
+    object *old_symbol = locate_symbol_in_env(name, env_layer);
 
     if (!val) {
         WARNING_MSG("Must specify a value for the symbol. Symbol not defined");
