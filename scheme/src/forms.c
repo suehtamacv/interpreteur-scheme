@@ -140,31 +140,12 @@ object form_define(object o, object env) {
 
     object nom = car(o);
     object val = cadr(o);
-    int define_result;
 
-restart:
-    if (is_Quote(val) == True) {
-        define_result = define_symbol(nom, cadr(val), &env);
-    } else if (is_Symbol(val) == True) {
-        object *found = locate_symbol(val, env);
-        if (found) {
-            val = *found;
-            goto restart;
-        } else {
-            WARNING_MSG("Can't define something to an unbound variable");
-            return NULL;
-        }
-    } else if (is_List(nom) == True) {
-        object c = make_compound(cdr(nom), val, NULL);
-        define_result = define_symbol(car(nom), c, &env);
+    if (is_List(nom) == True) {
+        object c = make_compound(cdr(nom), val, create_env_layer(env));
+        return (define_symbol(car(nom), c, &env) == 0 ? _void : NULL);
     } else {
-        define_result = define_symbol(nom, sfs_eval(val, env), &env);
-    }
-
-    if (define_result == 0) {
-        return _void;    /* Define returns void */
-    } else {
-        return NULL; /* Could not define */
+        return (define_symbol(nom, sfs_eval(val, env), &env) == 0 ? _void : NULL);
     }
 }
 

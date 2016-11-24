@@ -69,26 +69,21 @@ object sfs_eval(object input, object env) {
             return f->val.form.f(cdr(input), env);
         } else if (f->type == SFS_COMPOUND) {
             object parms = f->val.compound.parms;
-            object run_env;
-            if (f->val.compound.env) {
-                run_env = f->val.compound.env;
-            } else {
-                /* There are functions that do not have a dedicated environment, and thus
-                 * extend the current environment when called */
-                run_env = create_env_layer(env);
-            }
+            object run_env = f->val.compound.env;
 
-            object cur_list = parms;
-            object cur_vals = cdr(input);
-            if (list_length(cur_list) != list_length(cur_vals)) {
+            object curr_parm = parms;
+            object arguments = cdr(input);
+            if (list_length(curr_parm) != list_length(arguments)) {
                 WARNING_MSG("Wrong number of arguments on lambda expression");
                 return NULL;
             }
 
-            while (is_Nil(cur_list) == False) {
-                form_define(list(car(cur_list), car(cur_vals)), run_env);
-                cur_list = cdr(cur_list);
-                cur_vals = cdr(cur_vals);
+            while (is_Nil(curr_parm) == False) {
+                /* Evaluates argument in current environment */
+                object val = list(make_symbol("quote"), sfs_eval(car(arguments), env));
+                form_define(list(car(curr_parm), val), run_env);
+                curr_parm = cdr(curr_parm);
+                arguments = cdr(arguments);
             }
 
             return sfs_eval(f->val.compound.body, run_env);
