@@ -47,16 +47,38 @@ object form_begin(object o, object env) {
 
 object form_lambda(object o, object env) {
     object parms = car(o);
-    object inst_list = cdr(o);
+
+    /* Tests if the parameters are indeed symbols and if there are no repeated parameters */
+    {
+        object curr_parm = parms;
+        if (is_Symbol(car(curr_parm)) == False) {
+            WARNING_MSG("Invalid type of parameter in lambda expression - symbol expected");
+            return NULL;
+        }
+        while (is_Nil(curr_parm) == False) {
+            object test_parm = cdr(curr_parm);
+            while (is_Nil(test_parm) == False) {
+                if (is_Symbol(car(test_parm)) == True &&
+                        strcasecmp(car(curr_parm)->val.symbol, car(test_parm)->val.symbol) == 0) {
+                    WARNING_MSG("Can not have repeated parameters in lambda expression");
+                    return NULL;
+                }
+                test_parm = cdr(test_parm);
+            }
+            curr_parm = cdr(curr_parm);
+        }
+    }
+
+    object instruction_list = cdr(o);
     if (is_List(o) == False) {
         WARNING_MSG("The parameters of a lambda must be lists");
         return NULL;
     }
 
     object body = cons(make_symbol("begin"), nil);
-    while (is_Nil(inst_list) == False) {
-        body = cons(car(inst_list), body);
-        inst_list = cdr(inst_list);
+    while (is_Nil(instruction_list) == False) {
+        body = cons(car(instruction_list), body);
+        instruction_list = cdr(instruction_list);
     }
     return make_compound(parms, reverse(body), create_env_layer(env));
 }

@@ -69,7 +69,7 @@ object sfs_eval(object input, object env) {
             return f->val.form.f(cdr(input), env);
         } else if (f->type == SFS_COMPOUND) {
             object parms = f->val.compound.parms;
-            object run_env = f->val.compound.env;
+            object run_env = create_env_layer(f->val.compound.env);
 
             object curr_parm = parms;
             object arguments = cdr(input);
