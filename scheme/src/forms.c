@@ -23,8 +23,10 @@ void create_basic_forms(object env) {
     create_form("set!", form_set, env);
     create_form("eval", form_eval, env);
     create_form("lambda", form_lambda, env);
-    create_form("interaction-environment", form_interaction_environment, env);
     create_form("begin", form_begin, env);
+    create_form("let", form_let, env);
+    create_form("let*", form_let_star, env);
+    create_form("interaction-environment", form_interaction_environment, env);
 }
 
 void create_form(string form_name, object (*f)(object, object), object env) {
@@ -32,6 +34,14 @@ void create_form(string form_name, object (*f)(object, object), object env) {
         WARNING_MSG("Can't create a form into something who is not an environment");
     }
     define_symbol(make_symbol(form_name), make_form(f, form_name), &env);
+}
+
+object form_let(object o, object env) {
+
+}
+
+object form_let_star(object o, object env) {
+
 }
 
 object form_begin(object o, object env) {
