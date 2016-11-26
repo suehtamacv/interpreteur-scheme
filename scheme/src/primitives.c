@@ -51,6 +51,7 @@ void create_basic_primitives(object env) {
     create_primitive("set-cdr!", prim_set_cdr, env);
     create_primitive("cons", prim_cons, env);
     create_primitive("list", prim_list, env);
+    create_primitive("append", prim_append, env);
 
     /* Those are ordering primitives */
     create_primitive(">", prim_larger, env);
@@ -968,6 +969,32 @@ object prim_is_zero(object o) {
 
 object prim_list(object o) {
     return o;
+}
+
+object prim_append(object o) {
+    object res = nil;
+    if (is_List(o) == False) {
+        WARNING_MSG("Wrong type of arguments on \"append\": expecting lists");
+        return NULL;
+    }
+
+restart:
+    if (is_Nil(o) == True) {
+        return reverse(res);
+    }
+
+    object curr_list = car(o);
+    if (is_List(curr_list) == False) {
+        WARNING_MSG("Wrong type of arguments on \"append\": expecting lists");
+        return NULL;
+    }
+    while (is_Nil(curr_list) == False) {
+        res = cons(car(curr_list), res);
+        curr_list = cdr(curr_list);
+    }
+
+    o = cdr(o);
+    goto restart;
 }
 
 object prim_cons(object o) {
