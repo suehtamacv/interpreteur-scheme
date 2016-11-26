@@ -4,7 +4,7 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 QMAKE_CXX = gcc
-QMAKE_CFLAGS = -x c
+QMAKE_CFLAGS = -x c -g -DDEBUG
 
 HEADERS += include/basic.h \
            include/eval.h \
@@ -35,5 +35,10 @@ SOURCES += src/eval.c \
 OTHER_FILES += .astylerc
 
 INCLUDEPATH += include
+
+INSTALL_LIB.path = $$OUT_PWD/lib/
+INSTALL_LIB.files = lib/*.scm
+
+INSTALLS += INSTALL_LIB
 
 LIBS += -lreadline
