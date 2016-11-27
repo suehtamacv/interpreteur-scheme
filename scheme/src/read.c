@@ -733,6 +733,6 @@ object sfs_read_real_number(char *input, uint *h) {
     /* Considere que le nombre peut etre negatif */
     atom->val.number->val.real = cur_number * k;
 
-    DEBUG_MSG("Reading a NUM_REAL: %f", atom->val.number->val.real);
+    DEBUG_MSG("Reading a NUM_REAL: %Lf", atom->val.number->val.real);
     return atom;
 }

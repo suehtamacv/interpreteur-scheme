@@ -1,5 +1,6 @@
 # Object files
 test_sum.txt
+build*
 *~
 *.user
 *.o

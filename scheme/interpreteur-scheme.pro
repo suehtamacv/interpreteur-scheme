@@ -36,4 +36,9 @@ OTHER_FILES += .astylerc
 
 INCLUDEPATH += include
 
+INSTALL_LIB.path = $$OUT_PWD/lib/
+INSTALL_LIB.files = lib/*.scm
+
+INSTALLS += INSTALL_LIB
+
 LIBS += -lreadline

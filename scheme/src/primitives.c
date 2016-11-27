@@ -47,14 +47,11 @@ void create_basic_primitives(object env) {
     /* Those are the basic list handling functions */
     create_primitive("car", prim_car, env);
     create_primitive("cdr", prim_cdr, env);
-    create_primitive("caar", prim_caar, env);
-    create_primitive("cadr", prim_cadr, env);
-    create_primitive("cdar", prim_cdar, env);
-    create_primitive("cddr", prim_cddr, env);
     create_primitive("set-car!", prim_set_car, env);
     create_primitive("set-cdr!", prim_set_cdr, env);
     create_primitive("cons", prim_cons, env);
     create_primitive("list", prim_list, env);
+    create_primitive("append", prim_append, env);
 
     /* Those are ordering primitives */
     create_primitive(">", prim_larger, env);
@@ -974,6 +971,32 @@ object prim_list(object o) {
     return o;
 }
 
+object prim_append(object o) {
+    object res = nil;
+    if (is_List(o) == False) {
+        WARNING_MSG("Wrong type of arguments on \"append\": expecting lists");
+        return NULL;
+    }
+
+restart:
+    if (is_Nil(o) == True) {
+        return reverse(res);
+    }
+
+    object curr_list = car(o);
+    if (is_List(curr_list) == False) {
+        WARNING_MSG("Wrong type of arguments on \"append\": expecting lists");
+        return NULL;
+    }
+    while (is_Nil(curr_list) == False) {
+        res = cons(car(curr_list), res);
+        curr_list = cdr(curr_list);
+    }
+
+    o = cdr(o);
+    goto restart;
+}
+
 object prim_cons(object o) {
     TEST_NUMB_ARGUMENT_EQ(2, "cons");
     return cons(car(o), cadr(o));
@@ -1028,46 +1051,6 @@ object prim_cdr(object o) {
         return cdr(o);
     }
     WARNING_MSG("Wrong type of arguments on \"cdr\"");
-    return NULL;
-}
-
-object prim_caar(object o) {
-    TEST_NUMB_ARGUMENT_EQ(1, "caar");
-    o = car(o);
-    if(is_Pair(o) == True && is_Pair(car(o)) == True) {
-        return car(car(o));
-    }
-    WARNING_MSG("Wrong type of arguments on \"caar\"");
-    return NULL;
-}
-
-object prim_cadr(object o) {
-    TEST_NUMB_ARGUMENT_EQ(1, "cadr");
-    o = car(o);
-    if (is_Pair(o) == True && is_Pair(cdr(o)) == True) {
-        return car(cdr(o));
-    }
-    WARNING_MSG("Wrong type of arguments on \"cadr\"");
-    return NULL;
-}
-
-object prim_cdar(object o) {
-    TEST_NUMB_ARGUMENT_EQ(1, "cdar");
-    o = car(o);
-    if(is_Pair(o) == True && is_Pair(car(o)) == True) {
-        return cdr(car(o));
-    }
-    WARNING_MSG("Wrong type of arguments on \"cdar\"");
-    return NULL;
-}
-
-object prim_cddr(object o) {
-    TEST_NUMB_ARGUMENT_EQ(1, "cddr");
-    o = car(o);
-    if(is_Pair(o) == True && is_Pair(cdr(o)) == True) {
-        return cdr(cdr(o));
-    }
-    WARNING_MSG("Wrong type of arguments on \"cddr\"");
     return NULL;
 }
 
