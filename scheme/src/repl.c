@@ -63,7 +63,7 @@ void init_interpreter (void) {
 
 #define X(file) \
     fp = fopen(file, "r"); \
-    while (1) {\
+    while (fp) {\
     input[0] = '\0'; here = 0;\
     Sexpr_err = sfs_get_sexpr( input, fp ); \
     if (S_OK == Sexpr_err) { here = 0; sfs_eval(sfs_read(input, &here), master_environment); \
