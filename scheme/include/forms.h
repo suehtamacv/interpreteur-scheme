@@ -18,6 +18,7 @@ object form_lambda(object, object);
 object form_begin(object, object);
 object form_let(object, object);
 object form_let_star(object, object);
+object form_letrec(object, object);
 object form_interaction_environment(object, object);
 
 /* Those are auxiliary functions */

@@ -26,6 +26,7 @@ void create_basic_forms(object env) {
     create_form("begin", form_begin, env);
     create_form("let", form_let, env);
     create_form("let*", form_let_star, env);
+    create_form("letrec", form_letrec, env);
     create_form("interaction-environment", form_interaction_environment, env);
 }
 
@@ -74,13 +75,53 @@ object form_let_star(object o, object env) {
     while (is_Nil(parms) == False) {
         object curr_parm = car(parms);
         if (list_length(curr_parm) != 2) {
-            WARNING_MSG("Wrong let form, definition with more than two arguments found");
+            WARNING_MSG("Wrong let* form, definition with more than two arguments found");
             return NULL;
         }
 
         /* Pour LET*, l'evaluation se passe plutôt dans la fonction define */
         form_define(list(car(curr_parm), cadr(curr_parm)), run_env);
 
+        parms = cdr(parms);
+    }
+
+    object instruction_list = cdr(o);
+    if (is_List(o) == False) {
+        WARNING_MSG("The parameters of a lambda must be lists");
+        return NULL;
+    }
+
+    object body = cons(make_symbol("begin"), nil);
+    while (is_Nil(instruction_list) == False) {
+        body = cons(car(instruction_list), body);
+        instruction_list = cdr(instruction_list);
+    }
+    return sfs_eval(reverse(body), run_env);
+}
+
+object form_letrec(object o, object env) {
+    object parms = car(o);
+    object run_env = create_env_layer(env);
+
+    /* Defining parameters as void */
+    while (is_Nil(parms) == False) {
+        object curr_parm = car(parms);
+        form_define(list(car(curr_parm), _void), run_env);
+        parms = cdr(parms);
+    }
+
+    parms = car(o);
+    while (is_Nil(parms) == False) {
+        object curr_parm = car(parms);
+        if (list_length(curr_parm) != 2) {
+            WARNING_MSG("Wrong letrec form, definition with more than two arguments found");
+            return NULL;
+        }
+
+        /* In letrec we create an environment with the parameters defined
+         * as void, and then redefine the variables in the resulting
+         * environment */
+        form_define(list(car(curr_parm), cadr(curr_parm)), run_env);
         parms = cdr(parms);
     }
 
