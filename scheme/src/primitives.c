@@ -80,6 +80,7 @@ void create_basic_primitives(object env) {
     create_primitive("sin", prim_sin, env);
     create_primitive("cos", prim_cos, env);
     create_primitive("sqrt", prim_sqrt, env);
+    create_primitive("log", prim_log, env);
 
     /* Those are the primitives related to complex numbers */
     create_primitive("make-rectangular", prim_make_rectangular, env);
@@ -200,6 +201,58 @@ object prim_exp(object o) {
         object pha = make_complex(prim_cos(cons(imag_part(o->val.number), nil)),
                                   prim_sin(cons(imag_part(o->val.number), nil)));
         return prim_times(list(mag, pha));
+        break;
+    }
+
+    return NULL;
+}
+
+object prim_log(object o) {
+    TEST_NUMB_ARGUMENT_EQ(1, "exp");
+    o = car(o);
+
+    if (is_Number(o) == False) {
+        WARNING_MSG("\"exp\" can only be applied to numbers");
+        return NULL;
+    }
+
+    if (is_Zero(o) == True) {
+        WARNING_MSG("(log 0) is not defined");
+        return NULL;
+    }
+
+    switch (o->val.number->numtype) {
+    case NUM_UNDEF:
+        return NaN;
+        break;
+
+    case NUM_PINFTY:
+        return plus_inf;
+        break;
+
+    case NUM_MINFTY:
+        return make_complex(plus_inf, make_real(acos(-1)));
+        break;
+
+    case NUM_INTEGER:
+    case NUM_UINTEGER:
+        if (is_Positive(o) == True) {
+            return make_real(log(o->val.number->val.integer));
+        } else {
+            return make_complex(make_real(log(-o->val.number->val.integer)), make_real(acos(-1)));
+        }
+        break;
+
+    case NUM_REAL:
+        if (is_Positive(o) == True) {
+            return make_real(log(o->val.number->val.real));
+        } else {
+            return make_complex(make_real(log(-o->val.number->val.real)), make_real(acos(-1)));
+        }
+        break;
+
+    case NUM_COMPLEX:
+        return make_complex(make_real(log(num_abs(o)->val.number->val.real)), num_phase(o));
         break;
     }
 

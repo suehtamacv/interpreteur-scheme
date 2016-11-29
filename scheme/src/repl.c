@@ -22,7 +22,7 @@
 /* mode d'interaction avec l'interpreteur (exemple)*/
 typedef enum {INTERACTIF, SCRIPT} inter_mode;
 
-#define LIBRARIES X("lib/standard.scm") X("lib/trig.scm")
+#define LIBRARIES X("lib/standard.scm") X("lib/math.scm") X("lib/lists.scm")
 
 void usage_error( char *command ) {
     fprintf(stderr,

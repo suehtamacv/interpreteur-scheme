@@ -156,7 +156,7 @@ object form_lambda(object o, object env) {
     /* Tests if the parameters are indeed symbols and if there are no repeated parameters */
     {
         object curr_parm = parms;
-        if (is_Symbol(car(curr_parm)) == False) {
+        if (is_Nil(curr_parm) == False && is_Symbol(car(curr_parm)) == False) {
             WARNING_MSG("Invalid type of parameter in lambda expression - symbol expected");
             return NULL;
         }

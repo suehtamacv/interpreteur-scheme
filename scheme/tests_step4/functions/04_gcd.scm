@@ -3,14 +3,6 @@
 ; TEST_COMMENT=Greatest common divisor (Euclid algorithm)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(define gcd
-  (lambda (a b)
-	(if (= a b)
-		a
-		(if (> a b)
-			(gcd (- a b) b)
-			(gcd a (- b a))))))
-
 (gcd 0 0)
 (gcd 1 1)
 (gcd 2 1024)
