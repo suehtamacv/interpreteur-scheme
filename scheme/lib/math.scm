@@ -29,3 +29,12 @@
 (define sqrt
   (lambda (x)
 	(expt x (/ 2))))
+(define asin
+  (lambda (z)
+	(* 0-1j (log (+ (* 0+1j z) (sqrt (- 1 (* z z))))))))
+(define acos
+  (lambda (z)
+	(- 1.57079632679 (asin z))))
+(define atan
+  (lambda (z)
+	(/ (- (log (+ 1 (* 0+1j z))) (log (- 1 (* 0+1j z)))) 0+2j)))

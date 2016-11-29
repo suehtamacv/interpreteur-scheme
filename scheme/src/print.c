@@ -155,6 +155,9 @@ void sfs_print_number(object o) {
 
     case NUM_COMPLEX:
         sfs_print_number(real_part(o->val.number));
+        if (is_Zero(imag_part(o->val.number)) == True) {
+            break;
+        }
         if ((imag_part(o->val.number) == NaN ||
                 is_Negative(imag_part(o->val.number)) == False) &&
                 (imag_part(o->val.number)->val.number->numtype != NUM_PINFTY)) {
