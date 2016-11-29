@@ -79,7 +79,6 @@ void create_basic_primitives(object env) {
     create_primitive("exp", prim_exp, env);
     create_primitive("sin", prim_sin, env);
     create_primitive("cos", prim_cos, env);
-    create_primitive("sqrt", prim_sqrt, env);
     create_primitive("log", prim_log, env);
 
     /* Those are the primitives related to complex numbers */
@@ -253,49 +252,6 @@ object prim_log(object o) {
 
     case NUM_COMPLEX:
         return make_complex(make_real(log(num_abs(o)->val.number->val.real)), num_phase(o));
-        break;
-    }
-
-    return NULL;
-}
-
-object prim_sqrt(object o) {
-    TEST_NUMB_ARGUMENT_EQ(1, "sqrt");
-    o = car(o);
-
-    if (is_Number(o) == False) {
-        WARNING_MSG("\"sqrt\" can only be applied to numbers");
-        return NULL;
-    }
-
-    object mag = to_real(num_abs(o));
-    object pha = to_real(num_phase(o));
-
-    switch (o->val.number->numtype) {
-    case NUM_UNDEF:
-        return NaN;
-        break;
-
-    case NUM_PINFTY:
-        return plus_inf;
-        break;
-
-    case NUM_MINFTY:
-        return make_complex(make_integer(0), plus_inf);
-        break;
-
-    case NUM_INTEGER:
-    case NUM_UINTEGER:
-    case NUM_REAL:
-    case NUM_COMPLEX:
-        if (!pha || pha == NaN) {
-            return NaN;
-        } else if (is_Zero(pha) == True) {
-            return make_real(sqrt(mag->val.number->val.real));
-        } else {
-            return prim_make_polar(list(make_real(sqrt(mag->val.number->val.real)),
-                                        make_real(pha->val.number->val.real / 2)));
-        }
         break;
     }
 

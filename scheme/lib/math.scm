@@ -26,3 +26,6 @@
 			1
 			0)
 		(exp (* z2 (log z1))))))
+(define sqrt
+  (lambda (x)
+	(expt x (/ 2))))
