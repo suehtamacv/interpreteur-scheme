@@ -43,6 +43,7 @@ void create_basic_primitives(object env) {
     create_primitive("zero?", prim_is_zero, env);
     create_primitive("equal?", prim_is_equal, env);
     create_primitive("eq?", prim_is_eq, env);
+    create_primitive("not", prim_not, env);
 
     /* Those are the basic list handling functions */
     create_primitive("car", prim_car, env);
@@ -95,6 +96,16 @@ void create_primitive(string prim_name, object (*func)(object), object env) {
         WARNING_MSG("Can't create a primitive into something who is not an environment");
     }
     define_symbol(make_symbol(prim_name), make_primitive(func, prim_name), &env);
+}
+
+object prim_not(object o) {
+    TEST_NUMB_ARGUMENT_EQ(1, "not");
+
+    if (is_True(car(o)) == True) {
+        return _false;
+    } else {
+        return _true;
+    }
 }
 
 object prim_make_rectangular(object o) {

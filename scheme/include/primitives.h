@@ -26,6 +26,7 @@ object prim_is_negative(object);
 object prim_is_zero(object);
 object prim_is_eq(object);
 object prim_is_equal(object);
+object prim_not(object);
 
 /* Those are the basic list handling functions */
 object prim_car(object);
