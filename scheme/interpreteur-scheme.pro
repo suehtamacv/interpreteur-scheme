@@ -30,7 +30,7 @@ SOURCES += src/eval.c \
            src/forms.c \
            src/primitives.c \
            src/lists.c \
-    src/number.c
+           src/number.c
 
 OTHER_FILES += .astylerc
 

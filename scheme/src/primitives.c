@@ -79,7 +79,6 @@ void create_basic_primitives(object env) {
     create_primitive("exp", prim_exp, env);
     create_primitive("sin", prim_sin, env);
     create_primitive("cos", prim_cos, env);
-    create_primitive("tan", prim_tan, env);
     create_primitive("sqrt", prim_sqrt, env);
 
     /* Those are the primitives related to complex numbers */
@@ -317,10 +316,6 @@ object prim_cos(object o) {
         break;
     }
     return NULL;
-}
-
-object prim_tan(object o) {
-    return prim_division(list(prim_sin(o), prim_cos(o)));
 }
 
 object prim_abs(object o) {
