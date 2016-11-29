@@ -27,6 +27,7 @@ void create_basic_forms(object env) {
     create_form("let", form_let, env);
     create_form("let*", form_let_star, env);
     create_form("letrec", form_letrec, env);
+    create_form("cond", form_cond, env);
     create_form("interaction-environment", form_interaction_environment, env);
 }
 
@@ -35,6 +36,32 @@ void create_form(string form_name, object (*f)(object, object), object env) {
         WARNING_MSG("Can't create a form into something who is not an environment");
     }
     define_symbol(make_symbol(form_name), make_form(f, form_name), &env);
+}
+
+object form_cond(object o, object env) {
+    while (is_Nil(o) == False) {
+        object curr_condition = car(o);
+        if (is_List(curr_condition) == False) {
+            WARNING_MSG("'cond' expects a list as its argument");
+        } else if (list_length(curr_condition) != 2) {
+            WARNING_MSG("'cond' expects a condition and then an instruction in each case");
+            return NULL;
+        }
+        /* Found an else case */
+        else if (is_Symbol(car(curr_condition)) == True &&
+                 strcasecmp(car(curr_condition)->val.symbol,"else") == 0) {
+            if (list_length(o) != 1) {
+                WARNING_MSG("'else' condition should be the last in a 'cond'. Ignoring subsequent conditions");
+            }
+            return sfs_eval(cadr(curr_condition), env);
+        } else if (is_True(sfs_eval(car(curr_condition), env)) == True) {
+            return sfs_eval(cadr(curr_condition), env);
+        }
+
+        o = cdr(o);
+    }
+
+    return _void;
 }
 
 object form_let(object o, object env) {
@@ -263,16 +290,20 @@ restart:
 }
 
 object form_define(object o, object env) {
-    TEST_NUMB_ARGUMENT_EQ(2, "define");
-
     object nom = car(o);
-    object val = cadr(o);
+    object val = cdr(o);
 
     if (is_List(nom) == True) {
-        object c = make_compound(cdr(nom), val, create_env_layer(env));
+        object body = cons(make_symbol("begin"), nil);
+        while (is_Nil(val) == False) {
+            body = cons(car(val), body);
+            val = cdr(val);
+        }
+        object c = make_compound(cdr(nom), reverse(body), create_env_layer(env));
         return (define_symbol(car(nom), c, &env) == 0 ? _void : NULL);
     } else {
-        return (define_symbol(nom, sfs_eval(val, env), &env) == 0 ? _void : NULL);
+        TEST_NUMB_ARGUMENT_EQ(2, "define");
+        return (define_symbol(nom, sfs_eval(car(val), env), &env) == 0 ? _void : NULL);
     }
 }
 
