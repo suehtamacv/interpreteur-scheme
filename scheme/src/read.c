@@ -712,7 +712,7 @@ object sfs_read_real_number(char *input, uint *h) {
 
     (*h)++; /* Apres le point */
 
-    double frac_constant = 0.1;
+    long double frac_constant = 0.1;
     do { /* Ca lit la partie fractionnaire chiffre par chiffre */
         if (!isdigit(input[*h])) {
             WARNING_MSG("Invalid number found. \"%c\" is not a valid character in a number",

@@ -216,11 +216,11 @@ object num_abs(object n) {
         break;
 
     case NUM_REAL:
-        return make_real(fabs(n->val.number->val.real));
+        return make_real(fabsl(n->val.number->val.real));
         break;
 
     case NUM_INTEGER:
-        return make_integer(abs(n->val.number->val.integer));
+        return make_integer(labs(n->val.number->val.integer));
         break;
 
     case NUM_COMPLEX:
@@ -232,7 +232,7 @@ object num_abs(object n) {
                                 prim_times(list(
                                                imag_part(n->val.number),
                                                imag_part(n->val.number)))));
-        absval = make_real(sqrt(to_real(absval)->val.number->val.real));
+        absval = make_real(sqrtl(to_real(absval)->val.number->val.real));
         return absval;
         break;
     }
@@ -255,7 +255,7 @@ object num_phase(object n) {
         break;
 
     case NUM_MINFTY:
-        return make_real(acos(-1));
+        return make_real(acosl(-1));
         break;
 
     case NUM_UNDEF:
@@ -267,7 +267,7 @@ object num_phase(object n) {
         if (n->val.number->val.integer >= 0) {
             return make_integer(0);
         } else if (n->val.number->val.integer < 0) {
-            return make_real(acos(-1));
+            return make_real(acosl(-1));
         }
         break;
 
@@ -275,7 +275,7 @@ object num_phase(object n) {
         if (n->val.number->val.real >= 0) {
             return make_integer(0);
         } else if (n->val.number->val.real < 0) {
-            return make_real(acos(-1));
+            return make_real(acosl(-1));
         }
         break;
 
@@ -324,7 +324,7 @@ object num_phase(object n) {
             case NUM_REAL:
             case NUM_INTEGER:
             case NUM_UINTEGER:
-                return make_real(acos(-1));
+                return make_real(acosl(-1));
             }
 
         case NUM_INTEGER:
@@ -339,20 +339,20 @@ object num_phase(object n) {
                 break;
 
             case NUM_PINFTY:
-                return make_real(acos(-1) / 2);
+                return make_real(acosl(-1) / 2);
                 break;
 
             case NUM_MINFTY:
-                return make_real(-acos(-1) / 2);
+                return make_real(-acosl(-1) / 2);
                 break;
 
             case NUM_REAL:
-                return make_real(atan2(imag->val.real, real->val.integer));
+                return make_real(atan2l(imag->val.real, real->val.integer));
                 break;
 
             case NUM_INTEGER:
             case NUM_UINTEGER:
-                return make_real(atan2(imag->val.integer, real->val.integer));
+                return make_real(atan2l(imag->val.integer, real->val.integer));
                 break;
             }
 
@@ -367,20 +367,20 @@ object num_phase(object n) {
                 break;
 
             case NUM_PINFTY:
-                return make_real(acos(-1) / 2);
+                return make_real(acosl(-1) / 2);
                 break;
 
             case NUM_MINFTY:
-                return make_real(-acos(-1) / 2);
+                return make_real(-acosl(-1) / 2);
                 break;
 
             case NUM_REAL:
-                return make_real(atan2(imag->val.real, real->val.real));
+                return make_real(atan2l(imag->val.real, real->val.real));
                 break;
 
             case NUM_INTEGER:
             case NUM_UINTEGER:
-                return make_real(atan2(imag->val.integer, real->val.real));
+                return make_real(atan2l(imag->val.integer, real->val.real));
                 break;
             }
         }

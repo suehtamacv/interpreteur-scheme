@@ -198,11 +198,11 @@ object prim_exp(object o) {
 
     case NUM_INTEGER:
     case NUM_UINTEGER:
-        return make_real(exp(o->val.number->val.integer));
+        return make_real(expl(o->val.number->val.integer));
         break;
 
     case NUM_REAL:
-        return make_real(exp(o->val.number->val.real));
+        return make_real(expl(o->val.number->val.real));
         break;
 
     case NUM_COMPLEX:
@@ -241,28 +241,28 @@ object prim_log(object o) {
         break;
 
     case NUM_MINFTY:
-        return make_complex(plus_inf, make_real(acos(-1)));
+        return make_complex(plus_inf, make_real(acosl(-1)));
         break;
 
     case NUM_INTEGER:
     case NUM_UINTEGER:
         if (is_Positive(o) == True) {
-            return make_real(log(o->val.number->val.integer));
+            return make_real(logl(o->val.number->val.integer));
         } else {
-            return make_complex(make_real(log(-o->val.number->val.integer)), make_real(acos(-1)));
+            return make_complex(make_real(logl(-o->val.number->val.integer)), make_real(acosl(-1)));
         }
         break;
 
     case NUM_REAL:
         if (is_Positive(o) == True) {
-            return make_real(log(o->val.number->val.real));
+            return make_real(logl(o->val.number->val.real));
         } else {
-            return make_complex(make_real(log(-o->val.number->val.real)), make_real(acos(-1)));
+            return make_complex(make_real(logl(-o->val.number->val.real)), make_real(acosl(-1)));
         }
         break;
 
     case NUM_COMPLEX:
-        return make_complex(make_real(log(num_abs(o)->val.number->val.real)), num_phase(o));
+        return make_complex(make_real(logl(num_abs(o)->val.number->val.real)), num_phase(o));
         break;
     }
 
@@ -286,16 +286,16 @@ object prim_sin(object o) {
 
     case NUM_INTEGER:
     case NUM_UINTEGER:
-        return make_real(sin((double)o->val.number->val.integer));
+        return make_real(sinl(o->val.number->val.integer));
         break;
 
     case NUM_REAL:
-        return make_real(sin((double)o->val.number->val.real));
+        return make_real(sinl(o->val.number->val.real));
         break;
 
     case NUM_COMPLEX:
         (void) o;
-        return prim_cos(cons(prim_minus(list(make_real(acos(-1) / 2.0), o)), nil));
+        return prim_cos(cons(prim_minus(list(make_real(acosl(-1) / 2.0), o)), nil));
         break;
     }
     return NULL;
@@ -318,11 +318,11 @@ object prim_cos(object o) {
 
     case NUM_INTEGER:
     case NUM_UINTEGER:
-        return make_real(cos((double)o->val.number->val.integer));
+        return make_real(cosl(o->val.number->val.integer));
         break;
 
     case NUM_REAL:
-        return make_real(cos((double)o->val.number->val.real));
+        return make_real(cosl(o->val.number->val.real));
         break;
 
     case NUM_COMPLEX:
