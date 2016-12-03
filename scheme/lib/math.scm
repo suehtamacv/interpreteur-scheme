@@ -1,7 +1,7 @@
 (define gcd
   (lambda (a b)
-	(define a (abs a))
-	(define b (abs b))
+	(set! a (abs a))
+	(set! b (abs b))
 	(if (= a b)
 		a
 		(if (> a b)

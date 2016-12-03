@@ -43,18 +43,26 @@ object form_cond(object o, object env) {
         object curr_condition = car(o);
         if (is_List(curr_condition) == False) {
             WARNING_MSG("'cond' expects a list as its argument");
+            return NULL;
         } else if (list_length(curr_condition) != 2) {
             WARNING_MSG("'cond' expects a condition and then an instruction in each case");
+            return NULL;
+        } else if (is_Define(car(curr_condition)) == True) {
+            WARNING_MSG("Definitions not allowed in expression context");
             return NULL;
         }
         /* Found an else case */
         else if (is_Symbol(car(curr_condition)) == True &&
-                 strcasecmp(car(curr_condition)->val.symbol,"else") == 0) {
+                 strcasecmp(car(curr_condition)->val.symbol, "else") == 0) {
             if (list_length(o) != 1) {
                 WARNING_MSG("'else' condition should be the last in a 'cond'. Ignoring subsequent conditions");
             }
             return sfs_eval(cadr(curr_condition), env);
         } else if (is_True(sfs_eval(car(curr_condition), env)) == True) {
+            if (is_Define(cadr(curr_condition)) == True) {
+                WARNING_MSG("Definitions not allowed in expression context");
+                return NULL;
+            }
             return sfs_eval(cadr(curr_condition), env);
         }
 
@@ -72,6 +80,9 @@ object form_let(object o, object env) {
         object curr_parm = car(parms);
         if (list_length(curr_parm) != 2) {
             WARNING_MSG("Wrong let form, definition with more than two arguments found");
+            return NULL;
+        } else if (is_Define(car(curr_parm)) == True || is_Define(cadr(curr_parm)) == True) {
+            WARNING_MSG("Definitions not allowed in expression context");
             return NULL;
         }
 
@@ -103,6 +114,9 @@ object form_let_star(object o, object env) {
         object curr_parm = car(parms);
         if (list_length(curr_parm) != 2) {
             WARNING_MSG("Wrong let* form, definition with more than two arguments found");
+            return NULL;
+        } else if (is_Define(car(curr_parm)) == True || is_Define(cadr(curr_parm)) == True) {
+            WARNING_MSG("Definitions not allowed in expression context");
             return NULL;
         }
 
@@ -142,6 +156,9 @@ object form_letrec(object o, object env) {
         object curr_parm = car(parms);
         if (list_length(curr_parm) != 2) {
             WARNING_MSG("Wrong letrec form, definition with more than two arguments found");
+            return NULL;
+        } else if (is_Define(car(curr_parm)) == True || is_Define(cadr(curr_parm)) == True) {
+            WARNING_MSG("Definitions not allowed in expression context");
             return NULL;
         }
 
@@ -209,6 +226,10 @@ object form_lambda(object o, object env) {
 
     object body = cons(make_symbol("begin"), nil);
     while (is_Nil(instruction_list) == False) {
+        if (is_Define(car(instruction_list)) == True) {
+            WARNING_MSG("Definitions not allowed in expression context");
+            return NULL;
+        }
         body = cons(car(instruction_list), body);
         instruction_list = cdr(instruction_list);
     }
