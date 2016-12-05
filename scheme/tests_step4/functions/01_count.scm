@@ -17,7 +17,7 @@
 (count 1.1)
 (count -1.1)
 (count 3)
-(count 1+2j)
+(count 1+2i)
 (count (make-rectangular 0 (- (imag-part (count 0)))))
 
 total

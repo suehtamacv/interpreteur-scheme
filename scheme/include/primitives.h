@@ -73,4 +73,7 @@ object prim_imag_part(object);
 object prim_magnitude(object);
 object prim_angle(object);
 
+/* Reads default libraries */
+void read_lib(object);
+
 #endif /* PRIMITIVES_H */

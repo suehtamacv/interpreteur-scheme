@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <mem.h>
 #include <read.h>
+#include <eval.h>
 #include <stdlib.h>
 
 #define TEST_NUMB_ARGUMENT_EQ(n_Arg, nomFunction) \
@@ -249,7 +250,8 @@ object prim_log(object o) {
         if (is_Positive(o) == True) {
             return make_real(logl(o->val.number->val.integer));
         } else {
-            return make_complex(make_real(logl(-o->val.number->val.integer)), make_real(acosl(-1)));
+            return make_complex(make_real(logl(-o->val.number->val.integer)),
+                                make_real(acosl(-1)));
         }
         break;
 
@@ -257,12 +259,14 @@ object prim_log(object o) {
         if (is_Positive(o) == True) {
             return make_real(logl(o->val.number->val.real));
         } else {
-            return make_complex(make_real(logl(-o->val.number->val.real)), make_real(acosl(-1)));
+            return make_complex(make_real(logl(-o->val.number->val.real)),
+                                make_real(acosl(-1)));
         }
         break;
 
     case NUM_COMPLEX:
-        return make_complex(make_real(logl(num_abs(o)->val.number->val.real)), num_phase(o));
+        return make_complex(make_real(logl(num_abs(o)->val.number->val.real)),
+                            num_phase(o));
         break;
     }
 
@@ -1692,4 +1696,44 @@ object prim_division(object o) {
     }
 
     return prim_times(list(result, denominator));
+}
+
+void read_lib(object environment) {
+    /* Lis des libraries */
+    string _libraries[] = {"lib/standard.scm", "lib/math.scm", "lib/lists.scm", "EndOfList"};
+
+    uint lib;
+    char input[BIGSTRING];
+    init_string(input);
+    FILE *lib_file = NULL;
+    object expr;
+    uint here = 0;
+    uint Sexpr_err;
+
+    for (lib = 0; lib < 255; ++lib) {
+        if (strcmp(_libraries[lib], "EndOfList") == 0) {
+            break;
+        }
+
+        lib_file = fopen(_libraries[lib], "r");
+        while (lib_file) {
+            input[0] = '\0';
+            here = 0;
+            Sexpr_err = sfs_get_sexpr(input, lib_file);
+            if (S_OK == Sexpr_err) {
+                here = 0;
+                expr = sfs_read(input, &here);
+                if (expr) {
+                    sfs_eval(expr, environment);
+                }
+            } else if (S_KO == Sexpr_err) {
+                WARNING_MSG("Invalid library \'%s\'", _libraries[lib]);
+                fclose(lib_file);
+                break;
+            } else if (S_END == Sexpr_err) {
+                fclose(lib_file);
+                break;
+            }
+        }
+    }
 }

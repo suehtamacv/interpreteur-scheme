@@ -22,8 +22,6 @@
 /* mode d'interaction avec l'interpreteur (exemple)*/
 typedef enum {INTERACTIF, SCRIPT} inter_mode;
 
-#define LIBRARIES X("lib/standard.scm") X("lib/math.scm") X("lib/lists.scm")
-
 void usage_error( char *command ) {
     fprintf(stderr,
             "Usage: %s [file.scm]\n   If no file is given, executes in Shell mode.\n",
@@ -54,26 +52,6 @@ void init_interpreter (void) {
 
     /* Crée l'environment top-level */
     master_environment = form_interaction_environment(nil, nil);
-
-    /* Lis des libraries */
-    {
-        char input[BIGSTRING];
-        FILE *fp = NULL;
-        uint Sexpr_err, here = 0;
-
-#define X(file) \
-    fp = fopen(file, "r"); \
-    while (fp) {\
-    input[0] = '\0'; here = 0;\
-    Sexpr_err = sfs_get_sexpr( input, fp ); \
-    if (S_OK == Sexpr_err) { here = 0; sfs_eval(sfs_read(input, &here), master_environment); \
-    } else if (S_KO == Sexpr_err) { WARNING_MSG("Invalid library \'%s\'", file); fclose(fp); break; \
-    } else if (S_END == Sexpr_err) { fclose(fp); break; } \
-    }
-        LIBRARIES
-#undef X
-    }
-
 }
 
 int main (int argc, char *argv[]) {
@@ -82,7 +60,7 @@ int main (int argc, char *argv[]) {
     object     output = NULL;
     object     sexpr = NULL;
     inter_mode mode;
-     /* le flux dans lequel les commande seront lues : stdin (mode shell) ou un fichier */
+    /* le flux dans lequel les commande seront lues : stdin (mode shell) ou un fichier */
     FILE *     fp = NULL;
 
     /* exemples d'utilisation des macros du fichier notify.h */

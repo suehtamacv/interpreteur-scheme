@@ -101,13 +101,15 @@ object form_let(object o, object env) {
         if (list_length(curr_parm) != 2) {
             WARNING_MSG("Wrong let form, definition with more than two arguments found");
             return NULL;
-        } else if (is_Define(car(curr_parm)) == True || is_Define(cadr(curr_parm)) == True) {
+        } else if (is_Define(car(curr_parm)) == True ||
+                   is_Define(cadr(curr_parm)) == True) {
             WARNING_MSG("Definitions not allowed in expression context");
             return NULL;
         }
 
         /* Pour LET, l'evaluation se passe ici, avant de definir le variable */
-        form_define(list(car(curr_parm), quote(sfs_eval(cadr(curr_parm), env))), run_env);
+        form_define(list(car(curr_parm), quote(sfs_eval(cadr(curr_parm), env))),
+                    run_env);
 
         parms = cdr(parms);
     }
@@ -135,7 +137,8 @@ object form_let_star(object o, object env) {
         if (list_length(curr_parm) != 2) {
             WARNING_MSG("Wrong let* form, definition with more than two arguments found");
             return NULL;
-        } else if (is_Define(car(curr_parm)) == True || is_Define(cadr(curr_parm)) == True) {
+        } else if (is_Define(car(curr_parm)) == True ||
+                   is_Define(cadr(curr_parm)) == True) {
             WARNING_MSG("Definitions not allowed in expression context");
             return NULL;
         }
@@ -177,7 +180,8 @@ object form_letrec(object o, object env) {
         if (list_length(curr_parm) != 2) {
             WARNING_MSG("Wrong letrec form, definition with more than two arguments found");
             return NULL;
-        } else if (is_Define(car(curr_parm)) == True || is_Define(cadr(curr_parm)) == True) {
+        } else if (is_Define(car(curr_parm)) == True ||
+                   is_Define(cadr(curr_parm)) == True) {
             WARNING_MSG("Definitions not allowed in expression context");
             return NULL;
         }
@@ -263,6 +267,7 @@ object form_interaction_environment(object o, object env) {
     create_basic_forms(environment);
     create_basic_primitives(environment);
     define_symbol(make_symbol("NaN"), NaN, &environment);
+    read_lib(environment);
 
     return environment;
 }

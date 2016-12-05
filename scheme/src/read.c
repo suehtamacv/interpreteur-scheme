@@ -295,6 +295,9 @@ uint  sfs_get_sexpr( char *input, FILE *fp ) {
 
 
 object sfs_read( char *input, uint *h ) {
+    if (!input) {
+        return NULL;
+    }
     /* Ces caracteres doivent etre ignores */
     while (input[*h] == ' ' || input[*h] == '\t') {
         (*h)++;
