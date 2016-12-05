@@ -44,7 +44,7 @@ object form_cond(object o, object env) {
         if (is_List(curr_condition) == False) {
             WARNING_MSG("'cond' expects a list as its argument");
             return NULL;
-        } else if (list_length(curr_condition) != 2) {
+        } else if (list_length(curr_condition) < 2) {
             WARNING_MSG("'cond' expects a condition and then an instruction in each case");
             return NULL;
         } else if (is_Define(car(curr_condition)) == True) {
@@ -57,13 +57,33 @@ object form_cond(object o, object env) {
             if (list_length(o) != 1) {
                 WARNING_MSG("'else' condition should be the last in a 'cond'. Ignoring subsequent conditions");
             }
-            return sfs_eval(cadr(curr_condition), env);
-        } else if (is_True(sfs_eval(car(curr_condition), env)) == True) {
-            if (is_Define(cadr(curr_condition)) == True) {
-                WARNING_MSG("Definitions not allowed in expression context");
-                return NULL;
+            curr_condition = cdr(curr_condition);
+
+            object body = cons(make_symbol("begin"), nil);
+            while (is_Nil(curr_condition) == False) {
+                if (is_Define(car(curr_condition)) == True) {
+                    WARNING_MSG("Definitions not allowed in expression context");
+                    return NULL;
+                }
+                body = cons(car(curr_condition), body);
+                curr_condition = cdr(curr_condition);
             }
-            return sfs_eval(cadr(curr_condition), env);
+
+            return sfs_eval(reverse(body), env);
+        } else if (is_True(sfs_eval(car(curr_condition), env)) == True) {
+            curr_condition = cdr(curr_condition);
+
+            object body = cons(make_symbol("begin"), nil);
+            while (is_Nil(curr_condition) == False) {
+                if (is_Define(car(curr_condition)) == True) {
+                    WARNING_MSG("Definitions not allowed in expression context");
+                    return NULL;
+                }
+                body = cons(car(curr_condition), body);
+                curr_condition = cdr(curr_condition);
+            }
+
+            return sfs_eval(reverse(body), env);
         }
 
         o = cdr(o);
@@ -87,7 +107,7 @@ object form_let(object o, object env) {
         }
 
         /* Pour LET, l'evaluation se passe ici, avant de definir le variable */
-        form_define(list(car(curr_parm), sfs_eval(cadr(curr_parm), env)), run_env);
+        form_define(list(car(curr_parm), quote(sfs_eval(cadr(curr_parm), env))), run_env);
 
         parms = cdr(parms);
     }
@@ -331,6 +351,10 @@ object form_define(object o, object env) {
 object form_quote(object o, object env) {
     TEST_NUMB_ARGUMENT_EQ(1, "quote");
     return (env ? car(o) : NULL);
+}
+
+object quote(object o) {
+    return list(make_symbol("quote"), o);
 }
 
 object form_if(object o, object env) {

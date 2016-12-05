@@ -530,9 +530,9 @@ object prim_number_to_string(object o) {
                                                     nil));
             if (imag_part(car(o)->val.number) == NaN ||
                     is_Negative(imag_part(car(o)->val.number)) == False) {
-                sprintf(str, "%s+%sj", realpart->val.string, imagpart->val.string);
+                sprintf(str, "%s+%si", realpart->val.string, imagpart->val.string);
             } else {
-                sprintf(str, "%s%sj", realpart->val.string, imagpart->val.string);
+                sprintf(str, "%s%si", realpart->val.string, imagpart->val.string);
             }
             break;
         }

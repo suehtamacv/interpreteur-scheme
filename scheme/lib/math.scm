@@ -12,10 +12,10 @@
 	(/ (sin x) (cos x))))
 (define sinh
   (lambda (x)
-	(* 0-1j (sin (* x 0+1j))))) ;; sinh(x) = -j sin(jx)
+	(* 0-1i (sin (* x 0+1i))))) ;; sinh(x) = -i sin(ix)
 (define cosh
   (lambda (x)
-	(cos (* x 0+1j)))) ;; cosh(x) = cos(jx)
+	(cos (* x 0+1i)))) ;; cosh(x) = cos(ix)
 (define tanh
   (lambda (x)
 	(/ (sinh x) (cosh x))))
@@ -31,10 +31,10 @@
 	(expt x (/ 2))))
 (define asin
   (lambda (z)
-	(* 0-1j (log (+ (* 0+1j z) (sqrt (- 1 (* z z))))))))
+	(* 0-1i (log (+ (* 0+1i z) (sqrt (- 1 (* z z))))))))
 (define acos
   (lambda (z)
 	(- 1.57079632679 (asin z))))
 (define atan
   (lambda (z)
-	(/ (- (log (+ 1 (* 0+1j z))) (log (- 1 (* 0+1j z)))) 0+2j)))
+	(/ (- (log (+ 1 (* 0+1i z))) (log (- 1 (* 0+1i z)))) 0+2i)))

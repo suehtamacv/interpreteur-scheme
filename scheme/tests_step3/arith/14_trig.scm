@@ -27,5 +27,5 @@
 (tan -inf)
 (tan NaN)
 
-(define arcsinpi 1.57079632679-1.81152627246j)
+(define arcsinpi 1.57079632679-1.81152627246i)
 (< (abs (- (sin arcsinpi) pi)) eps)

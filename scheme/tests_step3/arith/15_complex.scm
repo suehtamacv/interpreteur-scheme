@@ -8,7 +8,7 @@
 
 (real-part 0)
 (real-part 1)
-(real-part 0+1j)
+(real-part 0+1i)
 (real-part NaN)
 (real-part +inf)
 (real-part -inf)
@@ -16,7 +16,7 @@
 
 (imag-part 0)
 (imag-part 1)
-(imag-part 0+1j)
+(imag-part 0+1i)
 (imag-part NaN)
 (imag-part +inf)
 (imag-part -inf)

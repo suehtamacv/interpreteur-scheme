@@ -164,7 +164,7 @@ void sfs_print_number(object o) {
             printf("+");
         }
         sfs_print_number(imag_part(o->val.number));
-        printf("j");
+        printf("i");
         break;
 
     case NUM_PINFTY:

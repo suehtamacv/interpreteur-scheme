@@ -16,6 +16,7 @@
 #include "read.h"
 #include "primitives.h"
 #include "lists.h"
+#include <forms.h>
 
 void flip( uint *i ) {
 
@@ -318,7 +319,7 @@ object sfs_read( char *input, uint *h ) {
         }
     } else if (input[*h] == '\'') {
         (*h)++;
-        return make_pair(make_symbol("quote"), make_pair(sfs_read(input, h), nil));
+        return quote(sfs_read(input, h));
     } else {
         return sfs_read_atom( input, h );
     }
@@ -499,7 +500,7 @@ object sfs_read_number(char *input, uint *h) {
                     }
                 }
             }
-            if (input[i] == 'i' || input[i] == 'j') {
+            if (input[i] == 'i') {
                 if (input[i + 1] != ' ' && input[i + 1] != '\0' &&
                         input[i + 1] != ')' && input[i + 1] != '(' &&
                         input[i + 1] != '\n' && input[i + 1] != '"') {
@@ -508,7 +509,7 @@ object sfs_read_number(char *input, uint *h) {
                     return NULL;
                 }
                 if (!foundSignal) {
-                    WARNING_MSG("Invalid complex number found: it should be written as {+|-}A{+|-}Bj");
+                    WARNING_MSG("Invalid complex number found: it should be written as {+|-}A{+|-}Bi");
                     return NULL;
                 }
                 isComplex = True;
@@ -674,7 +675,7 @@ object sfs_read_complex_number(char *input, uint *h) {
         is_negative = (input[*h] == '-' ? -1 : 1);
         (*h)++;
     }
-    sscanf(input + *h, "%[^+-]%[^ij]", realpart, imagpart);
+    sscanf(input + *h, "%[^+-]%[^i]", realpart, imagpart);
 
     atom->val.number->val.complex->real = sfs_read_number(realpart, &real_p);
     atom->val.number->val.complex->imag = sfs_read_number(imagpart, &imag_p);

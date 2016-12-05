@@ -11,8 +11,8 @@
 (abs NaN)
 (abs +inf)
 (abs -inf)
-(abs 3+4j)
-(abs (string->number "3+4j"))
+(abs 3+4i)
+(abs (string->number "3+4i"))
 
 (sqrt 1)
 (sqrt 4)

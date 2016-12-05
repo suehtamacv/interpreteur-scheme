@@ -24,6 +24,7 @@ object form_interaction_environment(object, object);
 
 /* Those are auxiliary functions */
 uint list_length(object);
+object quote(object);
 
 /* Those auxiliary functions verify if a certain form
  * is one of the special forms */
