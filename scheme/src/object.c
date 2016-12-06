@@ -90,7 +90,7 @@ object make_number(uint type) {
     o->val.number->numtype = type;
 
     if (type == NUM_COMPLEX) {
-        o->val.number->val.complex = sfs_malloc(sizeof(*o->val.number->val.complex));
+        o->val.number->val.z = sfs_malloc(sizeof(*o->val.number->val.z));
     }
 
     return o;

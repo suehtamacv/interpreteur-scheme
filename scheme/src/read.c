@@ -215,7 +215,7 @@ uint  sfs_get_sexpr( char *input, FILE *fp ) {
                     }
                     break;
                 case '"':
-                    if ( i < 2 || chunk[i - 1] != '\\' ) {
+                    if ( i < 2 || chunk[i - 1] != '\\') {
                         if ( in_string == FALSE ) {
                             if(typeOfExpressionFound == BASIC_ATOME) {
                                 WARNING_MSG("Parse error: invalid string after atom : '%s'", chunk + i);
@@ -232,6 +232,8 @@ uint  sfs_get_sexpr( char *input, FILE *fp ) {
                             }
                         }
                     }
+                    break;
+                case '\'':
                     break;
                 default:
                     if(in_string == FALSE) {
@@ -680,11 +682,11 @@ object sfs_read_complex_number(char *input, uint *h) {
     }
     sscanf(input + *h, "%[^+-]%[^i]", realpart, imagpart);
 
-    atom->val.number->val.complex->real = sfs_read_number(realpart, &real_p);
-    atom->val.number->val.complex->imag = sfs_read_number(imagpart, &imag_p);
+    atom->val.number->val.z->real = sfs_read_number(realpart, &real_p);
+    atom->val.number->val.z->imag = sfs_read_number(imagpart, &imag_p);
     if (is_negative == -1) {
-        atom->val.number->val.complex->real = prim_minus(cons(
-                atom->val.number->val.complex->real, nil));
+        atom->val.number->val.z->real = prim_minus(cons(
+                                            atom->val.number->val.z->real, nil));
     }
 
     *h += real_p + imag_p + 1;

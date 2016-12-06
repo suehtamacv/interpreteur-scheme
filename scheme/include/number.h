@@ -37,7 +37,7 @@ typedef struct complex_t {
      * @brief imag is the imaginary part of the complex number.
      */
     object imag;
-} *complex;
+} *Complex;
 
 typedef struct num_t {
 
@@ -45,7 +45,7 @@ typedef struct num_t {
     union {
         long double  real;
         int          integer;
-        complex      complex;
+        Complex      z;
     } val;
 
 } *num;

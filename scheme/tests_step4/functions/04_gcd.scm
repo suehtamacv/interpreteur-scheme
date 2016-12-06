@@ -2,6 +2,7 @@
 ; TEST_RETURN_CODE=PASS
 ; TEST_COMMENT=Greatest common divisor (Euclid algorithm)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (gcd 0 0)
 (gcd 1 1)
 (gcd 2 1024)

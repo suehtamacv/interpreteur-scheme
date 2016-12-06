@@ -21,4 +21,3 @@
 (imag-part (sqrt -9))
 (sqrt NaN)
 (sqrt +inf)
-(sqrt -inf)
