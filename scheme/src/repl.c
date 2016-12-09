@@ -52,6 +52,7 @@ void init_interpreter (void) {
 
     /* Crée l'environment top-level */
     master_environment = form_interaction_environment(nil, nil);
+    master_environment = create_env_layer(master_environment);
 }
 
 int main (int argc, char *argv[]) {
