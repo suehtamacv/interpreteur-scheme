@@ -4,10 +4,13 @@ DIRNAME=`basename $(PWD)`
 CC=`which gcc`
 LD=`which gcc`
 RM=`which rm` -f
+CP=`which cp` -R
+CD=`which cd`
 
 SRCDIR=src
 INCDIR=include
 TESTDIR=testing
+LIBDIR=lib
 
 GARBAGE=*~ $(SRCDIR)/*~ $(INCDIR)/*~ $(TESTDIR)/*~
 
@@ -37,9 +40,11 @@ all :
 
 debug   : $(OBJ_DBG)
 	$(LD) $^ $(LFLAGS) -o $(TARGET)
+	$(CP) $(LIBDIR) ../$(TESTDIR)/$(LIBDIR)
 
 release : $(OBJ_RLS)
 	$(LD) $^ $(LFLAGS) -o $(TARGET)
+	$(CP) $(LIBDIR) ../$(TESTDIR)/$(LIBDIR)
 
 %.dbg : %.c
 	$(CC) $< $(CFLAGS_DBG) -c -o $(basename $<).dbg
