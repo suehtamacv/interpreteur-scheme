@@ -61,7 +61,11 @@ void sfs_print_pair(object);
 /**
  * @brief sfs_print_pair prints an environment.
  */
-void sfs_print_environment(object);
+void sfs_print_environment(object, int depth);
+/**
+ * @brief sfs_print_compound prints a compound.
+ */
+void sfs_print_compound(object);
 
 #ifdef __cplusplus
 }

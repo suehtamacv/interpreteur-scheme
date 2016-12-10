@@ -17,9 +17,9 @@ object reverse(object o) {
 }
 
 object car(object o) {
-    if (is_Pair(o) == False && is_Environment(o) == False) {
+    if (!o || (is_Pair(o) == False && is_Environment(o) == False)) {
         WARNING_MSG("Trying to get car of a object who is not a pair (actually it is %d)",
-                  o->type);
+                    o->type);
         return NULL;
     }
 
@@ -32,9 +32,9 @@ object cdr(object o) {
         return nil;
     }
 
-    if (is_Pair(o) == False && is_Pair(o) == False) {
+    if (!o || (is_Pair(o) == False && is_Pair(o) == False)) {
         WARNING_MSG("Trying to get cdr of a object who is not a pair (actually it is %d)",
-                  o->type);
+                    o->type);
         return NULL;
     }
 

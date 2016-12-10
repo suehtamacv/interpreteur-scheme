@@ -44,6 +44,14 @@ object make_false() {
     return f;
 }
 
+object make_compound(object parms, object body, object env) {
+    object f = make_object(SFS_COMPOUND);
+    f->val.compound.parms = parms;
+    f->val.compound.body = body;
+    f->val.compound.env = env;
+    return f;
+}
+
 object make_primitive(object (*func)(object), string func_name) {
     object f = make_object(SFS_PRIMITIVE);
     f->val.primitive.f = func;
@@ -82,7 +90,7 @@ object make_number(uint type) {
     o->val.number->numtype = type;
 
     if (type == NUM_COMPLEX) {
-        o->val.number->val.complex = sfs_malloc(sizeof(*o->val.number->val.complex));
+        o->val.number->val.z = sfs_malloc(sizeof(*o->val.number->val.z));
     }
 
     return o;
@@ -353,7 +361,7 @@ Bool is_Symbol(object o) {
 }
 
 Bool is_Primitive(object o) {
-    if (o && o->type == SFS_PRIMITIVE) {
+    if (o && (o->type == SFS_PRIMITIVE || o->type == SFS_COMPOUND)) {
         return True;
     }
     return False;

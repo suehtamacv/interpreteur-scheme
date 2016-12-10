@@ -1,11 +1,15 @@
 # Object files
 test_sum.txt
+build*
+scheme/scheme
 *~
 *.user
 *.o
 *.ko
 *.obj
 *.elf
+*.dbg
+*.rls
 
 # Precompiled Headers
 *.gch

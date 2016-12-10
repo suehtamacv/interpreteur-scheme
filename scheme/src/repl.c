@@ -12,7 +12,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <strings.h>
-
 #include "object.h"
 #include "read.h"
 #include "eval.h"
@@ -22,7 +21,6 @@
 
 /* mode d'interaction avec l'interpreteur (exemple)*/
 typedef enum {INTERACTIF, SCRIPT} inter_mode;
-
 
 void usage_error( char *command ) {
     fprintf(stderr,
@@ -40,19 +38,21 @@ object plus_inf;
 object minus_inf;
 object NaN;
 
+int main (int argc, char *argv[]);
+
 void init_interpreter (void) {
     /* Crée les singletons */
     nil = make_nil();
     _void = make_nil();
     _true = make_true();
     _false = make_false();
-    master_environment = make_env_list();
     plus_inf = make_number(NUM_PINFTY);
     minus_inf = make_number(NUM_MINFTY);
     NaN = make_number(NUM_UNDEF);
 
     /* Crée l'environment top-level */
-    master_environment = form_interaction_environment(nil, master_environment);
+    master_environment = form_interaction_environment(nil, nil);
+    master_environment = create_env_layer(master_environment);
 }
 
 int main (int argc, char *argv[]) {
@@ -61,8 +61,8 @@ int main (int argc, char *argv[]) {
     object     output = NULL;
     object     sexpr = NULL;
     inter_mode mode;
-    FILE *     fp =
-        NULL; /* le flux dans lequel les commande seront lues : stdin (mode shell) ou un fichier */
+    /* le flux dans lequel les commande seront lues : stdin (mode shell) ou un fichier */
+    FILE *     fp = NULL;
 
     /* exemples d'utilisation des macros du fichier notify.h */
     /* WARNING_MSG : sera toujours affiche */
@@ -117,7 +117,7 @@ int main (int argc, char *argv[]) {
                 fclose( fp );
                 if (Sexpr_err == S_END) {
                     /* Cas fin de fichier script */
-                    exit(EXIT_SUCCESS);
+                    return EXIT_SUCCESS;
                 }
                 /* Cas S-Expression mal formee dans le fichier script */
                 ERROR_MSG("Malformed S-expression --- Aborts");
@@ -167,5 +167,5 @@ int main (int argc, char *argv[]) {
     if (mode == SCRIPT) {
         fclose( fp );
     }
-    exit( EXIT_SUCCESS );
+    return EXIT_SUCCESS;
 }

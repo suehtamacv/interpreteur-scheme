@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <mem.h>
 #include <read.h>
+#include <eval.h>
 #include <stdlib.h>
 
 #define TEST_NUMB_ARGUMENT_EQ(n_Arg, nomFunction) \
@@ -43,18 +44,16 @@ void create_basic_primitives(object env) {
     create_primitive("zero?", prim_is_zero, env);
     create_primitive("equal?", prim_is_equal, env);
     create_primitive("eq?", prim_is_eq, env);
+    create_primitive("not", prim_not, env);
 
     /* Those are the basic list handling functions */
     create_primitive("car", prim_car, env);
     create_primitive("cdr", prim_cdr, env);
-    create_primitive("caar", prim_caar, env);
-    create_primitive("cadr", prim_cadr, env);
-    create_primitive("cdar", prim_cdar, env);
-    create_primitive("cddr", prim_cddr, env);
     create_primitive("set-car!", prim_set_car, env);
     create_primitive("set-cdr!", prim_set_cdr, env);
     create_primitive("cons", prim_cons, env);
     create_primitive("list", prim_list, env);
+    create_primitive("append", prim_append, env);
 
     /* Those are ordering primitives */
     create_primitive(">", prim_larger, env);
@@ -82,8 +81,7 @@ void create_basic_primitives(object env) {
     create_primitive("exp", prim_exp, env);
     create_primitive("sin", prim_sin, env);
     create_primitive("cos", prim_cos, env);
-    create_primitive("tan", prim_tan, env);
-    create_primitive("sqrt", prim_sqrt, env);
+    create_primitive("log", prim_log, env);
 
     /* Those are the primitives related to complex numbers */
     create_primitive("make-rectangular", prim_make_rectangular, env);
@@ -99,6 +97,16 @@ void create_primitive(string prim_name, object (*func)(object), object env) {
         WARNING_MSG("Can't create a primitive into something who is not an environment");
     }
     define_symbol(make_symbol(prim_name), make_primitive(func, prim_name), &env);
+}
+
+object prim_not(object o) {
+    TEST_NUMB_ARGUMENT_EQ(1, "not");
+
+    if (is_True(car(o)) == True) {
+        return _false;
+    } else {
+        return _true;
+    }
 }
 
 object prim_make_rectangular(object o) {
@@ -210,17 +218,19 @@ object prim_exp(object o) {
     return NULL;
 }
 
-object prim_sqrt(object o) {
-    TEST_NUMB_ARGUMENT_EQ(1, "sqrt");
+object prim_log(object o) {
+    TEST_NUMB_ARGUMENT_EQ(1, "exp");
     o = car(o);
 
     if (is_Number(o) == False) {
-        WARNING_MSG("\"sqrt\" can only be applied to numbers");
+        WARNING_MSG("\"exp\" can only be applied to numbers");
         return NULL;
     }
 
-    object mag = to_real(num_abs(o));
-    object pha = to_real(num_phase(o));
+    if (is_Zero(o) == True) {
+        WARNING_MSG("(log 0) is not defined");
+        return NULL;
+    }
 
     switch (o->val.number->numtype) {
     case NUM_UNDEF:
@@ -232,21 +242,31 @@ object prim_sqrt(object o) {
         break;
 
     case NUM_MINFTY:
-        return make_complex(make_integer(0), plus_inf);
+        return make_complex(plus_inf, make_real(acos((long double) - 1)));
         break;
 
     case NUM_INTEGER:
     case NUM_UINTEGER:
-    case NUM_REAL:
-    case NUM_COMPLEX:
-        if (!pha || pha == NaN) {
-            return NaN;
-        } else if (is_Zero(pha) == True) {
-            return make_real(sqrt(mag->val.number->val.real));
+        if (is_Positive(o) == True) {
+            return make_real(log(o->val.number->val.integer));
         } else {
-            return prim_make_polar(list(make_real(sqrt(mag->val.number->val.real)),
-                                        make_real(pha->val.number->val.real / 2)));
+            return make_complex(make_real(log(-o->val.number->val.integer)),
+                                make_real(acos((long double) - 1)));
         }
+        break;
+
+    case NUM_REAL:
+        if (is_Positive(o) == True) {
+            return make_real(log(o->val.number->val.real));
+        } else {
+            return make_complex(make_real(log(-o->val.number->val.real)),
+                                make_real(acos((long double) - 1)));
+        }
+        break;
+
+    case NUM_COMPLEX:
+        return make_complex(make_real(log(num_abs(o)->val.number->val.real)),
+                            num_phase(o));
         break;
     }
 
@@ -270,11 +290,11 @@ object prim_sin(object o) {
 
     case NUM_INTEGER:
     case NUM_UINTEGER:
-        return make_real(sin((double)o->val.number->val.integer));
+        return make_real(sin(o->val.number->val.integer));
         break;
 
     case NUM_REAL:
-        return make_real(sin((double)o->val.number->val.real));
+        return make_real(sin(o->val.number->val.real));
         break;
 
     case NUM_COMPLEX:
@@ -302,11 +322,11 @@ object prim_cos(object o) {
 
     case NUM_INTEGER:
     case NUM_UINTEGER:
-        return make_real(cos((double)o->val.number->val.integer));
+        return make_real(cos(o->val.number->val.integer));
         break;
 
     case NUM_REAL:
-        return make_real(cos((double)o->val.number->val.real));
+        return make_real(cos(o->val.number->val.real));
         break;
 
     case NUM_COMPLEX:
@@ -320,10 +340,6 @@ object prim_cos(object o) {
         break;
     }
     return NULL;
-}
-
-object prim_tan(object o) {
-    return prim_division(list(prim_sin(o), prim_cos(o)));
 }
 
 object prim_abs(object o) {
@@ -518,9 +534,9 @@ object prim_number_to_string(object o) {
                                                     nil));
             if (imag_part(car(o)->val.number) == NaN ||
                     is_Negative(imag_part(car(o)->val.number)) == False) {
-                sprintf(str, "%s+%sj", realpart->val.string, imagpart->val.string);
+                sprintf(str, "%s+%si", realpart->val.string, imagpart->val.string);
             } else {
-                sprintf(str, "%s%sj", realpart->val.string, imagpart->val.string);
+                sprintf(str, "%s%si", realpart->val.string, imagpart->val.string);
             }
             break;
         }
@@ -974,6 +990,32 @@ object prim_list(object o) {
     return o;
 }
 
+object prim_append(object o) {
+    object res = nil;
+    if (is_List(o) == False) {
+        WARNING_MSG("Wrong type of arguments on \"append\": expecting lists");
+        return NULL;
+    }
+
+restart:
+    if (is_Nil(o) == True) {
+        return reverse(res);
+    }
+
+    object curr_list = car(o);
+    if (is_List(curr_list) == False) {
+        WARNING_MSG("Wrong type of arguments on \"append\": expecting lists");
+        return NULL;
+    }
+    while (is_Nil(curr_list) == False) {
+        res = cons(car(curr_list), res);
+        curr_list = cdr(curr_list);
+    }
+
+    o = cdr(o);
+    goto restart;
+}
+
 object prim_cons(object o) {
     TEST_NUMB_ARGUMENT_EQ(2, "cons");
     return cons(car(o), cadr(o));
@@ -1028,46 +1070,6 @@ object prim_cdr(object o) {
         return cdr(o);
     }
     WARNING_MSG("Wrong type of arguments on \"cdr\"");
-    return NULL;
-}
-
-object prim_caar(object o) {
-    TEST_NUMB_ARGUMENT_EQ(1, "caar");
-    o = car(o);
-    if(is_Pair(o) == True && is_Pair(car(o)) == True) {
-        return car(car(o));
-    }
-    WARNING_MSG("Wrong type of arguments on \"caar\"");
-    return NULL;
-}
-
-object prim_cadr(object o) {
-    TEST_NUMB_ARGUMENT_EQ(1, "cadr");
-    o = car(o);
-    if (is_Pair(o) == True && is_Pair(cdr(o)) == True) {
-        return car(cdr(o));
-    }
-    WARNING_MSG("Wrong type of arguments on \"cadr\"");
-    return NULL;
-}
-
-object prim_cdar(object o) {
-    TEST_NUMB_ARGUMENT_EQ(1, "cdar");
-    o = car(o);
-    if(is_Pair(o) == True && is_Pair(car(o)) == True) {
-        return cdr(car(o));
-    }
-    WARNING_MSG("Wrong type of arguments on \"cdar\"");
-    return NULL;
-}
-
-object prim_cddr(object o) {
-    TEST_NUMB_ARGUMENT_EQ(1, "cddr");
-    o = car(o);
-    if(is_Pair(o) == True && is_Pair(cdr(o)) == True) {
-        return cdr(cdr(o));
-    }
-    WARNING_MSG("Wrong type of arguments on \"cddr\"");
     return NULL;
 }
 
@@ -1182,7 +1184,7 @@ restart:
         switch (next_number->val.number->numtype) {
         case NUM_COMPLEX:
             result = to_complex(result);
-            result->val.number->val.complex->imag = imag_part(next_number->val.number);
+            result->val.number->val.z->imag = imag_part(next_number->val.number);
             break;
 
         default:
@@ -1201,7 +1203,7 @@ restart:
 
         case NUM_COMPLEX:
             result = to_complex(result);
-            result->val.number->val.complex->imag =
+            result->val.number->val.z->imag =
                 prim_plus(list(imag_part(result->val.number),
                                imag_part(next_number->val.number)));
             break;
@@ -1220,7 +1222,7 @@ restart:
 
         case NUM_COMPLEX:
             result = to_complex(result);
-            result->val.number->val.complex->imag =
+            result->val.number->val.z->imag =
                 prim_plus(list(imag_part(result->val.number),
                                imag_part(next_number->val.number)));
             break;
@@ -1257,12 +1259,12 @@ restart:
 
         case NUM_COMPLEX:
             result = to_complex(result);
-            result->val.number->val.complex->real = prim_plus(list(
-                    real_part(result->val.number),
-                    real_part(next_number->val.number)));
-            result->val.number->val.complex->imag = prim_plus(list(
-                    imag_part(result->val.number),
-                    imag_part(next_number->val.number)));
+            result->val.number->val.z->real = prim_plus(list(
+                                                  real_part(result->val.number),
+                                                  real_part(next_number->val.number)));
+            result->val.number->val.z->imag = prim_plus(list(
+                                                  imag_part(result->val.number),
+                                                  imag_part(next_number->val.number)));
             break;
         }
         break;
@@ -1292,12 +1294,12 @@ restart:
 
         case NUM_COMPLEX:
             result = to_complex(result);
-            result->val.number->val.complex->real = prim_plus(list(
-                    real_part(result->val.number),
-                    real_part(next_number->val.number)));
-            result->val.number->val.complex->imag = prim_plus(list(
-                    imag_part(result->val.number),
-                    imag_part(next_number->val.number)));
+            result->val.number->val.z->real = prim_plus(list(
+                                                  real_part(result->val.number),
+                                                  real_part(next_number->val.number)));
+            result->val.number->val.z->imag = prim_plus(list(
+                                                  imag_part(result->val.number),
+                                                  imag_part(next_number->val.number)));
             break;
         }
         break;
@@ -1307,7 +1309,7 @@ restart:
         case NUM_PINFTY:
         case NUM_MINFTY:
         case NUM_UNDEF:
-            result->val.number->val.complex->real =
+            result->val.number->val.z->real =
                 prim_plus(list(real_part(result->val.number),
                                real_part(next_number->val.number)));
             break;
@@ -1315,18 +1317,18 @@ restart:
         case NUM_INTEGER:
         case NUM_UINTEGER:
         case NUM_REAL:
-            result->val.number->val.complex->real = prim_plus(list(
-                    real_part(result->val.number),
-                    next_number));
+            result->val.number->val.z->real = prim_plus(list(
+                                                  real_part(result->val.number),
+                                                  next_number));
             break;
 
         case NUM_COMPLEX:
-            result->val.number->val.complex->real = prim_plus(list(
-                    real_part(result->val.number),
-                    real_part(next_number->val.number)));
-            result->val.number->val.complex->imag = prim_plus(list(
-                    imag_part(result->val.number),
-                    imag_part(next_number->val.number)));
+            result->val.number->val.z->real = prim_plus(list(
+                                                  real_part(result->val.number),
+                                                  real_part(next_number->val.number)));
+            result->val.number->val.z->imag = prim_plus(list(
+                                                  imag_part(result->val.number),
+                                                  imag_part(next_number->val.number)));
             break;
         }
         break;
@@ -1406,10 +1408,10 @@ restart:
         switch (next_number->val.number->numtype) {
         case NUM_COMPLEX:
             result = to_complex(result);
-            result->val.number->val.complex->real = prim_times(list(NaN,
-                                                    real_part(result->val.number)));
-            result->val.number->val.complex->imag = prim_times(list(NaN,
-                                                    imag_part(result->val.number)));
+            result->val.number->val.z->real = prim_times(list(NaN,
+                                              real_part(result->val.number)));
+            result->val.number->val.z->imag = prim_times(list(NaN,
+                                              imag_part(result->val.number)));
             break;
 
         default:
@@ -1448,10 +1450,10 @@ restart:
 
         case NUM_COMPLEX:
             result = to_complex(result);
-            result->val.number->val.complex->real = prim_times(list(plus_inf,
-                                                    real_part(result->val.number)));
-            result->val.number->val.complex->imag = prim_times(list(plus_inf,
-                                                    imag_part(result->val.number)));
+            result->val.number->val.z->real = prim_times(list(plus_inf,
+                                              real_part(result->val.number)));
+            result->val.number->val.z->imag = prim_times(list(plus_inf,
+                                              imag_part(result->val.number)));
             break;
         }
         break;
@@ -1487,10 +1489,10 @@ restart:
 
         case NUM_COMPLEX:
             result = to_complex(result);
-            result->val.number->val.complex->real = prim_times(list(minus_inf,
-                                                    real_part(result->val.number)));
-            result->val.number->val.complex->imag = prim_times(list(minus_inf,
-                                                    imag_part(result->val.number)));
+            result->val.number->val.z->real = prim_times(list(minus_inf,
+                                              real_part(result->val.number)));
+            result->val.number->val.z->imag = prim_times(list(minus_inf,
+                                              imag_part(result->val.number)));
             break;
         }
         break;
@@ -1530,20 +1532,20 @@ restart:
 
         case NUM_COMPLEX:
             result = to_complex(result);
-            rescpy->val.number->val.complex->real = sfs_malloc(sizeof(*
-                                                    (result->val.number->val.complex->real)));
-            rescpy->val.number->val.complex->imag = sfs_malloc(sizeof(*
-                                                    (result->val.number->val.complex->imag)));
-            memcpy(rescpy->val.number->val.complex->real,
-                   result->val.number->val.complex->real,
-                   sizeof(*(result->val.number->val.complex->real)));
-            memcpy(rescpy->val.number->val.complex->imag,
-                   result->val.number->val.complex->imag,
-                   sizeof(*(result->val.number->val.complex->imag)));
-            result->val.number->val.complex->real = prim_times(list(real_part(
-                    rescpy->val.number), real_part(next_number->val.number)));
-            result->val.number->val.complex->imag = prim_times(list(real_part(
-                    rescpy->val.number), imag_part(next_number->val.number)));
+            rescpy->val.number->val.z->real = sfs_malloc(sizeof(*
+                                              (result->val.number->val.z->real)));
+            rescpy->val.number->val.z->imag = sfs_malloc(sizeof(*
+                                              (result->val.number->val.z->imag)));
+            memcpy(rescpy->val.number->val.z->real,
+                   result->val.number->val.z->real,
+                   sizeof(*(result->val.number->val.z->real)));
+            memcpy(rescpy->val.number->val.z->imag,
+                   result->val.number->val.z->imag,
+                   sizeof(*(result->val.number->val.z->imag)));
+            result->val.number->val.z->real = prim_times(list(real_part(
+                                                  rescpy->val.number), real_part(next_number->val.number)));
+            result->val.number->val.z->imag = prim_times(list(real_part(
+                                                  rescpy->val.number), imag_part(next_number->val.number)));
             break;
         }
         break;
@@ -1579,20 +1581,20 @@ restart:
 
         case NUM_COMPLEX:
             result = to_complex(result);
-            rescpy->val.number->val.complex->real = sfs_malloc(sizeof(*
-                                                    (result->val.number->val.complex->real)));
-            rescpy->val.number->val.complex->imag = sfs_malloc(sizeof(*
-                                                    (result->val.number->val.complex->imag)));
-            memcpy(rescpy->val.number->val.complex->real,
-                   result->val.number->val.complex->real,
-                   sizeof(*(result->val.number->val.complex->real)));
-            memcpy(rescpy->val.number->val.complex->imag,
-                   result->val.number->val.complex->imag,
-                   sizeof(*(result->val.number->val.complex->imag)));
-            result->val.number->val.complex->real = prim_times(list(real_part(
-                    rescpy->val.number), real_part(next_number->val.number)));
-            result->val.number->val.complex->imag = prim_times(list(real_part(
-                    rescpy->val.number), imag_part(next_number->val.number)));
+            rescpy->val.number->val.z->real = sfs_malloc(sizeof(*
+                                              (result->val.number->val.z->real)));
+            rescpy->val.number->val.z->imag = sfs_malloc(sizeof(*
+                                              (result->val.number->val.z->imag)));
+            memcpy(rescpy->val.number->val.z->real,
+                   result->val.number->val.z->real,
+                   sizeof(*(result->val.number->val.z->real)));
+            memcpy(rescpy->val.number->val.z->imag,
+                   result->val.number->val.z->imag,
+                   sizeof(*(result->val.number->val.z->imag)));
+            result->val.number->val.z->real = prim_times(list(real_part(
+                                                  rescpy->val.number), real_part(next_number->val.number)));
+            result->val.number->val.z->imag = prim_times(list(real_part(
+                                                  rescpy->val.number), imag_part(next_number->val.number)));
             break;
         }
         break;
@@ -1602,43 +1604,43 @@ restart:
         case NUM_UNDEF:
         case NUM_MINFTY:
         case NUM_PINFTY:
-            result->val.number->val.complex->real = prim_times(list(next_number,
-                                                    real_part(result->val.number)));
-            result->val.number->val.complex->imag = prim_times(list(next_number,
-                                                    imag_part(result->val.number)));
+            result->val.number->val.z->real = prim_times(list(next_number,
+                                              real_part(result->val.number)));
+            result->val.number->val.z->imag = prim_times(list(next_number,
+                                              imag_part(result->val.number)));
             break;
 
         case NUM_UINTEGER:
         case NUM_INTEGER:
         case NUM_REAL:
-            result->val.number->val.complex->real = prim_times(list(real_part(
-                    result->val.number), next_number));
-            result->val.number->val.complex->imag = prim_times(list(imag_part(
-                    result->val.number), next_number));
+            result->val.number->val.z->real = prim_times(list(real_part(
+                                                  result->val.number), next_number));
+            result->val.number->val.z->imag = prim_times(list(imag_part(
+                                                  result->val.number), next_number));
             break;
 
         case NUM_COMPLEX:
             result = to_complex(result);
-            rescpy->val.number->val.complex->real = sfs_malloc(sizeof(*
-                                                    (result->val.number->val.complex->real)));
-            rescpy->val.number->val.complex->imag = sfs_malloc(sizeof(*
-                                                    (result->val.number->val.complex->imag)));
-            memcpy(rescpy->val.number->val.complex->real,
-                   result->val.number->val.complex->real,
-                   sizeof(*(result->val.number->val.complex->real)));
-            memcpy(rescpy->val.number->val.complex->imag,
-                   result->val.number->val.complex->imag,
-                   sizeof(*(result->val.number->val.complex->imag)));
-            result->val.number->val.complex->real = prim_minus(list(
-                    prim_times(list(real_part(next_number->val.number),
-                                    real_part(rescpy->val.number))),
-                    prim_times(list(imag_part(next_number->val.number),
-                                    imag_part(rescpy->val.number)))));
-            result->val.number->val.complex->imag = prim_plus(list(
-                    prim_times(list(real_part(next_number->val.number),
-                                    imag_part(rescpy->val.number))),
-                    prim_times(list(imag_part(next_number->val.number),
-                                    real_part(rescpy->val.number)))));
+            rescpy->val.number->val.z->real = sfs_malloc(sizeof(*
+                                              (result->val.number->val.z->real)));
+            rescpy->val.number->val.z->imag = sfs_malloc(sizeof(*
+                                              (result->val.number->val.z->imag)));
+            memcpy(rescpy->val.number->val.z->real,
+                   result->val.number->val.z->real,
+                   sizeof(*(result->val.number->val.z->real)));
+            memcpy(rescpy->val.number->val.z->imag,
+                   result->val.number->val.z->imag,
+                   sizeof(*(result->val.number->val.z->imag)));
+            result->val.number->val.z->real = prim_minus(list(
+                                                  prim_times(list(real_part(next_number->val.number),
+                                                          real_part(rescpy->val.number))),
+                                                  prim_times(list(imag_part(next_number->val.number),
+                                                          imag_part(rescpy->val.number)))));
+            result->val.number->val.z->imag = prim_plus(list(
+                                                  prim_times(list(real_part(next_number->val.number),
+                                                          imag_part(rescpy->val.number))),
+                                                  prim_times(list(imag_part(next_number->val.number),
+                                                          real_part(rescpy->val.number)))));
             break;
         }
         break;
@@ -1694,4 +1696,44 @@ object prim_division(object o) {
     }
 
     return prim_times(list(result, denominator));
+}
+
+void read_lib(object environment) {
+    /* Lis des libraries */
+    string _libraries[] = {"lib/standard.scm", "lib/math.scm", "lib/lists.scm", "EndOfList"};
+
+    uint lib;
+    char input[BIGSTRING];
+    init_string(input);
+    FILE *lib_file = NULL;
+    object expr;
+    uint here = 0;
+    uint Sexpr_err;
+
+    for (lib = 0; lib < 255; ++lib) {
+        if (strcmp(_libraries[lib], "EndOfList") == 0) {
+            break;
+        }
+
+        lib_file = fopen(_libraries[lib], "r");
+        while (lib_file) {
+            input[0] = '\0';
+            here = 0;
+            Sexpr_err = sfs_get_sexpr(input, lib_file);
+            if (S_OK == Sexpr_err) {
+                here = 0;
+                expr = sfs_read(input, &here);
+                if (expr) {
+                    sfs_eval(expr, environment);
+                }
+            } else if (S_KO == Sexpr_err) {
+                WARNING_MSG("Invalid library \'%s\'", _libraries[lib]);
+                fclose(lib_file);
+                break;
+            } else if (S_END == Sexpr_err) {
+                fclose(lib_file);
+                break;
+            }
+        }
+    }
 }

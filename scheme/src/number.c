@@ -41,8 +41,8 @@ object make_complex(object r, object i) {
         return NULL;
     }
 
-    o->val.number->val.complex->real = r;
-    o->val.number->val.complex->imag = i;
+    o->val.number->val.z->real = r;
+    o->val.number->val.z->imag = i;
     return o;
 }
 
@@ -75,7 +75,7 @@ object to_integer(object o) {
             WARNING_MSG("Cannot convert a complex number to integer");
             return NULL;
         } else {
-            return to_integer(o->val.number->val.complex->real);
+            return to_integer(o->val.number->val.z->real);
         }
 
     case NUM_UNDEF:
@@ -162,7 +162,7 @@ object real_part(number n) {
         break;
 
     case NUM_COMPLEX:
-        return n->val.complex->real;
+        return n->val.z->real;
         break;
     }
     return NULL;
@@ -184,7 +184,7 @@ object imag_part(number n) {
         break;
 
     case NUM_COMPLEX:
-        return n->val.complex->imag;
+        return n->val.z->imag;
         break;
     }
     return NULL;
@@ -220,7 +220,7 @@ object num_abs(object n) {
         break;
 
     case NUM_INTEGER:
-        return make_integer(abs(n->val.number->val.integer));
+        return make_integer(labs(n->val.number->val.integer));
         break;
 
     case NUM_COMPLEX:
@@ -232,7 +232,7 @@ object num_abs(object n) {
                                 prim_times(list(
                                                imag_part(n->val.number),
                                                imag_part(n->val.number)))));
-        absval = prim_sqrt(cons(to_real(absval), nil));
+        absval = make_real(sqrt(to_real(absval)->val.number->val.real));
         return absval;
         break;
     }

@@ -85,6 +85,7 @@ int define_symbol(object name, object val, object *environment) {
         DEBUG_MSG("Symbol %s already exists", name->val.string);
         *old_symbol = val;
     } else {
+        DEBUG_MSG("Defined with success");
         /* Creates the object binding */
         object binding = make_pair(make_object(SFS_SYMBOL), val);
         strcpy(binding->val.pair.car->val.symbol, name->val.symbol);

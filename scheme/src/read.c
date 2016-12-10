@@ -16,6 +16,7 @@
 #include "read.h"
 #include "primitives.h"
 #include "lists.h"
+#include <forms.h>
 
 void flip( uint *i ) {
 
@@ -214,7 +215,7 @@ uint  sfs_get_sexpr( char *input, FILE *fp ) {
                     }
                     break;
                 case '"':
-                    if ( i < 2 || chunk[i - 1] != '\\' ) {
+                    if ( i < 2 || chunk[i - 1] != '\\') {
                         if ( in_string == FALSE ) {
                             if(typeOfExpressionFound == BASIC_ATOME) {
                                 WARNING_MSG("Parse error: invalid string after atom : '%s'", chunk + i);
@@ -231,6 +232,8 @@ uint  sfs_get_sexpr( char *input, FILE *fp ) {
                             }
                         }
                     }
+                    break;
+                case '\'':
                     break;
                 default:
                     if(in_string == FALSE) {
@@ -294,6 +297,9 @@ uint  sfs_get_sexpr( char *input, FILE *fp ) {
 
 
 object sfs_read( char *input, uint *h ) {
+    if (!input) {
+        return NULL;
+    }
     /* Ces caracteres doivent etre ignores */
     while (input[*h] == ' ' || input[*h] == '\t') {
         (*h)++;
@@ -318,7 +324,7 @@ object sfs_read( char *input, uint *h ) {
         }
     } else if (input[*h] == '\'') {
         (*h)++;
-        return make_pair(make_symbol("quote"), make_pair(sfs_read(input, h), nil));
+        return quote(sfs_read(input, h));
     } else {
         return sfs_read_atom( input, h );
     }
@@ -499,7 +505,7 @@ object sfs_read_number(char *input, uint *h) {
                     }
                 }
             }
-            if (input[i] == 'i' || input[i] == 'j') {
+            if (input[i] == 'i') {
                 if (input[i + 1] != ' ' && input[i + 1] != '\0' &&
                         input[i + 1] != ')' && input[i + 1] != '(' &&
                         input[i + 1] != '\n' && input[i + 1] != '"') {
@@ -508,7 +514,7 @@ object sfs_read_number(char *input, uint *h) {
                     return NULL;
                 }
                 if (!foundSignal) {
-                    WARNING_MSG("Invalid complex number found: it should be written as {+|-}A{+|-}Bj");
+                    WARNING_MSG("Invalid complex number found: it should be written as {+|-}A{+|-}Bi");
                     return NULL;
                 }
                 isComplex = True;
@@ -674,13 +680,13 @@ object sfs_read_complex_number(char *input, uint *h) {
         is_negative = (input[*h] == '-' ? -1 : 1);
         (*h)++;
     }
-    sscanf(input + *h, "%[^+-]%[^ij]", realpart, imagpart);
+    sscanf(input + *h, "%[^+-]%[^i]", realpart, imagpart);
 
-    atom->val.number->val.complex->real = sfs_read_number(realpart, &real_p);
-    atom->val.number->val.complex->imag = sfs_read_number(imagpart, &imag_p);
+    atom->val.number->val.z->real = sfs_read_number(realpart, &real_p);
+    atom->val.number->val.z->imag = sfs_read_number(imagpart, &imag_p);
     if (is_negative == -1) {
-        atom->val.number->val.complex->real = prim_minus(cons(
-                atom->val.number->val.complex->real, nil));
+        atom->val.number->val.z->real = prim_minus(cons(
+                                            atom->val.number->val.z->real, nil));
     }
 
     *h += real_p + imag_p + 1;
@@ -712,7 +718,7 @@ object sfs_read_real_number(char *input, uint *h) {
 
     (*h)++; /* Apres le point */
 
-    double frac_constant = 0.1;
+    long double frac_constant = 0.1;
     do { /* Ca lit la partie fractionnaire chiffre par chiffre */
         if (!isdigit(input[*h])) {
             WARNING_MSG("Invalid number found. \"%c\" is not a valid character in a number",
@@ -733,6 +739,6 @@ object sfs_read_real_number(char *input, uint *h) {
     /* Considere que le nombre peut etre negatif */
     atom->val.number->val.real = cur_number * k;
 
-    DEBUG_MSG("Reading a NUM_REAL: %f", atom->val.number->val.real);
+    DEBUG_MSG("Reading a NUM_REAL: %Lf", atom->val.number->val.real);
     return atom;
 }

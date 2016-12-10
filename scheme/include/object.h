@@ -18,7 +18,7 @@ extern "C" {
 #include "number.h"
 
 typedef enum object_type_t {
-    SFS_NUMBER, SFS_CHARACTER, SFS_STRING, SFS_PAIR, SFS_NIL, SFS_BOOLEAN, SFS_SYMBOL, SFS_PRIMITIVE, SFS_FORM, SFS_ENV
+    SFS_NUMBER, SFS_CHARACTER, SFS_STRING, SFS_PAIR, SFS_NIL, SFS_BOOLEAN, SFS_SYMBOL, SFS_PRIMITIVE, SFS_FORM, SFS_ENV, SFS_COMPOUND
 } object_type;
 
 typedef struct object_t {
@@ -46,6 +46,12 @@ typedef struct object_t {
             struct object_t* (*f)(struct object_t *, struct object_t *);
             string func_name;
         } form;
+
+        struct {
+            struct object_t* parms;
+            struct object_t* body;
+            struct object_t* env;
+        } compound;
     } val;
 
 } *object;
@@ -56,13 +62,14 @@ object make_nil(void);
 object make_true(void);
 object make_false(void);
 object make_primitive(object (*f)(object), string func_name);
-object make_form(object (*f)(object,object), string func_name);
+object make_form(object (*f)(object, object), string func_name);
 object make_env_list(void);
 object make_symbol(string);
 object make_string(string);
 object make_number(uint type);
 object make_character(char);
 object make_integer(int);
+object make_compound(object parms, object body, object env);
 
 
 /* The following functions are to verify the type of object */

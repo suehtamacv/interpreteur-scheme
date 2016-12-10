@@ -7,6 +7,12 @@
 #include <strings.h>
 #include <primitives.h>
 
+#define TEST_NUMB_ARGUMENT_EQ(n_Arg, nomFunction) \
+    if (list_length(o) != n_Arg) { \
+        WARNING_MSG("Wrong number of arguments on \"" nomFunction "\""); \
+        return NULL;\
+    }
+
 void create_basic_forms(object env) {
     /* Create associations in the symbol table */
     create_form("and", form_and, env);
@@ -16,6 +22,12 @@ void create_basic_forms(object env) {
     create_form("if", form_if, env);
     create_form("set!", form_set, env);
     create_form("eval", form_eval, env);
+    create_form("lambda", form_lambda, env);
+    create_form("begin", form_begin, env);
+    create_form("let", form_let, env);
+    create_form("let*", form_let_star, env);
+    create_form("letrec", form_letrec, env);
+    create_form("cond", form_cond, env);
     create_form("interaction-environment", form_interaction_environment, env);
 }
 
@@ -26,27 +38,242 @@ void create_form(string form_name, object (*f)(object, object), object env) {
     define_symbol(make_symbol(form_name), make_form(f, form_name), &env);
 }
 
-object form_interaction_environment(object o, object env) {
-    if (list_length(o) != 0) {
-        WARNING_MSG("Wrong number of arguments on \"interaction-environment\"");
+object form_cond(object o, object env) {
+    while (is_Nil(o) == False) {
+        object curr_condition = car(o);
+        if (is_List(curr_condition) == False) {
+            WARNING_MSG("'cond' expects a list as its argument");
+            return NULL;
+        } else if (list_length(curr_condition) < 2) {
+            WARNING_MSG("'cond' expects a condition and then an instruction in each case");
+            return NULL;
+        } else if (is_Define(car(curr_condition)) == True) {
+            WARNING_MSG("Definitions not allowed in expression context");
+            return NULL;
+        }
+        /* Found an else case */
+        else if (is_Symbol(car(curr_condition)) == True &&
+                 strcasecmp(car(curr_condition)->val.symbol, "else") == 0) {
+            if (list_length(o) != 1) {
+                WARNING_MSG("'else' condition should be the last in a 'cond'. Ignoring subsequent conditions");
+            }
+            curr_condition = cdr(curr_condition);
+
+            object body = cons(make_symbol("begin"), nil);
+            while (is_Nil(curr_condition) == False) {
+                if (is_Define(car(curr_condition)) == True) {
+                    WARNING_MSG("Definitions not allowed in expression context");
+                    return NULL;
+                }
+                body = cons(car(curr_condition), body);
+                curr_condition = cdr(curr_condition);
+            }
+
+            return sfs_eval(reverse(body), env);
+        } else if (is_True(sfs_eval(car(curr_condition), env)) == True) {
+            curr_condition = cdr(curr_condition);
+
+            object body = cons(make_symbol("begin"), nil);
+            while (is_Nil(curr_condition) == False) {
+                if (is_Define(car(curr_condition)) == True) {
+                    WARNING_MSG("Definitions not allowed in expression context");
+                    return NULL;
+                }
+                body = cons(car(curr_condition), body);
+                curr_condition = cdr(curr_condition);
+            }
+
+            return sfs_eval(reverse(body), env);
+        }
+
+        o = cdr(o);
+    }
+
+    return _void;
+}
+
+object form_let(object o, object env) {
+    object parms = car(o);
+    object run_env = create_env_layer(env);
+
+    while (is_Nil(parms) == False) {
+        object curr_parm = car(parms);
+        if (list_length(curr_parm) != 2) {
+            WARNING_MSG("Wrong let form, definition with more than two arguments found");
+            return NULL;
+        } else if (is_Define(car(curr_parm)) == True ||
+                   is_Define(cadr(curr_parm)) == True) {
+            WARNING_MSG("Definitions not allowed in expression context");
+            return NULL;
+        }
+
+        /* Pour LET, l'evaluation se passe ici, avant de definir le variable */
+        form_define(list(car(curr_parm), quote(sfs_eval(cadr(curr_parm), env))),
+                    run_env);
+
+        parms = cdr(parms);
+    }
+
+    object instruction_list = cdr(o);
+    if (is_List(o) == False) {
+        WARNING_MSG("The parameters of a lambda must be lists");
         return NULL;
     }
+
+    object body = cons(make_symbol("begin"), nil);
+    while (is_Nil(instruction_list) == False) {
+        body = cons(car(instruction_list), body);
+        instruction_list = cdr(instruction_list);
+    }
+    return sfs_eval(reverse(body), run_env);
+}
+
+object form_let_star(object o, object env) {
+    object parms = car(o);
+    object run_env = create_env_layer(env);
+
+    while (is_Nil(parms) == False) {
+        object curr_parm = car(parms);
+        if (list_length(curr_parm) != 2) {
+            WARNING_MSG("Wrong let* form, definition with more than two arguments found");
+            return NULL;
+        } else if (is_Define(car(curr_parm)) == True ||
+                   is_Define(cadr(curr_parm)) == True) {
+            WARNING_MSG("Definitions not allowed in expression context");
+            return NULL;
+        }
+
+        /* Pour LET*, l'evaluation se passe plutôt dans la fonction define */
+        form_define(list(car(curr_parm), cadr(curr_parm)), run_env);
+
+        parms = cdr(parms);
+    }
+
+    object instruction_list = cdr(o);
+    if (is_List(o) == False) {
+        WARNING_MSG("The parameters of a lambda must be lists");
+        return NULL;
+    }
+
+    object body = cons(make_symbol("begin"), nil);
+    while (is_Nil(instruction_list) == False) {
+        body = cons(car(instruction_list), body);
+        instruction_list = cdr(instruction_list);
+    }
+    return sfs_eval(reverse(body), run_env);
+}
+
+object form_letrec(object o, object env) {
+    object parms = car(o);
+    object run_env = create_env_layer(env);
+
+    /* Defining parameters as void */
+    while (is_Nil(parms) == False) {
+        object curr_parm = car(parms);
+        form_define(list(car(curr_parm), _void), run_env);
+        parms = cdr(parms);
+    }
+
+    parms = car(o);
+    while (is_Nil(parms) == False) {
+        object curr_parm = car(parms);
+        if (list_length(curr_parm) != 2) {
+            WARNING_MSG("Wrong letrec form, definition with more than two arguments found");
+            return NULL;
+        } else if (is_Define(car(curr_parm)) == True ||
+                   is_Define(cadr(curr_parm)) == True) {
+            WARNING_MSG("Definitions not allowed in expression context");
+            return NULL;
+        }
+
+        /* In letrec we create an environment with the parameters defined
+         * as void, and then redefine the variables in the resulting
+         * environment */
+        form_define(list(car(curr_parm), cadr(curr_parm)), run_env);
+        parms = cdr(parms);
+    }
+
+    object instruction_list = cdr(o);
+    if (is_List(o) == False) {
+        WARNING_MSG("The parameters of a lambda must be lists");
+        return NULL;
+    }
+
+    object body = cons(make_symbol("begin"), nil);
+    while (is_Nil(instruction_list) == False) {
+        body = cons(car(instruction_list), body);
+        instruction_list = cdr(instruction_list);
+    }
+    return sfs_eval(reverse(body), run_env);
+}
+
+object form_begin(object o, object env) {
+    object result = nil;
+
+    while (is_Nil(o) == False) {
+        result = sfs_eval(car(o), env);
+        o = cdr(o);
+    }
+
+    return result;
+}
+
+object form_lambda(object o, object env) {
+    object parms = car(o);
+
+    /* Tests if the parameters are indeed symbols and if there are no repeated parameters */
+    {
+        object curr_parm = parms;
+        if (is_Nil(curr_parm) == False && is_Symbol(car(curr_parm)) == False) {
+            WARNING_MSG("Invalid type of parameter in lambda expression - symbol expected");
+            return NULL;
+        }
+        while (is_Nil(curr_parm) == False) {
+            object test_parm = cdr(curr_parm);
+            while (is_Nil(test_parm) == False) {
+                if (is_Symbol(car(test_parm)) == True &&
+                        strcasecmp(car(curr_parm)->val.symbol, car(test_parm)->val.symbol) == 0) {
+                    WARNING_MSG("Can not have repeated parameters in lambda expression");
+                    return NULL;
+                }
+                test_parm = cdr(test_parm);
+            }
+            curr_parm = cdr(curr_parm);
+        }
+    }
+
+    object instruction_list = cdr(o);
+    if (is_List(o) == False) {
+        WARNING_MSG("The parameters of a lambda must be lists");
+        return NULL;
+    }
+
+    object body = cons(make_symbol("begin"), nil);
+    while (is_Nil(instruction_list) == False) {
+        if (is_Define(car(instruction_list)) == True) {
+            WARNING_MSG("Definitions not allowed in expression context");
+            return NULL;
+        }
+        body = cons(car(instruction_list), body);
+        instruction_list = cdr(instruction_list);
+    }
+    return make_compound(parms, reverse(body), create_env_layer(env));
+}
+
+object form_interaction_environment(object o, object env) {
+    TEST_NUMB_ARGUMENT_EQ(0, "interaction-environment");
 
     object environment = create_env_layer(env);
     create_basic_forms(environment);
     create_basic_primitives(environment);
     define_symbol(make_symbol("NaN"), NaN, &environment);
-    environment = create_env_layer(environment);
+    read_lib(environment);
 
     return environment;
 }
 
 object form_eval(object o, object env) {
-    (void) env;
-    if (list_length(o) != 2) {
-        WARNING_MSG("Wrong number of arguments on \"eval\"");
-        return NULL;
-    }
+    TEST_NUMB_ARGUMENT_EQ(2, "eval");
     env = sfs_eval(cadr(o), env);
     return (env ? sfs_eval(sfs_eval(car(o), env), env) : NULL);
 }
@@ -109,44 +336,30 @@ restart:
 }
 
 object form_define(object o, object env) {
-    if (list_length(o) != 2) {
-        WARNING_MSG("Wrong number of arguments on \"define\"");
-        return NULL;
-    }
-
     object nom = car(o);
-    object val = cadr(o);
-    int define_result;
+    object val = cdr(o);
 
-restart:
-    if (is_Quote(val) == True) {
-        define_result = define_symbol(nom, val, &env);
-    } else if (is_Symbol(val) == True) {
-        object *found = locate_symbol(val, env);
-        if (found) {
-            val = *found;
-            goto restart;
-        } else {
-            WARNING_MSG("Can't define something to an unbound variable");
-            return NULL;
+    if (is_List(nom) == True) {
+        object body = cons(make_symbol("begin"), nil);
+        while (is_Nil(val) == False) {
+            body = cons(car(val), body);
+            val = cdr(val);
         }
+        object c = make_compound(cdr(nom), reverse(body), create_env_layer(env));
+        return (define_symbol(car(nom), c, &env) == 0 ? _void : NULL);
     } else {
-        define_result = define_symbol(nom, sfs_eval(val, env), &env);
-    }
-
-    if (define_result == 0) {
-        return _void;    /* Define returns void */
-    } else {
-        return NULL; /* Could not define */
+        TEST_NUMB_ARGUMENT_EQ(2, "define");
+        return (define_symbol(nom, sfs_eval(car(val), env), &env) == 0 ? _void : NULL);
     }
 }
 
 object form_quote(object o, object env) {
-    if (list_length(o) != 1) {
-        WARNING_MSG("Wrong number of arguments on \"quote\"");
-        return NULL;
-    }
+    TEST_NUMB_ARGUMENT_EQ(1, "quote");
     return (env ? car(o) : NULL);
+}
+
+object quote(object o) {
+    return list(make_symbol("quote"), o);
 }
 
 object form_if(object o, object env) {
@@ -177,12 +390,9 @@ object form_if(object o, object env) {
 }
 
 object form_set(object o, object env) {
-    if (list_length(o) != 2) {
-        WARNING_MSG("Wrong number of arguments on \"set!\"");
-        return NULL;
-    }
+    TEST_NUMB_ARGUMENT_EQ(2, "set!");
 
-    if (set_symbol(car(o), cadr(o), env) == 0) { /* Success */
+    if (set_symbol(car(o), sfs_eval(cadr(o), env), env) == 0) { /* Success */
         return _void;
     } else {
         return NULL;

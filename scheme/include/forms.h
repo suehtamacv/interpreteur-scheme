@@ -14,10 +14,17 @@ object form_quote(object, object);
 object form_if(object, object);
 object form_set(object, object);
 object form_eval(object, object);
+object form_lambda(object, object);
+object form_begin(object, object);
+object form_let(object, object);
+object form_let_star(object, object);
+object form_letrec(object, object);
+object form_cond(object, object);
 object form_interaction_environment(object, object);
 
 /* Those are auxiliary functions */
 uint list_length(object);
+object quote(object);
 
 /* Those auxiliary functions verify if a certain form
  * is one of the special forms */
