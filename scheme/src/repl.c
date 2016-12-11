@@ -42,6 +42,7 @@ int main (int argc, char *argv[]);
 
 void init_interpreter (void) {
     /* Crée les singletons */
+    INFO_MSG("Creating the singletons");
     nil = make_nil();
     _void = make_nil();
     _true = make_true();
@@ -51,6 +52,7 @@ void init_interpreter (void) {
     NaN = make_number(NUM_UNDEF);
 
     /* Crée l'environment top-level */
+    INFO_MSG("Creating top-level environment");
     master_environment = form_interaction_environment(nil, nil);
     master_environment = create_env_layer(master_environment);
 }

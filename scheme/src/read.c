@@ -358,8 +358,8 @@ object sfs_read_atom(char *input, uint *h) {
 
 object sfs_read_pair(char *input, uint *h) {
     object pair = make_object(SFS_PAIR);
-    DEBUG_MSG("Reading a pair");
-    DEBUG_MSG("Reading the CAR");
+    INFO_MSG("Reading a pair");
+    INFO_MSG("Reading the CAR");
     pair->val.pair.car = sfs_read(input, h);
 
     while (input[*h] == ' ' || input[*h] == '\t') {
@@ -369,10 +369,10 @@ object sfs_read_pair(char *input, uint *h) {
     /* On a trouve la fin de la liste : cdr vaut nil */
     if (input[*h] == ')') {
         (*h)++;
-        DEBUG_MSG("Reading the CDR: nil");
+        INFO_MSG("Reading the CDR: nil");
         pair->val.pair.cdr = nil;
     } else { /* On continue a lire la liste : le cdr de ce pair vaut lui meme un pair */
-        DEBUG_MSG("Reading the CDR");
+        INFO_MSG("Reading the CDR");
         pair->val.pair.cdr = sfs_read_pair(input, h);
     }
 

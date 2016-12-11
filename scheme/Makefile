@@ -22,11 +22,13 @@ LFLAGS=-lreadline -lm
 
 CFLAGS_DBG=$(CFLAGS) -g -DDEBUG -Wall
 CFLAGS_RLS=$(CFLAGS)
+CFLAGS_VBS=$(CFLAGS) -g -DDEBUG -DVERBOSE -Wall
 
 SRC=$(wildcard $(SRCDIR)/*.c)
 
 OBJ_DBG=$(SRC:.c=.dbg)
 OBJ_RLS=$(SRC:.c=.rls)
+OBJ_VBS=$(SRC:.c=.vbs)
 
 all : 
 	@echo "in " $(DIRNAME)
@@ -35,6 +37,7 @@ all :
 	@echo ""
 	@echo "make debug   => build DEBUG   version"
 	@echo "make release => build RELEASE version"
+	@echo "make verbose => build VERBOSE version"
 	@echo "make clean   => clean everything"
 	@echo "make tarball => produce archive"
 
@@ -46,14 +49,21 @@ release : $(OBJ_RLS)
 	$(LD) $^ $(LFLAGS) -o $(TARGET)
 	$(CP) $(LIBDIR) ../$(TESTDIR)
 
+verbose : $(OBJ_VBS)
+	$(LD) $^ $(LFLAGS) -o $(TARGET)
+	$(CP) $(LIBDIR) ../$(TESTDIR)
+
 %.dbg : %.c
 	$(CC) $< $(CFLAGS_DBG) -c -o $(basename $<).dbg
 
 %.rls : %.c
 	$(CC) $< $(CFLAGS_RLS) -c -o $(basename $<).rls
 
+%.vbs : %.c
+	$(CC) $< $(CFLAGS_VBS) -c -o $(basename $<).vbs
+
 clean : 
-	$(RM) $(TARGET) $(SRCDIR)/*.orig $(SRCDIR)/*.dbg $(SRCDIR)/*.rls $(GARBAGE) scheme-`whoami`-*.tgz
+	$(RM) $(TARGET) $(SRCDIR)/*.orig $(SRCDIR)/*.dbg $(SRCDIR)/*.rls $(SRCDIR)/*.vbs $(GARBAGE) scheme-`whoami`-*.tgz
 
 tarball : 
 	make clean 

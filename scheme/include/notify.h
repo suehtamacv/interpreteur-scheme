@@ -20,7 +20,8 @@ extern "C" {
 
 #define FOR_ERRORS      0x00
 #define FOR_WARNINGS    0x01
-#define FOR_INFOS       0x02
+#define FOR_DEBUGS      0x02
+#define FOR_INFOS       0x03
 
 #define STYLE_OFF       0x00
 #define STYLE_BOLD      0x01
@@ -37,22 +38,27 @@ extern "C" {
 #define COLOR_MAGENTA     35
 #define COLOR_CYAN        36
 #define COLOR_WHITE       37
+#define COLOR_LIGHT_GRAY  90
 
 #define STYLE_ERROR       STYLE_BLINK
 #define STYLE_WARNING     STYLE_BOLD
 #define STYLE_INFO        STYLE_BOLD
+#define STYLE_DEBUG       STYLE_BOLD
 
 #define COLOR_ERROR       COLOR_RED
 #define COLOR_WARNING     COLOR_YELLOW
-#define COLOR_INFO        COLOR_GREEN
+#define COLOR_INFO        COLOR_LIGHT_GRAY
+#define COLOR_DEBUG       COLOR_GREEN
 
 #define STYLE(purpose)						\
   (purpose == FOR_ERRORS ? STYLE_ERROR :			\
-   (purpose == FOR_WARNINGS ? STYLE_WARNING : STYLE_INFO ))
+   (purpose == FOR_WARNINGS ? STYLE_WARNING : \
+    (purpose == FOR_DEBUGS ? STYLE_DEBUG : STYLE_INFO )))
 
 #define COLOR(purpose)							\
   (purpose == FOR_ERRORS ? COLOR_ERROR :				\
-   (purpose == FOR_WARNINGS ? COLOR_WARNING : COLOR_INFO ))
+   (purpose == FOR_WARNINGS ? COLOR_WARNING : \
+    (purpose == FOR_DEBUGS ? COLOR_DEBUG : COLOR_INFO )))
 
 #define ON(stream) stream
 #define RESET_COLORS(on_stream)			\
@@ -101,7 +107,7 @@ extern "C" {
     fprintf( stderr, "%c[%d;%dm", 0x1B, STYLE_BOLD, COLOR_BLUE );	\
     fprintf( stderr, "[ DEBUG :: %s:%s:%d] ",				\
 	     __FILE__, __FUNCTION__, __LINE__ );			\
-    SET_COLORS(FOR_INFOS, ON(stderr));					\
+    SET_COLORS(FOR_DEBUGS, ON(stderr));					\
     fprintf( stderr, __VA_ARGS__ );					\
     fprintf( stderr, ".\n" );						\
     RESET_COLORS(ON(stderr));						\

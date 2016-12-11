@@ -19,6 +19,7 @@ object create_env_layer(object environment) {
         WARNING_MSG("Can't create a subenvironment into something who is not an environment");
         return NULL;
     }
+    INFO_MSG("Creating environment layer");
     environment = cons(nil, environment);
     environment->type = SFS_ENV;
     return environment;
@@ -38,6 +39,7 @@ object* locate_symbol(object name, object environment) {
     do {
         object* obj = locate_symbol_in_env(name, *env_layer);
         if (obj != NULL) {
+            INFO_MSG("Found object");
             return obj;
         }
         environment = cdr(environment);
@@ -47,6 +49,7 @@ object* locate_symbol(object name, object environment) {
         }
     } while(1);
 
+    INFO_MSG("Did not find object");
     return NULL;
 }
 
@@ -85,7 +88,7 @@ int define_symbol(object name, object val, object *environment) {
         DEBUG_MSG("Symbol %s already exists", name->val.string);
         *old_symbol = val;
     } else {
-        DEBUG_MSG("Defined with success");
+        INFO_MSG("Defined with success");
         /* Creates the object binding */
         object binding = make_pair(make_object(SFS_SYMBOL), val);
         strcpy(binding->val.pair.car->val.symbol, name->val.symbol);

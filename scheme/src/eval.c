@@ -20,10 +20,10 @@ object sfs_eval(object input, object env) {
     }
 
     if (is_AutoEvaluable(input) == True) {
-        DEBUG_MSG("Evaluating auto-evaluable object");
+        INFO_MSG("Evaluating auto-evaluable object");
         return input;
     } else if (is_Symbol(input) == True) {
-        DEBUG_MSG("Resolving symbol \"%s\" by searching for it in the symbol table",
+        INFO_MSG("Resolving symbol \"%s\" by searching for it in the symbol table",
                   input->val.symbol);
         object *l_symb = locate_symbol(input, env);
         if (l_symb == NULL) {
