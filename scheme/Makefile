@@ -40,11 +40,11 @@ all :
 
 debug   : $(OBJ_DBG)
 	$(LD) $^ $(LFLAGS) -o $(TARGET)
-	$(CP) $(LIBDIR) ../$(TESTDIR)/$(LIBDIR)
+	$(CP) $(LIBDIR) ../$(TESTDIR)
 
 release : $(OBJ_RLS)
 	$(LD) $^ $(LFLAGS) -o $(TARGET)
-	$(CP) $(LIBDIR) ../$(TESTDIR)/$(LIBDIR)
+	$(CP) $(LIBDIR) ../$(TESTDIR)
 
 %.dbg : %.c
 	$(CC) $< $(CFLAGS_DBG) -c -o $(basename $<).dbg
